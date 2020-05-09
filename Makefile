@@ -9,7 +9,7 @@ _posts/2020-05-16-feature-selection-part-2.md: experiments/feature_importance/rf
 	Rscript experiments/generate_mds.R experiments/feature_importance/rf_importance.Rmd
 	cp experiments/feature_importance/rf_importance.md _posts/2020-05-16-feature-selection-part-2.md
 	rm -rf rf_importance_files
-	cp -r experiments/feature_importance/rf_importance_files/ rf_importance_files
+	cp -r experiments/feature_importance/rf_importance_files/ _posts/rf_importance_files
 	rm -rf experiments/feature_importance/rf_importance.md
 
 help:
