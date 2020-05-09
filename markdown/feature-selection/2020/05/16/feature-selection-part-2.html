@@ -175,7 +175,7 @@ importance, we’ll use a rather ill-defined example. In this example,
 <code class="highlighter-rouge">x1</code>, <code class="highlighter-rouge">x2</code>, <code class="highlighter-rouge">x3</code> and <code class="highlighter-rouge">x4</code> are independent variables and the dependent
 variable is</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>y = x1 + (x2 + x3 + x4) / 2 + noise
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>y = x1 + (x2 + x3 + x4) * 0.5 + noise
 </code></pre></div></div>
 
 <p>When training a random forest, <code class="highlighter-rouge">x1</code> should appear as the most important
