@@ -6,8 +6,6 @@ categories: [markdown]
 title: Feature selection part 1
 ---
 
-# Feature selection part 1: A critique to univariate methods
-
 The purpose of this post is to show the weaknesses of univariate feature selection methods. This methods usually go in the following way:
 
 - Compute a correlation metric for every feature with the target (this metric might be correlation or mutual information, among others)

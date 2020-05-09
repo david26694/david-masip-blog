@@ -6,8 +6,6 @@ categories: [markdown]
 title: Feature selection part 2
 ---
 
-# Feature selection part 2: A critique to feature importance
-
 In part 1, I showed some of the dangers of using univariate selection
 methods. In part 2 I want to focus on the pitfalls of feature importance
 in random forests and gradient boosting methods.
