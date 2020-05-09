@@ -36,7 +36,7 @@ importance, we’ll use a rather ill-defined example. In this example,
 `x1`, `x2`, `x3` and `x4` are independent variables and the dependent
 variable is
 
-    y = x1 + (x2 + x3 + x4) / 2 + noise
+    y = x1 + (x2 + x3 + x4) * 0.5 + noise
 
 When training a random forest, `x1` should appear as the most important
 variable. If the feature selection method had to keep only one feature,
