@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.0.0">Jekyll</generator><link href="https://david26694.github.io/david-masip-blog/feed.xml" rel="self" type="application/atom+xml" /><link href="https://david26694.github.io/david-masip-blog/" rel="alternate" type="text/html" /><updated>2020-05-09T03:29:25-05:00</updated><id>https://david26694.github.io/david-masip-blog/feed.xml</id><title type="html">fastpages</title><subtitle>An easy to use blogging platform with support for Jupyter Notebooks.</subtitle><entry><title type="html">Feature Selection Part 2</title><link href="https://david26694.github.io/david-masip-blog/2020/05/16/feature-selection-part-2.html" rel="alternate" type="text/html" title="Feature Selection Part 2" /><published>2020-05-16T00:00:00-05:00</published><updated>2020-05-16T00:00:00-05:00</updated><id>https://david26694.github.io/david-masip-blog/2020/05/16/feature-selection-part-2</id><content type="html" xml:base="https://david26694.github.io/david-masip-blog/2020/05/16/feature-selection-part-2.html">&lt;h1 id=&quot;feature-selection-part-2-a-critique-to-feature-importance&quot;&gt;Feature selection part 2: A critique to feature importance&lt;/h1&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.0.0">Jekyll</generator><link href="https://david26694.github.io/david-masip-blog/feed.xml" rel="self" type="application/atom+xml" /><link href="https://david26694.github.io/david-masip-blog/" rel="alternate" type="text/html" /><updated>2020-05-09T03:30:15-05:00</updated><id>https://david26694.github.io/david-masip-blog/feed.xml</id><title type="html">fastpages</title><subtitle>An easy to use blogging platform with support for Jupyter Notebooks.</subtitle><entry><title type="html">Feature Selection Part 2</title><link href="https://david26694.github.io/david-masip-blog/2020/05/16/feature-selection-part-2.html" rel="alternate" type="text/html" title="Feature Selection Part 2" /><published>2020-05-16T00:00:00-05:00</published><updated>2020-05-16T00:00:00-05:00</updated><id>https://david26694.github.io/david-masip-blog/2020/05/16/feature-selection-part-2</id><content type="html" xml:base="https://david26694.github.io/david-masip-blog/2020/05/16/feature-selection-part-2.html">&lt;h1 id=&quot;feature-selection-part-2-a-critique-to-feature-importance&quot;&gt;Feature selection part 2: A critique to feature importance&lt;/h1&gt;
 
 &lt;p&gt;In part 1, I showed some of the dangers of using univariate selection
 methods. In part 2 I want to focus on the pitfalls of feature importance
@@ -333,7 +333,176 @@ generate &lt;code class=&quot;highlighter-rouge&quot;&gt;y&lt;/code&gt;.&lt;/li&
   &lt;li&gt;The error of the univariate method is 0.15, which is 0.05 (noise
 size used to generate &lt;code class=&quot;highlighter-rouge&quot;&gt;y&lt;/code&gt;) plus 0.10 (error we are commiting by not
 considering &lt;code class=&quot;highlighter-rouge&quot;&gt;x2&lt;/code&gt;).&lt;/li&gt;
-&lt;/ul&gt;</content><author><name></name></author><summary type="html">Feature selection part 1: A critique to univariate methods</summary></entry><entry><title type="html">Fastpages Notebook Blog Post</title><link href="https://david26694.github.io/david-masip-blog/jupyter/2020/02/20/test.html" rel="alternate" type="text/html" title="Fastpages Notebook Blog Post" /><published>2020-02-20T00:00:00-06:00</published><updated>2020-02-20T00:00:00-06:00</updated><id>https://david26694.github.io/david-masip-blog/jupyter/2020/02/20/test</id><content type="html" xml:base="https://david26694.github.io/david-masip-blog/jupyter/2020/02/20/test.html">&lt;!--
+&lt;/ul&gt;</content><author><name></name></author><summary type="html">Feature selection part 1: A critique to univariate methods</summary></entry><entry><title type="html">Art Of Readable Code</title><link href="https://david26694.github.io/david-masip-blog/2020/05/02/art-of-readable-code.html" rel="alternate" type="text/html" title="Art Of Readable Code" /><published>2020-05-02T00:00:00-05:00</published><updated>2020-05-02T00:00:00-05:00</updated><id>https://david26694.github.io/david-masip-blog/2020/05/02/art-of-readable-code</id><content type="html" xml:base="https://david26694.github.io/david-masip-blog/2020/05/02/art-of-readable-code.html">&lt;h1 id=&quot;the-art-of-readable-code&quot;&gt;The Art of Readable Code&lt;/h1&gt;
+
+&lt;p&gt;Some time ago I read &lt;a href=&quot;http://shop.oreilly.com/product/9780596802301.do&quot;&gt;The art of Readable Code&lt;/a&gt;. I recommend this read for every person starting a career where they have to code on a daily basis. Here’s a summary of the ideas I liked the most.&lt;/p&gt;
+
+&lt;h3 id=&quot;better-code&quot;&gt;Better code&lt;/h3&gt;
+
+&lt;h4 id=&quot;1-code-should-by-easy-to-understand&quot;&gt;1. Code should by easy to understand&lt;/h4&gt;
+&lt;ul&gt;
+  &lt;li&gt;Key ideas:
+    &lt;ul&gt;
+      &lt;li&gt;Code should be easy to understand.&lt;/li&gt;
+      &lt;li&gt;Code should be written to minimize the time it would take for someone else to understand it.&lt;/li&gt;
+      &lt;li&gt;Smaller isn’t always better.&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;I think defining a metric and push your efforts to improve it simplifies your life. In this case, the metric is the &lt;em&gt;time that it would take for someone to understand your code&lt;/em&gt;.&lt;/p&gt;
+
+&lt;h4 id=&quot;2-packing-information-into-names&quot;&gt;2. Packing information into names&lt;/h4&gt;
+&lt;ul&gt;
+  &lt;li&gt;Pack information into names.&lt;/li&gt;
+  &lt;li&gt;Choose specific words: get is not very specific.&lt;/li&gt;
+  &lt;li&gt;Avoid generic names like tmp, aux, retval.&lt;/li&gt;
+  &lt;li&gt;Variable names are tiny comments.&lt;/li&gt;
+  &lt;li&gt;Abbreviations: would a new teammate understand what the name means?&lt;/li&gt;
+  &lt;li&gt;Summary:
+    &lt;ul&gt;
+      &lt;li&gt;Use specific words.&lt;/li&gt;
+      &lt;li&gt;Avoid generic names.&lt;/li&gt;
+      &lt;li&gt;Attach important details.&lt;/li&gt;
+      &lt;li&gt;Use capitalization, underscores and so on in a meaningful way.&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;This chapter allowed me to give more meaningful names to variables and functions.  When I define a function called &lt;code class=&quot;highlighter-rouge&quot;&gt;get_data&lt;/code&gt; or a variable called &lt;code class=&quot;highlighter-rouge&quot;&gt;data&lt;/code&gt; there’s something in my head telling me I should improve it. I never call a variable &lt;code class=&quot;highlighter-rouge&quot;&gt;var&lt;/code&gt; anymore.&lt;/p&gt;
+
+&lt;h4 id=&quot;3-names-that-cant-be-misconstructed&quot;&gt;3. Names that can’t be misconstructed&lt;/h4&gt;
+&lt;ul&gt;
+  &lt;li&gt;Actively scrutinize names by asking: what other meanings can be interpreted?&lt;/li&gt;
+  &lt;li&gt;Summary:
+    &lt;ul&gt;
+      &lt;li&gt;Play devil’s advocate with names.&lt;/li&gt;
+      &lt;li&gt;When naming booleans, use words like &lt;em&gt;is&lt;/em&gt; to make it clear.&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;I like the idea of putting yourself into a new teammate position and see how could they fuck up due to your bad naming.&lt;/p&gt;
+
+&lt;h4 id=&quot;4-aesthetics&quot;&gt;4. Aesthetics&lt;/h4&gt;
+&lt;ul&gt;
+  &lt;li&gt;Use consistent layout, with patterns the reader can get used to.&lt;/li&gt;
+  &lt;li&gt;Make similar code look similar.&lt;/li&gt;
+  &lt;li&gt;Group related lines of code into blocks.&lt;/li&gt;
+  &lt;li&gt;Aligning parts of the code into “columns” can make code easy to skim through.&lt;/li&gt;
+  &lt;li&gt;If code mentions A, B, and C in one place, don’t say B, C, and A in another. Pick a meaningful order and stick with it.&lt;/li&gt;
+  &lt;li&gt;Use empty lines to break apart large blocks into logical “paragraphs.”&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;More aestethic code is easier to read.&lt;/p&gt;
+
+&lt;h4 id=&quot;5-knowing-what-to-comment&quot;&gt;5. Knowing what to comment&lt;/h4&gt;
+&lt;ul&gt;
+  &lt;li&gt;The purpose of commenting is to help the reader know as much as the writer did.&lt;/li&gt;
+  &lt;li&gt;Don’t comment just for the sake of commenting.&lt;/li&gt;
+  &lt;li&gt;Don’t comment bad names. Fix the names instead.&lt;/li&gt;
+  &lt;li&gt;Include director comments to understand the general idea. Imagine someone joins the team, what would you explain to her? These things have to be commented.&lt;/li&gt;
+  &lt;li&gt;Comment your constants.&lt;/li&gt;
+  &lt;li&gt;Put in the reader’s shoes.&lt;/li&gt;
+  &lt;li&gt;Advertise likely pitfalls: what is surprising about the code? how it might by misused?&lt;/li&gt;
+  &lt;li&gt;Summarise blocks of code so the reader doesn’t get lost in details.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;I used to write comments just to write comments. If a function is called:&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;get_client_ids&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;Please don’t add the comment&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;# This function gets the clients ids&lt;/code&gt;&lt;/p&gt;
+
+&lt;h4 id=&quot;6-making-comments-precise-and-compact&quot;&gt;6. Making comments precise and compact&lt;/h4&gt;
+&lt;ul&gt;
+  &lt;li&gt;Comments should have high info-to-space ratio&lt;/li&gt;
+  &lt;li&gt;Illustrate comments with carefully chosen input/output examples.&lt;/li&gt;
+  &lt;li&gt;Add high-level idea of code instead of obvious details.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Providing examples is key if you want someone to use your code. I think &lt;code class=&quot;highlighter-rouge&quot;&gt;R&lt;/code&gt; does this pretty well for package developers.&lt;/p&gt;
+
+&lt;h3 id=&quot;simplifying-loops-and-logic&quot;&gt;Simplifying loops and logic&lt;/h3&gt;
+
+&lt;h4 id=&quot;7-simplifying-loops-and-logic&quot;&gt;7. Simplifying loops and logic&lt;/h4&gt;
+&lt;ul&gt;
+  &lt;li&gt;Key idea: make control flow as natural as possible.&lt;/li&gt;
+  &lt;li&gt;Prefered orders in &lt;code class=&quot;highlighter-rouge&quot;&gt;if(a == b)&lt;/code&gt; vs &lt;code class=&quot;highlighter-rouge&quot;&gt;if(a != b)&lt;/code&gt;:
+    &lt;ul&gt;
+      &lt;li&gt;Prefer positive case first.&lt;/li&gt;
+      &lt;li&gt;Prefer simpler case first.&lt;/li&gt;
+      &lt;li&gt;Prefer more interesting case first (there can be conflicts with the above).&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;Return early from functions if possible.&lt;/li&gt;
+  &lt;li&gt;Minimize nesting.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;I think it’s easier to reason about positive cases than negative (negating adds a complexity layer).&lt;/p&gt;
+
+&lt;h4 id=&quot;8-breaking-down-giant-expressions&quot;&gt;8. Breaking down giant expressions&lt;/h4&gt;
+&lt;ul&gt;
+  &lt;li&gt;Key idea: break down giant expressions into more digestible pieces.&lt;/li&gt;
+  &lt;li&gt;Explaining variables: use extra variables that capture subexpressions.&lt;/li&gt;
+  &lt;li&gt;Beware of “clever” chunks of code: they’re often harder to read.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;This is something we’ve all been told. Split your code into functions, etc. I particularly like the warning about clever chunks of code. If you need to think very hard to code it, it’s probably going to be hard to understand.&lt;/p&gt;
+
+&lt;h4 id=&quot;9-variables-and-readability&quot;&gt;9. Variables and readability&lt;/h4&gt;
+&lt;ul&gt;
+  &lt;li&gt;Sloppy use of variables issues:
+    &lt;ul&gt;
+      &lt;li&gt;The more variables, the harder to keep track of them: Eliminate variables that jut get in the way.&lt;/li&gt;
+      &lt;li&gt;The bigger a variable scope, the longer you have to keep track: Make your variable visible by as few lines of code as possible.&lt;/li&gt;
+      &lt;li&gt;The more often it changes, the harder it is to keep track of its value: Prefer write-once variables.&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;I particularly like the fact that variables shouldn’t be updated a lot and that they should be in the shortest subset of code possible.&lt;/p&gt;
+
+&lt;h3 id=&quot;reorganizing-your-code&quot;&gt;Reorganizing your code&lt;/h3&gt;
+
+&lt;h4 id=&quot;10-extracting-unrelated-subproblems&quot;&gt;10. Extracting unrelated subproblems&lt;/h4&gt;
+&lt;ul&gt;
+  &lt;li&gt;Method to extract unrelated subproblems:
+    &lt;ul&gt;
+      &lt;li&gt;For each function/block, obtain the high-level goal of the code.&lt;/li&gt;
+      &lt;li&gt;For each line of code, ask if it solves the high-level goal or an unrelated subproblem.&lt;/li&gt;
+      &lt;li&gt;If enough lines solve an unrelated subproblem, extract the code in a separate function.&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;Create general-purpose code: separate generic code from project-specific code.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&quot;11-one-task-at-a-time&quot;&gt;11. One task at a time&lt;/h4&gt;
+&lt;ul&gt;
+  &lt;li&gt;Key idea: Code should be organized so that it’s doing only one task at a time.&lt;/li&gt;
+  &lt;li&gt;List all tasks code is doing. Some of them might easily become functions or classes. Others become paragraphs in a funciton.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&quot;12-turning-thoughts-into-code&quot;&gt;12. Turning thoughts into code&lt;/h4&gt;
+&lt;ul&gt;
+  &lt;li&gt;Process that can help you code clearly:
+    &lt;ul&gt;
+      &lt;li&gt;Describe code as you would to a colleague.&lt;/li&gt;
+      &lt;li&gt;Pay attention to key words.&lt;/li&gt;
+      &lt;li&gt;Write code to match description.&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;The method is also valid for debugging (as describing the problem).&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&quot;13-writing-less-code&quot;&gt;13. Writing less code&lt;/h4&gt;
+&lt;ul&gt;
+  &lt;li&gt;Eliminate nonessential features from product.&lt;/li&gt;
+  &lt;li&gt;Rethink requirements to solve the easiest version of the problem that still gets the job done.&lt;/li&gt;
+  &lt;li&gt;Stay familiar with standard libraries by reading their APIs.&lt;/li&gt;
+&lt;/ul&gt;</content><author><name></name></author><summary type="html">The Art of Readable Code</summary></entry><entry><title type="html">Fastpages Notebook Blog Post</title><link href="https://david26694.github.io/david-masip-blog/jupyter/2020/02/20/test.html" rel="alternate" type="text/html" title="Fastpages Notebook Blog Post" /><published>2020-02-20T00:00:00-06:00</published><updated>2020-02-20T00:00:00-06:00</updated><id>https://david26694.github.io/david-masip-blog/jupyter/2020/02/20/test</id><content type="html" xml:base="https://david26694.github.io/david-masip-blog/jupyter/2020/02/20/test.html">&lt;!--
 #################################################
 ### THIS FILE WAS AUTOGENERATED! DO NOT EDIT! ###
 #################################################

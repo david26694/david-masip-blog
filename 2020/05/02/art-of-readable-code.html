@@ -1,0 +1,171 @@
+<h1 id="the-art-of-readable-code">The Art of Readable Code</h1>
+
+<p>Some time ago I read <a href="http://shop.oreilly.com/product/9780596802301.do">The art of Readable Code</a>. I recommend this read for every person starting a career where they have to code on a daily basis. Here’s a summary of the ideas I liked the most.</p>
+
+<h3 id="better-code">Better code</h3>
+
+<h4 id="1-code-should-by-easy-to-understand">1. Code should by easy to understand</h4>
+<ul>
+  <li>Key ideas:
+    <ul>
+      <li>Code should be easy to understand.</li>
+      <li>Code should be written to minimize the time it would take for someone else to understand it.</li>
+      <li>Smaller isn’t always better.</li>
+    </ul>
+  </li>
+</ul>
+
+<p>I think defining a metric and push your efforts to improve it simplifies your life. In this case, the metric is the <em>time that it would take for someone to understand your code</em>.</p>
+
+<h4 id="2-packing-information-into-names">2. Packing information into names</h4>
+<ul>
+  <li>Pack information into names.</li>
+  <li>Choose specific words: get is not very specific.</li>
+  <li>Avoid generic names like tmp, aux, retval.</li>
+  <li>Variable names are tiny comments.</li>
+  <li>Abbreviations: would a new teammate understand what the name means?</li>
+  <li>Summary:
+    <ul>
+      <li>Use specific words.</li>
+      <li>Avoid generic names.</li>
+      <li>Attach important details.</li>
+      <li>Use capitalization, underscores and so on in a meaningful way.</li>
+    </ul>
+  </li>
+</ul>
+
+<p>This chapter allowed me to give more meaningful names to variables and functions.  When I define a function called <code class="highlighter-rouge">get_data</code> or a variable called <code class="highlighter-rouge">data</code> there’s something in my head telling me I should improve it. I never call a variable <code class="highlighter-rouge">var</code> anymore.</p>
+
+<h4 id="3-names-that-cant-be-misconstructed">3. Names that can’t be misconstructed</h4>
+<ul>
+  <li>Actively scrutinize names by asking: what other meanings can be interpreted?</li>
+  <li>Summary:
+    <ul>
+      <li>Play devil’s advocate with names.</li>
+      <li>When naming booleans, use words like <em>is</em> to make it clear.</li>
+    </ul>
+  </li>
+</ul>
+
+<p>I like the idea of putting yourself into a new teammate position and see how could they fuck up due to your bad naming.</p>
+
+<h4 id="4-aesthetics">4. Aesthetics</h4>
+<ul>
+  <li>Use consistent layout, with patterns the reader can get used to.</li>
+  <li>Make similar code look similar.</li>
+  <li>Group related lines of code into blocks.</li>
+  <li>Aligning parts of the code into “columns” can make code easy to skim through.</li>
+  <li>If code mentions A, B, and C in one place, don’t say B, C, and A in another. Pick a meaningful order and stick with it.</li>
+  <li>Use empty lines to break apart large blocks into logical “paragraphs.”</li>
+</ul>
+
+<p>More aestethic code is easier to read.</p>
+
+<h4 id="5-knowing-what-to-comment">5. Knowing what to comment</h4>
+<ul>
+  <li>The purpose of commenting is to help the reader know as much as the writer did.</li>
+  <li>Don’t comment just for the sake of commenting.</li>
+  <li>Don’t comment bad names. Fix the names instead.</li>
+  <li>Include director comments to understand the general idea. Imagine someone joins the team, what would you explain to her? These things have to be commented.</li>
+  <li>Comment your constants.</li>
+  <li>Put in the reader’s shoes.</li>
+  <li>Advertise likely pitfalls: what is surprising about the code? how it might by misused?</li>
+  <li>Summarise blocks of code so the reader doesn’t get lost in details.</li>
+</ul>
+
+<p>I used to write comments just to write comments. If a function is called:</p>
+
+<p><code class="highlighter-rouge">get_client_ids</code></p>
+
+<p>Please don’t add the comment</p>
+
+<p><code class="highlighter-rouge"># This function gets the clients ids</code></p>
+
+<h4 id="6-making-comments-precise-and-compact">6. Making comments precise and compact</h4>
+<ul>
+  <li>Comments should have high info-to-space ratio</li>
+  <li>Illustrate comments with carefully chosen input/output examples.</li>
+  <li>Add high-level idea of code instead of obvious details.</li>
+</ul>
+
+<p>Providing examples is key if you want someone to use your code. I think <code class="highlighter-rouge">R</code> does this pretty well for package developers.</p>
+
+<h3 id="simplifying-loops-and-logic">Simplifying loops and logic</h3>
+
+<h4 id="7-simplifying-loops-and-logic">7. Simplifying loops and logic</h4>
+<ul>
+  <li>Key idea: make control flow as natural as possible.</li>
+  <li>Prefered orders in <code class="highlighter-rouge">if(a == b)</code> vs <code class="highlighter-rouge">if(a != b)</code>:
+    <ul>
+      <li>Prefer positive case first.</li>
+      <li>Prefer simpler case first.</li>
+      <li>Prefer more interesting case first (there can be conflicts with the above).</li>
+    </ul>
+  </li>
+  <li>Return early from functions if possible.</li>
+  <li>Minimize nesting.</li>
+</ul>
+
+<p>I think it’s easier to reason about positive cases than negative (negating adds a complexity layer).</p>
+
+<h4 id="8-breaking-down-giant-expressions">8. Breaking down giant expressions</h4>
+<ul>
+  <li>Key idea: break down giant expressions into more digestible pieces.</li>
+  <li>Explaining variables: use extra variables that capture subexpressions.</li>
+  <li>Beware of “clever” chunks of code: they’re often harder to read.</li>
+</ul>
+
+<p>This is something we’ve all been told. Split your code into functions, etc. I particularly like the warning about clever chunks of code. If you need to think very hard to code it, it’s probably going to be hard to understand.</p>
+
+<h4 id="9-variables-and-readability">9. Variables and readability</h4>
+<ul>
+  <li>Sloppy use of variables issues:
+    <ul>
+      <li>The more variables, the harder to keep track of them: Eliminate variables that jut get in the way.</li>
+      <li>The bigger a variable scope, the longer you have to keep track: Make your variable visible by as few lines of code as possible.</li>
+      <li>The more often it changes, the harder it is to keep track of its value: Prefer write-once variables.</li>
+    </ul>
+  </li>
+</ul>
+
+<p>I particularly like the fact that variables shouldn’t be updated a lot and that they should be in the shortest subset of code possible.</p>
+
+<h3 id="reorganizing-your-code">Reorganizing your code</h3>
+
+<h4 id="10-extracting-unrelated-subproblems">10. Extracting unrelated subproblems</h4>
+<ul>
+  <li>Method to extract unrelated subproblems:
+    <ul>
+      <li>For each function/block, obtain the high-level goal of the code.</li>
+      <li>For each line of code, ask if it solves the high-level goal or an unrelated subproblem.</li>
+      <li>If enough lines solve an unrelated subproblem, extract the code in a separate function.</li>
+    </ul>
+  </li>
+  <li>Create general-purpose code: separate generic code from project-specific code.</li>
+</ul>
+
+<h4 id="11-one-task-at-a-time">11. One task at a time</h4>
+<ul>
+  <li>Key idea: Code should be organized so that it’s doing only one task at a time.</li>
+  <li>List all tasks code is doing. Some of them might easily become functions or classes. Others become paragraphs in a funciton.</li>
+</ul>
+
+<h4 id="12-turning-thoughts-into-code">12. Turning thoughts into code</h4>
+<ul>
+  <li>Process that can help you code clearly:
+    <ul>
+      <li>Describe code as you would to a colleague.</li>
+      <li>Pay attention to key words.</li>
+      <li>Write code to match description.</li>
+    </ul>
+  </li>
+  <li>The method is also valid for debugging (as describing the problem).</li>
+</ul>
+
+<h4 id="13-writing-less-code">13. Writing less code</h4>
+<ul>
+  <li>Eliminate nonessential features from product.</li>
+  <li>Rethink requirements to solve the easiest version of the problem that still gets the job done.</li>
+  <li>Stay familiar with standard libraries by reading their APIs.</li>
+</ul>
+
