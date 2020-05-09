@@ -7,30 +7,30 @@
 <meta name="generator" content="Jekyll v4.0.0" />
 <meta property="og:title" content="Feature selection part 1" />
 <meta property="og:locale" content="en_US" />
-<meta name="description" content="A critique to univariate methods" />
-<meta property="og:description" content="A critique to univariate methods" />
+<meta name="description" content="A critique to univariate selection methods" />
+<meta property="og:description" content="A critique to univariate selection methods" />
 <link rel="canonical" href="https://david26694.github.io/david-masip-blog/markdown/2020/05/09/feature-selection-part-1.html" />
 <meta property="og:url" content="https://david26694.github.io/david-masip-blog/markdown/2020/05/09/feature-selection-part-1.html" />
 <meta property="og:site_name" content="David Masip’s blog" />
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2020-05-09T00:00:00-05:00" />
 <script type="application/ld+json">
-{"description":"A critique to univariate methods","headline":"Feature selection part 1","dateModified":"2020-05-09T00:00:00-05:00","datePublished":"2020-05-09T00:00:00-05:00","@type":"BlogPosting","url":"https://david26694.github.io/david-masip-blog/markdown/2020/05/09/feature-selection-part-1.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://david26694.github.io/david-masip-blog/markdown/2020/05/09/feature-selection-part-1.html"},"@context":"https://schema.org"}</script>
+{"description":"A critique to univariate selection methods","headline":"Feature selection part 1","dateModified":"2020-05-09T00:00:00-05:00","datePublished":"2020-05-09T00:00:00-05:00","@type":"BlogPosting","url":"https://david26694.github.io/david-masip-blog/markdown/2020/05/09/feature-selection-part-1.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://david26694.github.io/david-masip-blog/markdown/2020/05/09/feature-selection-part-1.html"},"@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 <link rel="stylesheet" href="/david-masip-blog/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://david26694.github.io/david-masip-blog/feed.xml" title="David Masip's blog" /><link rel="shortcut icon" type="image/x-icon" href="/david-masip-blog/images/favicon.ico"><!-- Begin Jekyll SEO tag v2.6.1 -->
 <title>Feature selection part 1 | David Masip’s blog</title>
 <meta name="generator" content="Jekyll v4.0.0" />
 <meta property="og:title" content="Feature selection part 1" />
 <meta property="og:locale" content="en_US" />
-<meta name="description" content="A critique to univariate methods" />
-<meta property="og:description" content="A critique to univariate methods" />
+<meta name="description" content="A critique to univariate selection methods" />
+<meta property="og:description" content="A critique to univariate selection methods" />
 <link rel="canonical" href="https://david26694.github.io/david-masip-blog/markdown/2020/05/09/feature-selection-part-1.html" />
 <meta property="og:url" content="https://david26694.github.io/david-masip-blog/markdown/2020/05/09/feature-selection-part-1.html" />
 <meta property="og:site_name" content="David Masip’s blog" />
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2020-05-09T00:00:00-05:00" />
 <script type="application/ld+json">
-{"description":"A critique to univariate methods","headline":"Feature selection part 1","dateModified":"2020-05-09T00:00:00-05:00","datePublished":"2020-05-09T00:00:00-05:00","@type":"BlogPosting","url":"https://david26694.github.io/david-masip-blog/markdown/2020/05/09/feature-selection-part-1.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://david26694.github.io/david-masip-blog/markdown/2020/05/09/feature-selection-part-1.html"},"@context":"https://schema.org"}</script>
+{"description":"A critique to univariate selection methods","headline":"Feature selection part 1","dateModified":"2020-05-09T00:00:00-05:00","datePublished":"2020-05-09T00:00:00-05:00","@type":"BlogPosting","url":"https://david26694.github.io/david-masip-blog/markdown/2020/05/09/feature-selection-part-1.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://david26694.github.io/david-masip-blog/markdown/2020/05/09/feature-selection-part-1.html"},"@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 
 <link href="https://unpkg.com/@primer/css/dist/primer.css" rel="stylesheet" />
@@ -118,7 +118,7 @@ window.onload = wrap_img;
         <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
 
   <header class="post-header">
-    <h1 class="post-title p-name" itemprop="name headline">Feature selection part 1</h1><p class="page-description">A critique to univariate methods</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2020-05-09T00:00:00-05:00" itemprop="datePublished">
+    <h1 class="post-title p-name" itemprop="name headline">Feature selection part 1</h1><p class="page-description">A critique to univariate selection methods</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2020-05-09T00:00:00-05:00" itemprop="datePublished">
         May 9, 2020
       </time>
        • <span class="read-time" title="Estimated read time">
@@ -140,9 +140,7 @@ window.onload = wrap_img;
     </header>
 
   <div class="post-content e-content" itemprop="articleBody">
-    <h1 id="feature-selection-part-1-a-critique-to-univariate-methods">Feature selection part 1: A critique to univariate methods</h1>
-
-<p>The purpose of this post is to show the weaknesses of univariate feature
+    <p>The purpose of this post is to show the weaknesses of univariate feature
 selection methods. This methods usually go in the following way:</p>
 
 <ul>
