@@ -175,4 +175,8 @@ plotmo::plot_glmnet(lasso$glmnet.fit)
 
 Latest try
 
-![b](https://github.com/david26694/david-masip-blog/blob/master/rf_importance_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+![b](https://github.com/david26694/david-masip-blog/blob/master/rf_importance_files/figure-gfm/unnamed-chunk-7-1.png)
+
+Other
+
+![](https://raw.githubusercontent.com/david26694/david-masip-blog/master/rf_importance_files/figure-gfm/unnamed-chunk-7-1.png)
