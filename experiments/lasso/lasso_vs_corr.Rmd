@@ -3,6 +3,7 @@ toc: false
 layout: post
 description: A critique to univariate selection methods
 categories: [markdown, feature-selection]
+comments: true
 title: Feature selection part 1
 ---
 

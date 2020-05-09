@@ -3,6 +3,7 @@ toc: false
 layout: post
 description: Review of the book
 categories: [markdown, code]
+comments: true
 title: The Art of Readable Code
 ---
 

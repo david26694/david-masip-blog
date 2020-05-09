@@ -3,6 +3,7 @@ toc: false
 layout: post
 description: A critique to feature importance
 categories: [markdown, feature-selection]
+comments: true
 title: Feature selection part 2
 ---
 
