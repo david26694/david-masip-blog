@@ -2,7 +2,7 @@
 toc: false
 layout: post
 description: A critique to feature importance
-categories: [markdown]
+categories: [markdown, feature-selection]
 title: Feature selection part 2
 ---
 
@@ -29,7 +29,7 @@ y = x1 + (x2 + x3 + x4) / 2 + noise
 ```
 When training a random forest, `x1` should appear as the most important variable. If the feature selection method had to keep only one feature, `x1` should be the one to select.
 
-To see an example where feature importance might mislead you, we've created some borthers to `x1`. These brothers are variables that are very correlated to `x1` and will be used to model `y` as well. These brothers are what cause the importance of `x1` to be diminished.
+To see an example where feature importance might mislead you, we've created some brothers to `x1`. These brothers are variables that are very correlated to `x1` and will be used to model `y` as well. These brothers are what cause the importance of `x1` to be diminished.
 
 ```{r message=FALSE, warning=FALSE, echo=FALSE}
 # library(rmarkdown)
@@ -127,5 +127,7 @@ In fact, the next figure shows that the last feature to be vanished is `x1`, whi
 # x1 is the last one to go
 plotmo::plot_glmnet(lasso$glmnet.fit)
 ```
+
+
 
 

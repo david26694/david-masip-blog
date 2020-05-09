@@ -2,7 +2,7 @@
 toc: false
 layout: post
 description: A critique to feature importance
-categories: [markdown]
+categories: [markdown, feature-selection]
 title: Feature selection part 2
 ---
 
@@ -43,7 +43,7 @@ variable. If the feature selection method had to keep only one feature,
 `x1` should be the one to select.
 
 To see an example where feature importance might mislead you, we’ve
-created some borthers to `x1`. These brothers are variables that are
+created some brothers to `x1`. These brothers are variables that are
 very correlated to `x1` and will be used to model `y` as well. These
 brothers are what cause the importance of `x1` to be diminished.
 
