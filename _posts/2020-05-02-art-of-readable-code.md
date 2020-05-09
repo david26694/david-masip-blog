@@ -1,12 +1,10 @@
 ---
-toc: true
+toc: false
 layout: post
 description: Review of the book
 categories: [markdown]
 title: The Art of Readable Code
 ---
-
-# The Art of Readable Code
 
 Some time ago I read [The art of Readable Code](http://shop.oreilly.com/product/9780596802301.do). I recommend this read for every person starting a career where they have to code on a daily basis. Here's a summary of the ideas I liked the most.
 
