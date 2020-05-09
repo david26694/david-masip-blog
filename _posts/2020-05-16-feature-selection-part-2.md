@@ -1,3 +1,11 @@
+---
+toc: false
+layout: post
+description: A critique to feature importance
+categories: [markdown]
+title: Feature selection part 2
+---
+
 # Feature selection part 2: A critique to feature importance
 
 In part 1, I showed some of the dangers of using univariate selection
