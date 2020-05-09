@@ -7,11 +7,9 @@ _posts/2020-05-09-feature-selection-part-1.md: experiments/lasso/lasso_vs_corr.R
 	
 _posts/2020-05-16-feature-selection-part-2.md: experiments/feature_importance/rf_importance.Rmd
 	Rscript experiments/generate_mds.R experiments/feature_importance/rf_importance.Rmd
-	cp experiments/feature_importance/rf_importance.md _posts/2020-05-16-feature-selection-part-2.md
+	sed 's/\!\[\](/\!\[\](https\:\/\/raw.githubusercontent.com\/david26694\/david-masip-blog\/master\/experiments\/feature_importance\//g' experiments/feature_importance/rf_importance.md > _posts/2020-05-16-feature-selection-part-2.md 
 	rm -rf _posts/rf_importance_files
 	rm -rf rf_importance_files
-	cp -r experiments/feature_importance/rf_importance_files/ _posts/rf_importance_files
-	cp -r experiments/feature_importance/rf_importance_files/ rf_importance_files
 	rm -rf experiments/feature_importance/rf_importance.md
 
 help:
