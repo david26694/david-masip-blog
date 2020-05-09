@@ -7,26 +7,26 @@
 <meta name="generator" content="Jekyll v4.0.0" />
 <meta property="og:title" content="Feature selection part 1" />
 <meta property="og:locale" content="en_US" />
-<meta name="description" content="A critique to univariate methods" />
-<meta property="og:description" content="A critique to univariate methods" />
+<meta name="description" content="A critique to univariate selection methods" />
+<meta property="og:description" content="A critique to univariate selection methods" />
 <link rel="canonical" href="https://david26694.github.io/david-masip-blog/experiments/lasso/lasso_vs_corr.Rmd" />
 <meta property="og:url" content="https://david26694.github.io/david-masip-blog/experiments/lasso/lasso_vs_corr.Rmd" />
 <meta property="og:site_name" content="fastpages" />
 <script type="application/ld+json">
-{"description":"A critique to univariate methods","@type":"WebPage","headline":"Feature selection part 1","url":"https://david26694.github.io/david-masip-blog/experiments/lasso/lasso_vs_corr.Rmd","@context":"https://schema.org"}</script>
+{"description":"A critique to univariate selection methods","@type":"WebPage","headline":"Feature selection part 1","url":"https://david26694.github.io/david-masip-blog/experiments/lasso/lasso_vs_corr.Rmd","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 <link rel="stylesheet" href="/david-masip-blog/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://david26694.github.io/david-masip-blog/feed.xml" title="fastpages" /><link rel="shortcut icon" type="image/x-icon" href="/david-masip-blog/images/favicon.ico"><!-- Begin Jekyll SEO tag v2.6.1 -->
 <title>Feature selection part 1 | fastpages</title>
 <meta name="generator" content="Jekyll v4.0.0" />
 <meta property="og:title" content="Feature selection part 1" />
 <meta property="og:locale" content="en_US" />
-<meta name="description" content="A critique to univariate methods" />
-<meta property="og:description" content="A critique to univariate methods" />
+<meta name="description" content="A critique to univariate selection methods" />
+<meta property="og:description" content="A critique to univariate selection methods" />
 <link rel="canonical" href="https://david26694.github.io/david-masip-blog/experiments/lasso/lasso_vs_corr.Rmd" />
 <meta property="og:url" content="https://david26694.github.io/david-masip-blog/experiments/lasso/lasso_vs_corr.Rmd" />
 <meta property="og:site_name" content="fastpages" />
 <script type="application/ld+json">
-{"description":"A critique to univariate methods","@type":"WebPage","headline":"Feature selection part 1","url":"https://david26694.github.io/david-masip-blog/experiments/lasso/lasso_vs_corr.Rmd","@context":"https://schema.org"}</script>
+{"description":"A critique to univariate selection methods","@type":"WebPage","headline":"Feature selection part 1","url":"https://david26694.github.io/david-masip-blog/experiments/lasso/lasso_vs_corr.Rmd","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 
 <link href="https://unpkg.com/@primer/css/dist/primer.css" rel="stylesheet" />
@@ -90,7 +90,7 @@ window.onload = wrap_img;
           </span>
         </label>
 
-        <div class="trigger"><a class="page-link" href="/david-masip-blog/about/">About Me</a><a class="page-link" href="/david-masip-blog/experiments/lasso/lasso_vs_corr.Rmd">Feature selection part 1</a><a class="page-link" href="/david-masip-blog/experiments/lasso/lasso_vs_corr.html">Feature selection part 1</a><a class="page-link" href="/david-masip-blog/experiments/feature_importance/rf_importance.Rmd">Feature selection part 2</a><a class="page-link" href="/david-masip-blog/experiments/feature_importance/rf_importance.html">Feature selection part 2</a><a class="page-link" href="/david-masip-blog/search/">Search</a><a class="page-link" href="/david-masip-blog/categories/">Tags</a></div>
+        <div class="trigger"><a class="page-link" href="/david-masip-blog/about/">About Me</a><a class="page-link" href="/david-masip-blog/experiments/lasso/lasso_vs_corr.Rmd">Feature selection part 1</a><a class="page-link" href="/david-masip-blog/experiments/feature_importance/rf_importance.Rmd">Feature selection part 2</a><a class="page-link" href="/david-masip-blog/search/">Search</a><a class="page-link" href="/david-masip-blog/categories/">Tags</a></div>
       </nav></div>
 </header>
 <main class="page-content" aria-label="Content">
@@ -98,7 +98,7 @@ window.onload = wrap_img;
         <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
 
   <header class="post-header">
-    <h1 class="post-title p-name" itemprop="name headline">Feature selection part 1</h1><p class="page-description">A critique to univariate methods</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="" itemprop="datePublished">
+    <h1 class="post-title p-name" itemprop="name headline">Feature selection part 1</h1><p class="page-description">A critique to univariate selection methods</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="" itemprop="datePublished">
         
       </time>
        • <span class="read-time" title="Estimated read time">
