@@ -248,15 +248,12 @@ importance)</p>
 </span><span class="n">rf</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">randomForest</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">,</span><span class="w"> </span><span class="n">importance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">T</span><span class="p">)</span><span class="w">
 </span></code></pre></div></div>
 
-<p>And we show the importance of the
-features</p>
+<p>And we show the importance of the features</p>
 
 <div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">varImpPlot</span><span class="p">(</span><span class="n">rf</span><span class="p">,</span><span class="w"> </span><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span><span class="p">)</span><span class="w">
 </span></code></pre></div></div>
 
-<p><img src="rf_importance_files/figure-gfm/unnamed-chunk-5-1.png" alt="" /><!-- --></p>
-
-<p><img src="https://raw.githubusercontent.com/david26694/david-masip-blog/master/experiments/feature_importance/rf_importance_files/figure-gfm/unnamed-chunk-5-1.png" alt="" /></p>
+<p><img src="https://raw.githubusercontent.com/david26694/david-masip-blog/master/experiments/feature_importance/rf_importance_files/figure-gfm/unnamed-chunk-5-1.png" alt="" /><!-- --></p>
 
 <p>This shows the shortcomings of feature importance: <code class="highlighter-rouge">x1</code> doesn’t appear
 as the most important feature. If we were to select three variables, we
@@ -307,9 +304,7 @@ coefficients. If we regularize a bit more, they’ll probably vanish.</p>
 </span><span class="n">plotmo</span><span class="o">::</span><span class="n">plot_glmnet</span><span class="p">(</span><span class="n">lasso</span><span class="o">$</span><span class="n">glmnet.fit</span><span class="p">)</span><span class="w">
 </span></code></pre></div></div>
 
-<p><img src="rf_importance_files/figure-gfm/unnamed-chunk-7-1.png" alt="" /><!-- --></p>
-
-<p><img src="https://raw.githubusercontent.com/david26694/david-masip-blog/master/experiments/feature_importance/rf_importance_files/figure-gfm/unnamed-chunk-7-1.png" alt="" /></p>
+<p><img src="https://raw.githubusercontent.com/david26694/david-masip-blog/master/experiments/feature_importance/rf_importance_files/figure-gfm/unnamed-chunk-7-1.png" alt="" /><!-- --></p>
 
   </div><!-- from https://github.com/utterance/utterances -->
 <script src="https://utteranc.es/client.js"
