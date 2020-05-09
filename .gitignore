@@ -11,3 +11,18 @@ _notebooks/.ipynb_checkpoints
 .netlify
 .tweet-cache
 __pycache__
+.Rproj.user
+
+
+# R
+.Rproj.user
+*.Rproj
+.Rhistory
+.RData
+
+# Mac
+*.DS_Store
+
+# Feature importance files
+*rf_importance_files/
+

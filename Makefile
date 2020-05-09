@@ -1,3 +1,15 @@
+build_rmd: _posts/2020-05-09-feature-selection-part-1.md _posts/2020-05-16-feature-selection-part-2.md
+
+_posts/2020-05-09-feature-selection-part-1.md: experiments/lasso/lasso_vs_corr.Rmd
+	Rscript experiments/generate_mds.R experiments/lasso/lasso_vs_corr.Rmd
+	cp experiments/lasso/lasso_vs_corr.md _posts/2020-05-09-feature-selection-part-1.md
+	
+_posts/2020-05-16-feature-selection-part-2.md: experiments/feature_importance/rf_importance.Rmd
+	Rscript experiments/generate_mds.R experiments/feature_importance/rf_importance.Rmd
+	cp experiments/feature_importance/rf_importance.md _posts/2020-05-16-feature-selection-part-2.md
+	rm -rf _posts/rf_importance_files
+	cp -r experiments/feature_importance/rf_importance_files/ _posts/rf_importance_files
+
 help:
 	cat Makefile
 
