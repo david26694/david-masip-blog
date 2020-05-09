@@ -13,7 +13,7 @@
 <lastmod>2020-05-02T00:00:00-05:00</lastmod>
 </url>
 <url>
-<loc>https://david26694.github.io/david-masip-blog/2020/05/09/feature-selection-part-1.html</loc>
+<loc>https://david26694.github.io/david-masip-blog/markdown/2020/05/09/feature-selection-part-1.html</loc>
 <lastmod>2020-05-09T00:00:00-05:00</lastmod>
 </url>
 <url>
@@ -27,6 +27,9 @@
 <loc>https://david26694.github.io/david-masip-blog/</loc>
 </url>
 <url>
+<loc>https://david26694.github.io/david-masip-blog/experiments/lasso/lasso_vs_corr.html</loc>
+</url>
+<url>
 <loc>https://david26694.github.io/david-masip-blog/search/</loc>
 </url>
 <url>
@@ -34,10 +37,10 @@
 </url>
 <url>
 <loc>https://david26694.github.io/david-masip-blog/experiments/feature_importance/rf_importance.html</loc>
-<lastmod>2020-05-09T03:36:13-05:00</lastmod>
+<lastmod>2020-05-09T03:41:21-05:00</lastmod>
 </url>
 <url>
 <loc>https://david26694.github.io/david-masip-blog/experiments/lasso/lasso_vs_corr.html</loc>
-<lastmod>2020-05-09T03:36:13-05:00</lastmod>
+<lastmod>2020-05-09T03:41:21-05:00</lastmod>
 </url>
 </urlset>
