@@ -118,7 +118,7 @@ And we show the importance of the features
 varImpPlot(rf, type = 1)
 ```
 
-![](rf_importance_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+![](/_posts/rf_importance_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
 
 This shows the shortcomings of feature importance: `x1` doesn’t appear
 as the most important feature. If we were to select three variables, we
