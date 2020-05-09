@@ -1,3 +1,11 @@
+---
+toc: false
+layout: post
+description: A critique to univariate methods
+categories: [markdown]
+title: Feature selection part 1
+---
+
 # Feature selection part 1: A critique to univariate methods
 
 The purpose of this post is to show the weaknesses of univariate feature
