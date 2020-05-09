@@ -1,7 +1,9 @@
 ---
 toc: true
 layout: post
+description: Review of the book
 categories: [markdown]
+title: The Art of Readable Code
 ---
 
 # The Art of Readable Code
