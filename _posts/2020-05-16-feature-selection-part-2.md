@@ -170,4 +170,4 @@ In fact, the next figure shows that the last feature to be vanished is
 plotmo::plot_glmnet(lasso$glmnet.fit)
 ```
 
-![](rf_importance_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+![](../rf_importance_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
