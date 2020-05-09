@@ -112,13 +112,16 @@ importance)
 rf <- randomForest(X, y, importance = T)
 ```
 
-And we show the importance of the features
+And we show the importance of the
+features
 
 ``` r
 varImpPlot(rf, type = 1)
 ```
 
-![](/_posts/rf_importance_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+![](rf_importance_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+
+![](https://raw.githubusercontent.com/david26694/david-masip-blog/master/experiments/feature_importance/rf_importance_files/figure-gfm/unnamed-chunk-5-1.png)
 
 This shows the shortcomings of feature importance: `x1` doesn’t appear
 as the most important feature. If we were to select three variables, we
@@ -170,13 +173,6 @@ In fact, the next figure shows that the last feature to be vanished is
 plotmo::plot_glmnet(lasso$glmnet.fit)
 ```
 
-![a](../rf_importance_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+![](rf_importance_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
 
-
-Latest try
-
-![b](https://github.com/david26694/david-masip-blog/blob/master/rf_importance_files/figure-gfm/unnamed-chunk-7-1.png)
-
-Other
-
-![](https://raw.githubusercontent.com/david26694/david-masip-blog/master/rf_importance_files/figure-gfm/unnamed-chunk-7-1.png)
+![](https://raw.githubusercontent.com/david26694/david-masip-blog/master/experiments/feature_importance/rf_importance_files/figure-gfm/unnamed-chunk-7-1.png)

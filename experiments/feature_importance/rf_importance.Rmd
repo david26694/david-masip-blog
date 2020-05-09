@@ -104,6 +104,8 @@ And we show the importance of the features
 varImpPlot(rf, type = 1)
 ```
 
+![](https://raw.githubusercontent.com/david26694/david-masip-blog/master/experiments/feature_importance/rf_importance_files/figure-gfm/unnamed-chunk-5-1.png)
+
 This shows the shortcomings of feature importance: `x1` doesn't appear as the most important feature. If we were to select three variables, we would select `x2`, `x3` and `x4`, and this would of course degrade the model performance.
 
 And if you think about it, it makes sense. In this random forest, to model the `x1` contribution, some splits are done with `x1`, some with her brothers. For this reason, if `x1` gets broken, the impact is not as big as if `x2` breaks.
@@ -129,4 +131,4 @@ In fact, the next figure shows that the last feature to be vanished is `x1`, whi
 plotmo::plot_glmnet(lasso$glmnet.fit)
 ```
 
-
+![](https://raw.githubusercontent.com/david26694/david-masip-blog/master/experiments/feature_importance/rf_importance_files/figure-gfm/unnamed-chunk-7-1.png)
