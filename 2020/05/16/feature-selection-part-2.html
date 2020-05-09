@@ -1,0 +1,164 @@
+<h1 id="feature-selection-part-2-a-critique-to-feature-importance">Feature selection part 2: A critique to feature importance</h1>
+
+<p>In part 1, I showed some of the dangers of using univariate selection
+methods. In part 2 I want to focus on the pitfalls of feature importance
+in random forests and gradient boosting methods.</p>
+
+<p>I’ll write about it in the feature selection chapter as feature
+importances can be used to select features, <a href="https://scikit-learn.org/stable/modules/generated/sklearn.feature_selection.SelectFromModel.html#sklearn.feature_selection.SelectFromModel">as in Sklearn
+SelectFromModel</a>.</p>
+
+<p>In order to select features using feature importances, one can:</p>
+
+<ul>
+  <li>Train a model that has allows to compute feature importances.</li>
+  <li>Retrain the model with only the most important features.</li>
+</ul>
+
+<p>In my experience, when retraining with only the most important features,
+the model usually degrades a little (this might not always happen).</p>
+
+<p>The main issue regarding selecting features using feature importance is
+that, if a feature is highly correlated with others, its importance will
+be lower than if this doesn’t happen.</p>
+
+<p>As a rule of thumb, I’d say check that your features are not very
+correlated if you want to assess them using feature importance.</p>
+
+<h2 id="experiment-set-up">Experiment set-up</h2>
+
+<p>In order to show the deficiencies of selecting features using feature
+importance, we’ll use a rather ill-defined example. In this example,
+<code class="highlighter-rouge">x1</code>, <code class="highlighter-rouge">x2</code>, <code class="highlighter-rouge">x3</code> and <code class="highlighter-rouge">x4</code> are independent variables and the dependent
+variable is</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>y = x1 + (x2 + x3 + x4) / 2 + noise
+</code></pre></div></div>
+
+<p>When training a random forest, <code class="highlighter-rouge">x1</code> should appear as the most important
+variable. If the feature selection method had to keep only one feature,
+<code class="highlighter-rouge">x1</code> should be the one to select.</p>
+
+<p>To see an example where feature importance might mislead you, we’ve
+created some borthers to <code class="highlighter-rouge">x1</code>. These brothers are variables that are
+very correlated to <code class="highlighter-rouge">x1</code> and will be used to model <code class="highlighter-rouge">y</code> as well. These
+brothers are what cause the importance of <code class="highlighter-rouge">x1</code> to be diminished.</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">library</span><span class="p">(</span><span class="s2">"dplyr"</span><span class="p">)</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="s2">"randomForest"</span><span class="p">)</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="s2">"glmnet"</span><span class="p">)</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="s2">"yardstick"</span><span class="p">)</span><span class="w">
+
+
+</span><span class="n">set.seed</span><span class="p">(</span><span class="m">42</span><span class="p">)</span><span class="w">
+
+</span><span class="n">len</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="m">5000</span><span class="w">
+
+</span><span class="n">x1</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">rnorm</span><span class="p">(</span><span class="n">len</span><span class="p">)</span><span class="w">
+</span><span class="n">x2</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">rnorm</span><span class="p">(</span><span class="n">len</span><span class="p">)</span><span class="w">
+</span><span class="n">x3</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">rnorm</span><span class="p">(</span><span class="n">len</span><span class="p">)</span><span class="w">
+</span><span class="n">x4</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">rnorm</span><span class="p">(</span><span class="n">len</span><span class="p">)</span><span class="w">
+
+</span><span class="c1"># The outcome is created without the brothers</span><span class="w">
+</span><span class="n">y</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">x1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">0.5</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">x2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">0.5</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">x3</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">0.5</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">x4</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">rnorm</span><span class="p">(</span><span class="n">len</span><span class="p">)</span><span class="w">
+
+</span><span class="n">x11</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="m">0.95</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">x1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">0.05</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">rnorm</span><span class="p">(</span><span class="n">len</span><span class="p">)</span><span class="w">
+</span><span class="n">x12</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="m">0.95</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">x1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">0.05</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">rnorm</span><span class="p">(</span><span class="n">len</span><span class="p">)</span><span class="w">
+</span><span class="n">x13</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="m">0.95</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">x1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">0.05</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">rnorm</span><span class="p">(</span><span class="n">len</span><span class="p">)</span><span class="w">
+</span><span class="n">x14</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="m">0.95</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">x1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">0.05</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">rnorm</span><span class="p">(</span><span class="n">len</span><span class="p">)</span><span class="w">
+</span><span class="n">x15</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="m">0.95</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">x1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">0.05</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">rnorm</span><span class="p">(</span><span class="n">len</span><span class="p">)</span><span class="w">
+</span><span class="n">x16</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="m">0.95</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">x1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">0.05</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">rnorm</span><span class="p">(</span><span class="n">len</span><span class="p">)</span><span class="w">
+</span><span class="n">x17</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="m">0.95</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">x1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">0.05</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">rnorm</span><span class="p">(</span><span class="n">len</span><span class="p">)</span><span class="w">
+</span><span class="n">x18</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="m">0.95</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">x1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">0.05</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">rnorm</span><span class="p">(</span><span class="n">len</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p>The table for the model is created, with <code class="highlighter-rouge">x1</code> to <code class="highlighter-rouge">x4</code>, as well as <code class="highlighter-rouge">x1</code>’s
+brothers.</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">model_tbl</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">tibble</span><span class="p">(</span><span class="w">
+  </span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">y</span><span class="p">,</span><span class="w">
+  </span><span class="n">x1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x1</span><span class="p">,</span><span class="w">
+  </span><span class="n">x2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x2</span><span class="p">,</span><span class="w">
+  </span><span class="n">x3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x3</span><span class="p">,</span><span class="w">
+  </span><span class="n">x4</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x4</span><span class="p">,</span><span class="w">
+  </span><span class="n">x11</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x11</span><span class="p">,</span><span class="w">
+  </span><span class="n">x12</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x12</span><span class="p">,</span><span class="w">
+  </span><span class="n">x13</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x13</span><span class="p">,</span><span class="w">
+  </span><span class="n">x14</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x14</span><span class="p">,</span><span class="w">
+  </span><span class="n">x15</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x15</span><span class="p">,</span><span class="w">
+  </span><span class="n">x16</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x16</span><span class="p">,</span><span class="w">
+  </span><span class="n">x17</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x17</span><span class="p">,</span><span class="w">
+  </span><span class="n">x18</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x18</span><span class="w">
+</span><span class="p">)</span><span class="w">
+
+</span><span class="n">X</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">as.matrix</span><span class="p">(</span><span class="n">select</span><span class="p">(</span><span class="n">model_tbl</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="n">y</span><span class="p">))</span><span class="w">
+</span></code></pre></div></div>
+
+<h2 id="random-forest-importance">Random forest importance</h2>
+
+<p>We’ll train a random forest model (when training this model, it
+automatically computes feature
+importance)</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Random forest importance ------------------------------------------------</span><span class="w">
+
+</span><span class="n">rf</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">randomForest</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">,</span><span class="w"> </span><span class="n">importance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">T</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p>And we show the importance of the features</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">varImpPlot</span><span class="p">(</span><span class="n">rf</span><span class="p">,</span><span class="w"> </span><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p><img src="rf_importance_files/figure-gfm/unnamed-chunk-5-1.png" alt="" /><!-- --></p>
+
+<p>This shows the shortcomings of feature importance: <code class="highlighter-rouge">x1</code> doesn’t appear
+as the most important feature. If we were to select three variables, we
+would select <code class="highlighter-rouge">x2</code>, <code class="highlighter-rouge">x3</code> and <code class="highlighter-rouge">x4</code>, and this would of course degrade the
+model performance.</p>
+
+<p>And if you think about it, it makes sense. In this random forest, to
+model the <code class="highlighter-rouge">x1</code> contribution, some splits are done with <code class="highlighter-rouge">x1</code>, some with
+her brothers. For this reason, if <code class="highlighter-rouge">x1</code> gets broken, the impact is not as
+big as if <code class="highlighter-rouge">x2</code> breaks.</p>
+
+<h3 id="lasso-selection">Lasso selection</h3>
+
+<p>On the other hand, lasso kind of makes it (recall that <code class="highlighter-rouge">cv.glmnet</code>
+default is lasso):</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Train lasso</span><span class="w">
+</span><span class="n">lasso</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">cv.glmnet</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w">
+
+</span><span class="c1"># Kind of makes it</span><span class="w">
+</span><span class="n">coef</span><span class="p">(</span><span class="n">lasso</span><span class="p">,</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"lambda.min"</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>## 13 x 1 sparse Matrix of class "dgCMatrix"
+##                      1
+## (Intercept) 0.01334871
+## x1          0.90829549
+## x2          0.49467345
+## x3          0.49902516
+## x4          0.48559226
+## x11         0.01570838
+## x12         .         
+## x13         .         
+## x14         .         
+## x15         .         
+## x16         0.02241166
+## x17         0.06331782
+## x18         .
+</code></pre></div></div>
+
+<p>It selects some of the <code class="highlighter-rouge">x1</code> brothers, but with really small
+coefficients. If we regularize a bit more, they’ll probably vanish.</p>
+
+<p>In fact, the next figure shows that the last feature to be vanished is
+<code class="highlighter-rouge">x1</code>, which didn’t happen in the random forest:</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># x1 is the last one to go</span><span class="w">
+</span><span class="n">plotmo</span><span class="o">::</span><span class="n">plot_glmnet</span><span class="p">(</span><span class="n">lasso</span><span class="o">$</span><span class="n">glmnet.fit</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p><img src="rf_importance_files/figure-gfm/unnamed-chunk-7-1.png" alt="" /><!-- --></p>

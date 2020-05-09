@@ -1,0 +1,173 @@
+<h1 id="feature-selection-part-1-a-critique-to-univariate-methods">Feature selection part 1: A critique to univariate methods</h1>
+
+<p>The purpose of this post is to show the weaknesses of univariate feature
+selection methods. This methods usually go in the following way:</p>
+
+<ul>
+  <li>Compute a correlation metric for every feature with the target (this
+metric might be correlation or mutual information, among others)</li>
+  <li>Select the features that score the best regarding this metric</li>
+</ul>
+
+<p>A possible implementation is <a href="https://scikit-learn.org/stable/modules/generated/sklearn.feature_selection.SelectKBest.html">SelectKBest in
+sklearn</a>.</p>
+
+<p>If you’re an univariate method lover and have a different perspective,
+don’t hesitate to contact me.</p>
+
+<h2 id="experiment-set-up">Experiment set-up</h2>
+
+<p>Let’s prepare an experiment to see the deficiencies of these methods. We
+generate two variables <code class="highlighter-rouge">x1</code> and <code class="highlighter-rouge">x2</code> and a target variable <code class="highlighter-rouge">y</code> that is
+<code class="highlighter-rouge">x1 + 0.1 * x2 + noise</code>. So, the variable <code class="highlighter-rouge">y</code> is very similar to <code class="highlighter-rouge">x1</code>,
+but has some <code class="highlighter-rouge">x2</code> as well. Then we create two variables <code class="highlighter-rouge">x1a</code> and <code class="highlighter-rouge">x2a</code>,
+that are noisy versions of <code class="highlighter-rouge">x1</code> and <code class="highlighter-rouge">x2</code>.</p>
+
+<p>Although the data is artifical, I believe this occurs in real life. When
+performing feature engineering, we might end up with pretty good
+features that are correlated, and also have not so good features.</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">library</span><span class="p">(</span><span class="n">dplyr</span><span class="p">)</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="n">glmnet</span><span class="p">)</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="n">yardstick</span><span class="p">)</span><span class="w">
+
+</span><span class="n">set.seed</span><span class="p">(</span><span class="m">42</span><span class="p">)</span><span class="w">
+
+</span><span class="n">len</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="m">20000</span><span class="w">
+
+</span><span class="n">x1</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">rnorm</span><span class="p">(</span><span class="n">len</span><span class="p">)</span><span class="w">
+</span><span class="n">x2</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">rnorm</span><span class="p">(</span><span class="n">len</span><span class="p">)</span><span class="w">
+
+</span><span class="c1"># All the rnorm(len) that appear from now on are to simulate noise</span><span class="w">
+</span><span class="n">y</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">x1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">0.1</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">x2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">0.05</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">rnorm</span><span class="p">(</span><span class="n">len</span><span class="p">)</span><span class="w">
+
+</span><span class="n">x1a</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="m">0.8</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">x1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">0.2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">rnorm</span><span class="p">(</span><span class="n">len</span><span class="p">)</span><span class="w">
+</span><span class="n">x2a</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="m">0.8</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">x2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">0.2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">rnorm</span><span class="p">(</span><span class="n">len</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p>After this, we split the data in train and test sets to estimate errors.
+We also transform the data to matrix representation, as we’re going to
+use <em>glmnet</em> package that uses matrices to fit models.</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">model_tbl</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">tibble</span><span class="p">(</span><span class="w">
+ </span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">y</span><span class="p">,</span><span class="w">
+ </span><span class="n">x1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x1</span><span class="p">,</span><span class="w">
+ </span><span class="n">x2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x2</span><span class="p">,</span><span class="w">
+ </span><span class="n">x1a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x1a</span><span class="p">,</span><span class="w">
+ </span><span class="n">x2a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x2a</span><span class="w">
+</span><span class="p">)</span><span class="w">
+
+</span><span class="c1"># Split train and test ----------------------------------------------------</span><span class="w">
+
+</span><span class="n">X</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">as.matrix</span><span class="p">(</span><span class="n">select</span><span class="p">(</span><span class="n">model_tbl</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="n">y</span><span class="p">))</span><span class="w">
+
+</span><span class="n">X_train</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">X</span><span class="p">[</span><span class="m">1</span><span class="o">:</span><span class="p">(</span><span class="n">len</span><span class="o">/</span><span class="m">2</span><span class="p">),]</span><span class="w">
+</span><span class="n">y_train</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">y</span><span class="p">[</span><span class="m">1</span><span class="o">:</span><span class="p">(</span><span class="n">len</span><span class="o">/</span><span class="m">2</span><span class="p">)]</span><span class="w">
+</span><span class="n">X_test</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">X</span><span class="p">[(</span><span class="n">len</span><span class="o">/</span><span class="m">2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span><span class="p">)</span><span class="o">:</span><span class="n">len</span><span class="p">,]</span><span class="w">
+</span><span class="n">y_test</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">y</span><span class="p">[(</span><span class="n">len</span><span class="o">/</span><span class="m">2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span><span class="p">)</span><span class="o">:</span><span class="n">len</span><span class="p">]</span><span class="w">
+</span></code></pre></div></div>
+
+<h2 id="univariate-method-approach">Univariate-method approach</h2>
+
+<p>The univariate method approach that we follow here consists in keeping
+the most correlated variables with the target. For this reason, we
+compute the correlation for each variable:</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">cor</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span><span class="w"> </span><span class="n">y_train</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>##           [,1]
+## x1  0.99390574
+## x2  0.10012730
+## x1a 0.96482998
+## x2a 0.09786507
+</code></pre></div></div>
+
+<p>We’ll keep only the first and third variables, as they are the most
+correlated with the target. We’ll train a <em>ridge</em> model using <em>glmnet</em>
+and cross-validation to select the optimal hyperparameters:</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">X_train_cor</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">X_train</span><span class="p">[,</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="m">3</span><span class="p">)]</span><span class="w">
+</span><span class="n">X_test_cor</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">X_test</span><span class="p">[,</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="m">3</span><span class="p">)]</span><span class="w">
+
+</span><span class="n">ridge</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">cv.glmnet</span><span class="p">(</span><span class="n">X_train_cor</span><span class="p">,</span><span class="w"> </span><span class="n">y_train</span><span class="p">,</span><span class="w"> </span><span class="n">alpha</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="p">)</span><span class="w">
+
+</span><span class="n">y_pred_cor</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">as.vector</span><span class="p">(</span><span class="n">predict</span><span class="p">(</span><span class="n">ridge</span><span class="p">,</span><span class="w"> </span><span class="n">X_test_cor</span><span class="p">,</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"lambda.min"</span><span class="p">))</span><span class="w">
+</span></code></pre></div></div>
+
+<h2 id="multivariate-methods-the-lasso">Multivariate methods: the Lasso</h2>
+
+<p>The Lasso can be thought of as a multivariate feature selection method,
+as it uses all the features at the same time to select a subset. Here we
+are applying a Lasso because <code class="highlighter-rouge">cv.glmnet</code> does Lasso (<code class="highlighter-rouge">alpha = 1</code>) by
+default.</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">lasso</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">cv.glmnet</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span><span class="w"> </span><span class="n">y_train</span><span class="p">)</span><span class="w">
+
+</span><span class="n">y_pred_lasso</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">as.vector</span><span class="p">(</span><span class="n">predict</span><span class="p">(</span><span class="n">lasso</span><span class="p">,</span><span class="w"> </span><span class="n">X_test</span><span class="p">,</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"lambda.min"</span><span class="p">))</span><span class="w">
+</span></code></pre></div></div>
+
+<h2 id="results">Results</h2>
+
+<h3 id="coefficient-comparison">Coefficient comparison</h3>
+
+<p>By construction, the coefficients should be 1 for <code class="highlighter-rouge">x1</code> and 0.1 for <code class="highlighter-rouge">x2</code>.
+In the ridge case (recall that we’ve applied univariate selection using
+correlation), this won’t happen as we’ve deleted <code class="highlighter-rouge">x2</code> because the
+correlation with the target was too low.</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">coef</span><span class="p">(</span><span class="n">ridge</span><span class="p">,</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"lambda.min"</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>## 3 x 1 sparse Matrix of class "dgCMatrix"
+##                        1
+## (Intercept) -0.000664586
+## x1           0.589067554
+## x1a          0.439495206
+</code></pre></div></div>
+
+<p>In fact, what we have is a mixture of <code class="highlighter-rouge">x1</code> and <code class="highlighter-rouge">x1a</code>.</p>
+
+<p>On the other hand, the Lasso sets the coefficients of <code class="highlighter-rouge">x1a</code> and <code class="highlighter-rouge">x2a</code> to
+0 (doesn’t select those variables), and estimates the coefficents of
+<code class="highlighter-rouge">x1</code> and <code class="highlighter-rouge">x2</code> pretty well:</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">coef</span><span class="p">(</span><span class="n">lasso</span><span class="p">,</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"lambda.min"</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>## 5 x 1 sparse Matrix of class "dgCMatrix"
+##                         1
+## (Intercept) -0.0004744455
+## x1           0.9954934728
+## x2           0.0941690869
+## x1a          .           
+## x2a          .
+</code></pre></div></div>
+
+<h3 id="test-set-results">Test set results</h3>
+
+<p>If you care more about model performance and not that much of proper
+estimation of the parameters, I also have an argument for you. The Lasso
+predictions are way better than the correlation method predictions:</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">rmse_vec</span><span class="p">(</span><span class="n">y_pred_lasso</span><span class="p">,</span><span class="w"> </span><span class="n">y_test</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>## [1] 0.05027135
+</code></pre></div></div>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">rmse_vec</span><span class="p">(</span><span class="n">y_pred_cor</span><span class="p">,</span><span class="w"> </span><span class="n">y_test</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>## [1] 0.1563891
+</code></pre></div></div>
+
+<p>We can even interpret it:</p>
+
+<ul>
+  <li>The lasso error is around 0.05 which is the “noise size” used to
+generate <code class="highlighter-rouge">y</code>.</li>
+  <li>The error of the univariate method is 0.15, which is 0.05 (noise
+size used to generate <code class="highlighter-rouge">y</code>) plus 0.10 (error we are commiting by not
+considering <code class="highlighter-rouge">x2</code>).</li>
+</ul>
