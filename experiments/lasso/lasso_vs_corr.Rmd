@@ -16,7 +16,7 @@ A possible implementation is [SelectKBest in sklearn](https://scikit-learn.org/s
 
 If you're an univariate method lover and have a different perspective, don't hesitate to contact me.
 
-## Experiment set-up
+### Experiment set-up
 
 Let's prepare an experiment to see the deficiencies of these methods. We generate two variables `x1` and `x2` and a target variable `y` that is `x1 + 0.1 * x2 + noise`. So, the variable `y` is very similar to `x1`, but has some `x2` as well. Then we create two variables `x1a` and `x2a`, that are noisy versions of `x1` and `x2`.
 
@@ -71,7 +71,7 @@ y_test <- y[(len/2 + 1):len]
 ```
 
 
-## Univariate-method approach
+### Univariate-method approach
 
 The univariate method approach that we follow here consists in keeping the most correlated variables with the target. For this reason, we compute the correlation for each variable:
 
@@ -91,7 +91,7 @@ y_pred_cor <- as.vector(predict(ridge, X_test_cor, s = "lambda.min"))
 
 ```
 
-## Multivariate methods: the Lasso
+### Multivariate methods: the Lasso
 
 The Lasso can be thought of as a multivariate feature selection method, as it uses all the features at the same time to select a subset. Here we are applying a Lasso because `cv.glmnet` does Lasso (`alpha = 1`) by default.
 
@@ -101,9 +101,9 @@ lasso <- cv.glmnet(X_train, y_train)
 y_pred_lasso <- as.vector(predict(lasso, X_test, s = "lambda.min"))
 ```
 
-## Results
+### Results
 
-### Coefficient comparison
+#### Coefficient comparison
 
 By construction, the coefficients should be 1 for `x1` and 0.1 for `x2`. In the ridge case (recall that we've applied univariate selection using correlation), this won't happen as we've deleted `x2` because the correlation with the target was too low.
 
@@ -119,7 +119,7 @@ On the other hand, the Lasso sets the coefficients of `x1a` and `x2a` to 0 (does
 coef(lasso, s = "lambda.min")
 ```
 
-### Test set results
+#### Test set results
 
 If you care more about model performance and not that much of proper estimation of the parameters, I also have an argument for you. The Lasso predictions are way better than the correlation method predictions:
 

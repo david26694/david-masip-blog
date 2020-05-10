@@ -20,7 +20,7 @@ sklearn](https://scikit-learn.org/stable/modules/generated/sklearn.feature_selec
 If you’re an univariate method lover and have a different perspective,
 don’t hesitate to contact me.
 
-## Experiment set-up
+### Experiment set-up
 
 Let’s prepare an experiment to see the deficiencies of these methods. We
 generate two variables `x1` and `x2` and a target variable `y` that is
@@ -74,7 +74,7 @@ X_test <- X[(len/2 + 1):len,]
 y_test <- y[(len/2 + 1):len]
 ```
 
-## Univariate-method approach
+### Univariate-method approach
 
 The univariate method approach that we follow here consists in keeping
 the most correlated variables with the target. For this reason, we
@@ -103,7 +103,7 @@ ridge <- cv.glmnet(X_train_cor, y_train, alpha = 0)
 y_pred_cor <- as.vector(predict(ridge, X_test_cor, s = "lambda.min"))
 ```
 
-## Multivariate methods: the Lasso
+### Multivariate methods: the Lasso
 
 The Lasso can be thought of as a multivariate feature selection method,
 as it uses all the features at the same time to select a subset. Here we
@@ -116,9 +116,9 @@ lasso <- cv.glmnet(X_train, y_train)
 y_pred_lasso <- as.vector(predict(lasso, X_test, s = "lambda.min"))
 ```
 
-## Results
+### Results
 
-### Coefficient comparison
+#### Coefficient comparison
 
 By construction, the coefficients should be 1 for `x1` and 0.1 for `x2`.
 In the ridge case (recall that we’ve applied univariate selection using
@@ -153,7 +153,7 @@ coef(lasso, s = "lambda.min")
     ## x1a          .           
     ## x2a          .
 
-### Test set results
+#### Test set results
 
 If you care more about model performance and not that much of proper
 estimation of the parameters, I also have an argument for you. The Lasso
