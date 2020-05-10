@@ -41,6 +41,7 @@ The simplest bayesian solution to estimating the parameter of a Bernoulli is the
 We use the beta distribution because [it is the conjugate prior of the Bernoulli](https://en.wikipedia.org/wiki/Conjugate_prior#Table_of_conjugate_distributions). One issue that we have is providing the parameters $\alpha$ and $\beta$ of the prior distribution. 
 
 If we don't want to assume much about $p$, we can use Jeffreys prior. In the beta distribution case, this is achieved by setting $\alpha = \beta = 1/2$. In this case, if the client has gone through $n$ events and $x$ of them have been successes ($n$ emails sent, $x$ of them opened), the bayesian fraction will be the following: 
+
 $$\hat{p} = \frac{x + 0.5}{n + 1} $$
 
 If we know something about the distribution of $p$, we can assume more and choose $\alpha$ and $\beta$ such that the beta distribution represents our prior belief (I know this is a bit heuristic), [here's an app to explore the possible priors for the beta distribution](https://r.amherst.edu/apps/nhorton/Shiny-Bayes/).
