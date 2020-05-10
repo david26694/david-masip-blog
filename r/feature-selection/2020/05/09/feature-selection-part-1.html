@@ -158,7 +158,7 @@ sklearn</a>.</p>
 <p>If you’re an univariate method lover and have a different perspective,
 don’t hesitate to contact me.</p>
 
-<h2 id="experiment-set-up">Experiment set-up</h2>
+<h3 id="experiment-set-up">Experiment set-up</h3>
 
 <p>Let’s prepare an experiment to see the deficiencies of these methods. We
 generate two variables <code class="highlighter-rouge">x1</code> and <code class="highlighter-rouge">x2</code> and a target variable <code class="highlighter-rouge">y</code> that is
@@ -210,7 +210,7 @@ use <em>glmnet</em> package that uses matrices to fit models.</p>
 </span><span class="n">y_test</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">y</span><span class="p">[(</span><span class="n">len</span><span class="o">/</span><span class="m">2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span><span class="p">)</span><span class="o">:</span><span class="n">len</span><span class="p">]</span><span class="w">
 </span></code></pre></div></div>
 
-<h2 id="univariate-method-approach">Univariate-method approach</h2>
+<h3 id="univariate-method-approach">Univariate-method approach</h3>
 
 <p>The univariate method approach that we follow here consists in keeping
 the most correlated variables with the target. For this reason, we
@@ -238,7 +238,7 @@ and cross-validation to select the optimal hyperparameters:</p>
 </span><span class="n">y_pred_cor</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">as.vector</span><span class="p">(</span><span class="n">predict</span><span class="p">(</span><span class="n">ridge</span><span class="p">,</span><span class="w"> </span><span class="n">X_test_cor</span><span class="p">,</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"lambda.min"</span><span class="p">))</span><span class="w">
 </span></code></pre></div></div>
 
-<h2 id="multivariate-methods-the-lasso">Multivariate methods: the Lasso</h2>
+<h3 id="multivariate-methods-the-lasso">Multivariate methods: the Lasso</h3>
 
 <p>The Lasso can be thought of as a multivariate feature selection method,
 as it uses all the features at the same time to select a subset. Here we
@@ -250,9 +250,9 @@ default.</p>
 </span><span class="n">y_pred_lasso</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">as.vector</span><span class="p">(</span><span class="n">predict</span><span class="p">(</span><span class="n">lasso</span><span class="p">,</span><span class="w"> </span><span class="n">X_test</span><span class="p">,</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"lambda.min"</span><span class="p">))</span><span class="w">
 </span></code></pre></div></div>
 
-<h2 id="results">Results</h2>
+<h3 id="results">Results</h3>
 
-<h3 id="coefficient-comparison">Coefficient comparison</h3>
+<h4 id="coefficient-comparison">Coefficient comparison</h4>
 
 <p>By construction, the coefficients should be 1 for <code class="highlighter-rouge">x1</code> and 0.1 for <code class="highlighter-rouge">x2</code>.
 In the ridge case (recall that we’ve applied univariate selection using
@@ -287,7 +287,7 @@ correlation with the target was too low.</p>
 ## x2a          .
 </code></pre></div></div>
 
-<h3 id="test-set-results">Test set results</h3>
+<h4 id="test-set-results">Test set results</h4>
 
 <p>If you care more about model performance and not that much of proper
 estimation of the parameters, I also have an argument for you. The Lasso

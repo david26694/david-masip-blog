@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.0.0">Jekyll</generator><link href="https://david26694.github.io/david-masip-blog/feed.xml" rel="self" type="application/atom+xml" /><link href="https://david26694.github.io/david-masip-blog/" rel="alternate" type="text/html" /><updated>2020-05-10T05:22:35-05:00</updated><id>https://david26694.github.io/david-masip-blog/feed.xml</id><title type="html">David Masip’s notes</title><entry><title type="html">A bayesian trick for feature engineering</title><link href="https://david26694.github.io/david-masip-blog/feature-engineering/bayesian-statistics/2020/05/23/bayesian-feature-engineering.html" rel="alternate" type="text/html" title="A bayesian trick for feature engineering" /><published>2020-05-23T00:00:00-05:00</published><updated>2020-05-23T00:00:00-05:00</updated><id>https://david26694.github.io/david-masip-blog/feature-engineering/bayesian-statistics/2020/05/23/bayesian-feature-engineering</id><content type="html" xml:base="https://david26694.github.io/david-masip-blog/feature-engineering/bayesian-statistics/2020/05/23/bayesian-feature-engineering.html">&lt;h3 id=&quot;problem-formulation&quot;&gt;Problem formulation&lt;/h3&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.0.0">Jekyll</generator><link href="https://david26694.github.io/david-masip-blog/feed.xml" rel="self" type="application/atom+xml" /><link href="https://david26694.github.io/david-masip-blog/" rel="alternate" type="text/html" /><updated>2020-05-10T05:47:18-05:00</updated><id>https://david26694.github.io/david-masip-blog/feed.xml</id><title type="html">David Masip’s notes</title><entry><title type="html">A bayesian trick for feature engineering</title><link href="https://david26694.github.io/david-masip-blog/feature-engineering/bayesian-statistics/2020/05/23/bayesian-feature-engineering.html" rel="alternate" type="text/html" title="A bayesian trick for feature engineering" /><published>2020-05-23T00:00:00-05:00</published><updated>2020-05-23T00:00:00-05:00</updated><id>https://david26694.github.io/david-masip-blog/feature-engineering/bayesian-statistics/2020/05/23/bayesian-feature-engineering</id><content type="html" xml:base="https://david26694.github.io/david-masip-blog/feature-engineering/bayesian-statistics/2020/05/23/bayesian-feature-engineering.html">&lt;h3 id=&quot;problem-formulation&quot;&gt;Problem formulation&lt;/h3&gt;
 
 &lt;p&gt;You are building a model and, for the entity you want to infer, there is a history of binary events. For instance:&lt;/p&gt;
 
@@ -67,23 +67,22 @@ SelectFromModel&lt;/a&gt;.&lt;/p&gt;
 &lt;/ul&gt;
 
 &lt;p&gt;In my experience, when retraining with only the most important features,
-the model usually degrades a little (this might not always happen).&lt;/p&gt;
+the model usually degrades a little.&lt;/p&gt;
 
 &lt;p&gt;The main issue regarding selecting features using feature importance is
 that, if a feature is highly correlated with others, its importance will
-be lower than if this doesn’t happen.&lt;/p&gt;
+be lower than if it isn’t correlated with any features. For this reason
+I advise to check that your features are not very correlated if you want
+to assess them using feature importance.&lt;/p&gt;
 
-&lt;p&gt;As a rule of thumb, I’d say check that your features are not very
-correlated if you want to assess them using feature importance.&lt;/p&gt;
+&lt;h3 id=&quot;experiment-set-up&quot;&gt;Experiment set-up&lt;/h3&gt;
 
-&lt;h2 id=&quot;experiment-set-up&quot;&gt;Experiment set-up&lt;/h2&gt;
-
-&lt;p&gt;In order to show the deficiencies of selecting features using feature
+&lt;p&gt;In order to show the issues of selecting features using feature
 importance, we’ll use a rather ill-defined example. In this example,
 &lt;code class=&quot;highlighter-rouge&quot;&gt;x1&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;x2&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;x3&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;x4&lt;/code&gt; are independent variables and the dependent
 variable is&lt;/p&gt;
 
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;y = x1 + (x2 + x3 + x4) * 0.5 + noise
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;y ~ x1 + (x2 + x3 + x4) * 0.5 + noise
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;When training a random forest, &lt;code class=&quot;highlighter-rouge&quot;&gt;x1&lt;/code&gt; should appear as the most important
@@ -91,15 +90,13 @@ variable. If the feature selection method had to keep only one feature,
 &lt;code class=&quot;highlighter-rouge&quot;&gt;x1&lt;/code&gt; should be the one to select.&lt;/p&gt;
 
 &lt;p&gt;To see an example where feature importance might mislead you, we’ve
-created some brothers to &lt;code class=&quot;highlighter-rouge&quot;&gt;x1&lt;/code&gt;. These brothers are variables that are
-very correlated to &lt;code class=&quot;highlighter-rouge&quot;&gt;x1&lt;/code&gt; and will be used to model &lt;code class=&quot;highlighter-rouge&quot;&gt;y&lt;/code&gt; as well. These
-brothers are what cause the importance of &lt;code class=&quot;highlighter-rouge&quot;&gt;x1&lt;/code&gt; to be diminished.&lt;/p&gt;
+created some brothers to &lt;code class=&quot;highlighter-rouge&quot;&gt;x1&lt;/code&gt;. They are variables that are very
+correlated to &lt;code class=&quot;highlighter-rouge&quot;&gt;x1&lt;/code&gt; and will be used to model &lt;code class=&quot;highlighter-rouge&quot;&gt;y&lt;/code&gt; as well. These brothers
+are what cause the importance of &lt;code class=&quot;highlighter-rouge&quot;&gt;x1&lt;/code&gt; to be diminished.&lt;/p&gt;
 
 &lt;div class=&quot;language-r highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;library&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;dplyr&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
 &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;library&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;randomForest&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
 &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;library&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;glmnet&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;library&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;yardstick&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-
 
 &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;set.seed&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;42&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
 
@@ -113,6 +110,7 @@ brothers are what cause the importance of &lt;code class=&quot;highlighter-rouge
 &lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;# The outcome is created without the brothers&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
 &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x1&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;0.5&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x2&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;0.5&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x3&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;0.5&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x4&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;rnorm&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
 
+&lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;# x1i are x1's &quot;brothers&quot;: variables that are mainly x1 but with some noise&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
 &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x11&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;0.95&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x1&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;0.05&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;rnorm&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
 &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x12&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;0.95&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x1&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;0.05&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;rnorm&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
 &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x13&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;0.95&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x1&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;0.05&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;rnorm&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
@@ -123,7 +121,7 @@ brothers are what cause the importance of &lt;code class=&quot;highlighter-rouge
 &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x18&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;0.95&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x1&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;0.05&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;rnorm&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
 &lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;The table for the model is created, with &lt;code class=&quot;highlighter-rouge&quot;&gt;x1&lt;/code&gt; to &lt;code class=&quot;highlighter-rouge&quot;&gt;x4&lt;/code&gt;, as well as &lt;code class=&quot;highlighter-rouge&quot;&gt;x1&lt;/code&gt;’s
+&lt;p&gt;Then we create the feature matrix, with &lt;code class=&quot;highlighter-rouge&quot;&gt;x1&lt;/code&gt; to &lt;code class=&quot;highlighter-rouge&quot;&gt;x4&lt;/code&gt;, as well as &lt;code class=&quot;highlighter-rouge&quot;&gt;x1&lt;/code&gt;’s
 brothers.&lt;/p&gt;
 
 &lt;div class=&quot;language-r highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;model_tbl&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;tibble&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
@@ -145,18 +143,15 @@ brothers.&lt;/p&gt;
 &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;as.matrix&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;select&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;model_tbl&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
 &lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;h2 id=&quot;random-forest-importance&quot;&gt;Random forest importance&lt;/h2&gt;
+&lt;h3 id=&quot;random-forest-importance&quot;&gt;Random forest importance&lt;/h3&gt;
 
-&lt;p&gt;We’ll train a random forest model (when training this model, it
-automatically computes feature
-importance)&lt;/p&gt;
+&lt;p&gt;A random forest model is trained (when training this model, it
+automatically computes feature importance).&lt;/p&gt;
 
-&lt;div class=&quot;language-r highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;# Random forest importance ------------------------------------------------&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-
-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;rf&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;randomForest&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;importance&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;div class=&quot;language-r highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;rf&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;randomForest&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;importance&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
 &lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;And we show the importance of the features&lt;/p&gt;
+&lt;p&gt;And we show the importance of the features:&lt;/p&gt;
 
 &lt;div class=&quot;language-r highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;varImpPlot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;rf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;type&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
 &lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
@@ -168,10 +163,10 @@ as the most important feature. If we were to select three variables, we
 would select &lt;code class=&quot;highlighter-rouge&quot;&gt;x2&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;x3&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;x4&lt;/code&gt;, and this would of course degrade the
 model performance.&lt;/p&gt;
 
-&lt;p&gt;And if you think about it, it makes sense. In this random forest, to
-model the &lt;code class=&quot;highlighter-rouge&quot;&gt;x1&lt;/code&gt; contribution, some splits are done with &lt;code class=&quot;highlighter-rouge&quot;&gt;x1&lt;/code&gt;, some with
-her brothers. For this reason, if &lt;code class=&quot;highlighter-rouge&quot;&gt;x1&lt;/code&gt; gets broken, the impact is not as
-big as if &lt;code class=&quot;highlighter-rouge&quot;&gt;x2&lt;/code&gt; breaks.&lt;/p&gt;
+&lt;p&gt;Thinking about it, it makes sense. In this random forest, to model the
+&lt;code class=&quot;highlighter-rouge&quot;&gt;x1&lt;/code&gt; contribution, some splits are done with &lt;code class=&quot;highlighter-rouge&quot;&gt;x1&lt;/code&gt;, some with her
+brothers. For this reason, if &lt;code class=&quot;highlighter-rouge&quot;&gt;x1&lt;/code&gt; gets broken, the impact is not as big
+as if &lt;code class=&quot;highlighter-rouge&quot;&gt;x2&lt;/code&gt; breaks.&lt;/p&gt;
 
 &lt;h3 id=&quot;lasso-selection&quot;&gt;Lasso selection&lt;/h3&gt;
 
@@ -212,7 +207,15 @@ coefficients. If we regularize a bit more, they’ll probably vanish.&lt;/p&gt;
 &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;plotmo&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;plot_glmnet&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;lasso&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;glmnet.fit&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
 &lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/david26694/david-masip-blog/master/experiments/feature_importance/rf_importance_files/figure-gfm/unnamed-chunk-7-1.png&quot; alt=&quot;&quot; /&gt;&lt;!-- --&gt;&lt;/p&gt;</content><author><name></name></author><summary type="html">In part 1, I showed some of the dangers of using univariate selection methods. In part 2 I want to focus on the pitfalls of feature importance in random forests and gradient boosting methods.</summary></entry><entry><title type="html">Feature selection part 1</title><link href="https://david26694.github.io/david-masip-blog/r/feature-selection/2020/05/09/feature-selection-part-1.html" rel="alternate" type="text/html" title="Feature selection part 1" /><published>2020-05-09T00:00:00-05:00</published><updated>2020-05-09T00:00:00-05:00</updated><id>https://david26694.github.io/david-masip-blog/r/feature-selection/2020/05/09/feature-selection-part-1</id><content type="html" xml:base="https://david26694.github.io/david-masip-blog/r/feature-selection/2020/05/09/feature-selection-part-1.html">&lt;p&gt;The purpose of this post is to show the weaknesses of univariate feature
+&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/david26694/david-masip-blog/master/experiments/feature_importance/rf_importance_files/figure-gfm/unnamed-chunk-7-1.png&quot; alt=&quot;&quot; /&gt;&lt;!-- --&gt;&lt;/p&gt;
+
+&lt;p&gt;Of course Lasso selects the variables better in this case, as the model
+is generated linearly. A case where feature importance might shine more
+than the Lasso is when the dependent variable is a non-linear function
+of the features.&lt;/p&gt;
+
+&lt;p&gt;To sum up, be careful with feature importance when having highly
+correlated features.&lt;/p&gt;</content><author><name></name></author><summary type="html">In part 1, I showed some of the dangers of using univariate selection methods. In part 2 I want to focus on the pitfalls of feature importance in random forests and gradient boosting methods.</summary></entry><entry><title type="html">Feature selection part 1</title><link href="https://david26694.github.io/david-masip-blog/r/feature-selection/2020/05/09/feature-selection-part-1.html" rel="alternate" type="text/html" title="Feature selection part 1" /><published>2020-05-09T00:00:00-05:00</published><updated>2020-05-09T00:00:00-05:00</updated><id>https://david26694.github.io/david-masip-blog/r/feature-selection/2020/05/09/feature-selection-part-1</id><content type="html" xml:base="https://david26694.github.io/david-masip-blog/r/feature-selection/2020/05/09/feature-selection-part-1.html">&lt;p&gt;The purpose of this post is to show the weaknesses of univariate feature
 selection methods. This methods usually go in the following way:&lt;/p&gt;
 
 &lt;ul&gt;
@@ -227,7 +230,7 @@ sklearn&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;If you’re an univariate method lover and have a different perspective,
 don’t hesitate to contact me.&lt;/p&gt;
 
-&lt;h2 id=&quot;experiment-set-up&quot;&gt;Experiment set-up&lt;/h2&gt;
+&lt;h3 id=&quot;experiment-set-up&quot;&gt;Experiment set-up&lt;/h3&gt;
 
 &lt;p&gt;Let’s prepare an experiment to see the deficiencies of these methods. We
 generate two variables &lt;code class=&quot;highlighter-rouge&quot;&gt;x1&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;x2&lt;/code&gt; and a target variable &lt;code class=&quot;highlighter-rouge&quot;&gt;y&lt;/code&gt; that is
@@ -279,7 +282,7 @@ use &lt;em&gt;glmnet&lt;/em&gt; package that uses matrices to fit models.&lt;/p&
 &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;y_test&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
 &lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;h2 id=&quot;univariate-method-approach&quot;&gt;Univariate-method approach&lt;/h2&gt;
+&lt;h3 id=&quot;univariate-method-approach&quot;&gt;Univariate-method approach&lt;/h3&gt;
 
 &lt;p&gt;The univariate method approach that we follow here consists in keeping
 the most correlated variables with the target. For this reason, we
@@ -307,7 +310,7 @@ and cross-validation to select the optimal hyperparameters:&lt;/p&gt;
 &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;y_pred_cor&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;as.vector&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;predict&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ridge&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X_test_cor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;s&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;lambda.min&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
 &lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;h2 id=&quot;multivariate-methods-the-lasso&quot;&gt;Multivariate methods: the Lasso&lt;/h2&gt;
+&lt;h3 id=&quot;multivariate-methods-the-lasso&quot;&gt;Multivariate methods: the Lasso&lt;/h3&gt;
 
 &lt;p&gt;The Lasso can be thought of as a multivariate feature selection method,
 as it uses all the features at the same time to select a subset. Here we
@@ -319,9 +322,9 @@ default.&lt;/p&gt;
 &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;y_pred_lasso&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;as.vector&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;predict&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;lasso&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X_test&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;s&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;lambda.min&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
 &lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;h2 id=&quot;results&quot;&gt;Results&lt;/h2&gt;
+&lt;h3 id=&quot;results&quot;&gt;Results&lt;/h3&gt;
 
-&lt;h3 id=&quot;coefficient-comparison&quot;&gt;Coefficient comparison&lt;/h3&gt;
+&lt;h4 id=&quot;coefficient-comparison&quot;&gt;Coefficient comparison&lt;/h4&gt;
 
 &lt;p&gt;By construction, the coefficients should be 1 for &lt;code class=&quot;highlighter-rouge&quot;&gt;x1&lt;/code&gt; and 0.1 for &lt;code class=&quot;highlighter-rouge&quot;&gt;x2&lt;/code&gt;.
 In the ridge case (recall that we’ve applied univariate selection using
@@ -356,7 +359,7 @@ correlation with the target was too low.&lt;/p&gt;
 ## x2a          .
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;h3 id=&quot;test-set-results&quot;&gt;Test set results&lt;/h3&gt;
+&lt;h4 id=&quot;test-set-results&quot;&gt;Test set results&lt;/h4&gt;
 
 &lt;p&gt;If you care more about model performance and not that much of proper
 estimation of the parameters, I also have an argument for you. The Lasso

@@ -159,23 +159,22 @@ SelectFromModel</a>.</p>
 </ul>
 
 <p>In my experience, when retraining with only the most important features,
-the model usually degrades a little (this might not always happen).</p>
+the model usually degrades a little.</p>
 
 <p>The main issue regarding selecting features using feature importance is
 that, if a feature is highly correlated with others, its importance will
-be lower than if this doesn’t happen.</p>
+be lower than if it isn’t correlated with any features. For this reason
+I advise to check that your features are not very correlated if you want
+to assess them using feature importance.</p>
 
-<p>As a rule of thumb, I’d say check that your features are not very
-correlated if you want to assess them using feature importance.</p>
+<h3 id="experiment-set-up">Experiment set-up</h3>
 
-<h2 id="experiment-set-up">Experiment set-up</h2>
-
-<p>In order to show the deficiencies of selecting features using feature
+<p>In order to show the issues of selecting features using feature
 importance, we’ll use a rather ill-defined example. In this example,
 <code class="highlighter-rouge">x1</code>, <code class="highlighter-rouge">x2</code>, <code class="highlighter-rouge">x3</code> and <code class="highlighter-rouge">x4</code> are independent variables and the dependent
 variable is</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>y = x1 + (x2 + x3 + x4) * 0.5 + noise
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>y ~ x1 + (x2 + x3 + x4) * 0.5 + noise
 </code></pre></div></div>
 
 <p>When training a random forest, <code class="highlighter-rouge">x1</code> should appear as the most important
@@ -183,15 +182,13 @@ variable. If the feature selection method had to keep only one feature,
 <code class="highlighter-rouge">x1</code> should be the one to select.</p>
 
 <p>To see an example where feature importance might mislead you, we’ve
-created some brothers to <code class="highlighter-rouge">x1</code>. These brothers are variables that are
-very correlated to <code class="highlighter-rouge">x1</code> and will be used to model <code class="highlighter-rouge">y</code> as well. These
-brothers are what cause the importance of <code class="highlighter-rouge">x1</code> to be diminished.</p>
+created some brothers to <code class="highlighter-rouge">x1</code>. They are variables that are very
+correlated to <code class="highlighter-rouge">x1</code> and will be used to model <code class="highlighter-rouge">y</code> as well. These brothers
+are what cause the importance of <code class="highlighter-rouge">x1</code> to be diminished.</p>
 
 <div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">library</span><span class="p">(</span><span class="s2">"dplyr"</span><span class="p">)</span><span class="w">
 </span><span class="n">library</span><span class="p">(</span><span class="s2">"randomForest"</span><span class="p">)</span><span class="w">
 </span><span class="n">library</span><span class="p">(</span><span class="s2">"glmnet"</span><span class="p">)</span><span class="w">
-</span><span class="n">library</span><span class="p">(</span><span class="s2">"yardstick"</span><span class="p">)</span><span class="w">
-
 
 </span><span class="n">set.seed</span><span class="p">(</span><span class="m">42</span><span class="p">)</span><span class="w">
 
@@ -205,6 +202,7 @@ brothers are what cause the importance of <code class="highlighter-rouge">x1</co
 </span><span class="c1"># The outcome is created without the brothers</span><span class="w">
 </span><span class="n">y</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">x1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">0.5</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">x2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">0.5</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">x3</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">0.5</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">x4</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">rnorm</span><span class="p">(</span><span class="n">len</span><span class="p">)</span><span class="w">
 
+</span><span class="c1"># x1i are x1's "brothers": variables that are mainly x1 but with some noise</span><span class="w">
 </span><span class="n">x11</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="m">0.95</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">x1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">0.05</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">rnorm</span><span class="p">(</span><span class="n">len</span><span class="p">)</span><span class="w">
 </span><span class="n">x12</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="m">0.95</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">x1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">0.05</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">rnorm</span><span class="p">(</span><span class="n">len</span><span class="p">)</span><span class="w">
 </span><span class="n">x13</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="m">0.95</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">x1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">0.05</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">rnorm</span><span class="p">(</span><span class="n">len</span><span class="p">)</span><span class="w">
@@ -215,7 +213,7 @@ brothers are what cause the importance of <code class="highlighter-rouge">x1</co
 </span><span class="n">x18</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="m">0.95</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">x1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">0.05</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">rnorm</span><span class="p">(</span><span class="n">len</span><span class="p">)</span><span class="w">
 </span></code></pre></div></div>
 
-<p>The table for the model is created, with <code class="highlighter-rouge">x1</code> to <code class="highlighter-rouge">x4</code>, as well as <code class="highlighter-rouge">x1</code>’s
+<p>Then we create the feature matrix, with <code class="highlighter-rouge">x1</code> to <code class="highlighter-rouge">x4</code>, as well as <code class="highlighter-rouge">x1</code>’s
 brothers.</p>
 
 <div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">model_tbl</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">tibble</span><span class="p">(</span><span class="w">
@@ -237,18 +235,15 @@ brothers.</p>
 </span><span class="n">X</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">as.matrix</span><span class="p">(</span><span class="n">select</span><span class="p">(</span><span class="n">model_tbl</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="n">y</span><span class="p">))</span><span class="w">
 </span></code></pre></div></div>
 
-<h2 id="random-forest-importance">Random forest importance</h2>
+<h3 id="random-forest-importance">Random forest importance</h3>
 
-<p>We’ll train a random forest model (when training this model, it
-automatically computes feature
-importance)</p>
+<p>A random forest model is trained (when training this model, it
+automatically computes feature importance).</p>
 
-<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Random forest importance ------------------------------------------------</span><span class="w">
-
-</span><span class="n">rf</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">randomForest</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">,</span><span class="w"> </span><span class="n">importance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">T</span><span class="p">)</span><span class="w">
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">rf</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">randomForest</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">,</span><span class="w"> </span><span class="n">importance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">T</span><span class="p">)</span><span class="w">
 </span></code></pre></div></div>
 
-<p>And we show the importance of the features</p>
+<p>And we show the importance of the features:</p>
 
 <div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">varImpPlot</span><span class="p">(</span><span class="n">rf</span><span class="p">,</span><span class="w"> </span><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span><span class="p">)</span><span class="w">
 </span></code></pre></div></div>
@@ -260,10 +255,10 @@ as the most important feature. If we were to select three variables, we
 would select <code class="highlighter-rouge">x2</code>, <code class="highlighter-rouge">x3</code> and <code class="highlighter-rouge">x4</code>, and this would of course degrade the
 model performance.</p>
 
-<p>And if you think about it, it makes sense. In this random forest, to
-model the <code class="highlighter-rouge">x1</code> contribution, some splits are done with <code class="highlighter-rouge">x1</code>, some with
-her brothers. For this reason, if <code class="highlighter-rouge">x1</code> gets broken, the impact is not as
-big as if <code class="highlighter-rouge">x2</code> breaks.</p>
+<p>Thinking about it, it makes sense. In this random forest, to model the
+<code class="highlighter-rouge">x1</code> contribution, some splits are done with <code class="highlighter-rouge">x1</code>, some with her
+brothers. For this reason, if <code class="highlighter-rouge">x1</code> gets broken, the impact is not as big
+as if <code class="highlighter-rouge">x2</code> breaks.</p>
 
 <h3 id="lasso-selection">Lasso selection</h3>
 
@@ -305,6 +300,14 @@ coefficients. If we regularize a bit more, they’ll probably vanish.</p>
 </span></code></pre></div></div>
 
 <p><img src="https://raw.githubusercontent.com/david26694/david-masip-blog/master/experiments/feature_importance/rf_importance_files/figure-gfm/unnamed-chunk-7-1.png" alt="" /><!-- --></p>
+
+<p>Of course Lasso selects the variables better in this case, as the model
+is generated linearly. A case where feature importance might shine more
+than the Lasso is when the dependent variable is a non-linear function
+of the features.</p>
+
+<p>To sum up, be careful with feature importance when having highly
+correlated features.</p>
 
   </div><!-- from https://github.com/utterance/utterances -->
 <script src="https://utteranc.es/client.js"
