@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>slider package | David Masip’s notes</title>
+<meta name="generator" content="Jekyll v4.0.0" />
+<meta property="og:title" content="slider package" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="The ultimate package for time-series feature engineering" />
+<meta property="og:description" content="The ultimate package for time-series feature engineering" />
+<link rel="canonical" href="https://david26694.github.io/david-masip-blog/r/feature-engineering/2020/05/30/slider.html" />
+<meta property="og:url" content="https://david26694.github.io/david-masip-blog/r/feature-engineering/2020/05/30/slider.html" />
+<meta property="og:site_name" content="David Masip’s notes" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-05-30T00:00:00-05:00" />
+<script type="application/ld+json">
+{"description":"The ultimate package for time-series feature engineering","headline":"slider package","dateModified":"2020-05-30T00:00:00-05:00","datePublished":"2020-05-30T00:00:00-05:00","@type":"BlogPosting","url":"https://david26694.github.io/david-masip-blog/r/feature-engineering/2020/05/30/slider.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://david26694.github.io/david-masip-blog/r/feature-engineering/2020/05/30/slider.html"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/david-masip-blog/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://david26694.github.io/david-masip-blog/feed.xml" title="David Masip's notes" /><link rel="shortcut icon" type="image/x-icon" href="/david-masip-blog/images/favicon.ico"><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>slider package | David Masip’s notes</title>
+<meta name="generator" content="Jekyll v4.0.0" />
+<meta property="og:title" content="slider package" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="The ultimate package for time-series feature engineering" />
+<meta property="og:description" content="The ultimate package for time-series feature engineering" />
+<link rel="canonical" href="https://david26694.github.io/david-masip-blog/r/feature-engineering/2020/05/30/slider.html" />
+<meta property="og:url" content="https://david26694.github.io/david-masip-blog/r/feature-engineering/2020/05/30/slider.html" />
+<meta property="og:site_name" content="David Masip’s notes" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-05-30T00:00:00-05:00" />
+<script type="application/ld+json">
+{"description":"The ultimate package for time-series feature engineering","headline":"slider package","dateModified":"2020-05-30T00:00:00-05:00","datePublished":"2020-05-30T00:00:00-05:00","@type":"BlogPosting","url":"https://david26694.github.io/david-masip-blog/r/feature-engineering/2020/05/30/slider.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://david26694.github.io/david-masip-blog/r/feature-engineering/2020/05/30/slider.html"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+<link href="https://unpkg.com/@primer/css/dist/primer.css" rel="stylesheet" />
+<link rel="stylesheet" href="//use.fontawesome.com/releases/v5.0.7/css/all.css"><link type="application/atom+xml" rel="alternate" href="https://david26694.github.io/david-masip-blog/feed.xml" title="David Masip's notes" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"> </script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"></script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement( document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "[%", right: "%]", display: true},
+            {left: "$", right: "$", display: false}
+        ]}
+        );
+    });
+    </script>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js"></script>
+<script type="text/javascript">
+require.config({
+  paths: {
+    jquery: 'https://code.jquery.com/jquery-3.5.0.min',
+    plotly: 'https://cdn.plot.ly/plotly-latest.min'
+  },
+
+  shim: {
+    plotly: {
+      deps: ['jquery'],
+      exports: 'plotly'
+    }
+  }
+});
+</script>
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head><body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/david-masip-blog/">David Masip&#39;s notes</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/david-masip-blog/about/">About Me</a><a class="page-link" href="/david-masip-blog/search/">Search</a><a class="page-link" href="/david-masip-blog/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">slider package</h1><p class="page-description">The ultimate package for time-series feature engineering</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2020-05-30T00:00:00-05:00" itemprop="datePublished">
+        May 30, 2020
+      </time>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      7 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/david-masip-blog/categories/#r">r</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/david-masip-blog/categories/#feature-engineering">feature-engineering</a>
+        
+      
+      </p>
+    
+
+    </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p><a href="https://davisvaughan.github.io/slider/">slider</a> is an R package that
+allows to perform sliding window calculations. In this post we’re going
+to see how slider can be used to perform feature engineering for sales
+forecasting problems.</p>
+
+<h3 id="problem-formulation">Problem formulation</h3>
+
+<p>Your are working on a demand prediction problem. You have sales data
+that has the following structure:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>##   shop product       date units_sold
+## 1    A  iogurt 2020-02-01         11
+## 2    A  iogurt 2020-02-02         15
+## 3    A  iogurt 2020-02-03         14
+## 4    B  iogurt 2020-02-01         25
+## 5    B  iogurt 2020-02-02         33
+## 6    B  iogurt 2020-02-03         33
+</code></pre></div></div>
+
+<p>And you want to predict, for each shop and each product, the units that
+will be sold during the following day.</p>
+
+<p>To do so, you’ll create features like:</p>
+
+<ul>
+  <li>How much was the product sold on average during last week in that
+shop.</li>
+  <li>How much was the product sold on average during last week in all
+shops.</li>
+  <li>How much was the shop selling on average during last week.</li>
+  <li>Similar features but using last month data, instead of last week. Or
+maybe even using the over-all sales history that we have.</li>
+  <li>Perhaps we want compute averages by using the mean, but maybe we
+want the median, maximum and minimum units sold during the week.</li>
+</ul>
+
+<p>I think slider is one of the simplest ways of doing this.</p>
+
+<h3 id="introduction-to-slider">Introduction to slider</h3>
+
+<p>Slider has a main function, <code class="highlighter-rouge">slide</code>, and variations of it. According to
+the documentation,</p>
+
+<blockquote>
+  <p>slide() iterates through .x using a sliding window, applying .f to
+each sub-window of .x.</p>
+</blockquote>
+
+<p>The sub-window of .x is highly customizable. The parameters to customize
+the sub-window are mainly <code class="highlighter-rouge">.before</code>, <code class="highlighter-rouge">.after</code>, <code class="highlighter-rouge">.step</code> and <code class="highlighter-rouge">.complete</code>.</p>
+
+<p>Let’s see it with some examples. Compute the over-all sales in shop A
+until today (this is not a feature we want to train our model on, but
+something to see the behaviour of slide):</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Cumulative sold items until today</span><span class="w">
+</span><span class="n">sales_tbl</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">filter</span><span class="p">(</span><span class="n">shop</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s1">'A'</span><span class="p">)</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">mutate</span><span class="p">(</span><span class="w">
+    </span><span class="c1"># (slightly technical warning) We're going to be using </span><span class="w">
+    </span><span class="c1"># slide_vec instead of slide, they're basically the same, </span><span class="w">
+    </span><span class="c1"># but slide_vec returns a vector, whereas slide returns a list</span><span class="w">
+    </span><span class="n">sum_sold_wrong</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">slide_vec</span><span class="p">(</span><span class="n">.x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">units_sold</span><span class="p">,</span><span class="w"> </span><span class="n">.f</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sum</span><span class="p">,</span><span class="w"> </span><span class="n">.before</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">Inf</span><span class="p">)</span><span class="w">
+  </span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>##   shop product       date units_sold sum_sold_wrong
+## 1    A  iogurt 2020-02-01         11             11
+## 2    A  iogurt 2020-02-02         15             26
+## 3    A  iogurt 2020-02-03         14             40
+</code></pre></div></div>
+
+<p>The <code class="highlighter-rouge">.before</code> parameter indicates how many days do we go back to
+aggregate the sold units. If we set it to <code class="highlighter-rouge">Inf</code>, it computes the units
+sold until today.</p>
+
+<p>The issue is that this <code class="highlighter-rouge">sum_sold_wrong</code> has the units that have been
+sold including today. If we want to exclude today’s data, which makes
+sense as we want to predict without today’s information, slider has this
+nice trick (setting <code class="highlighter-rouge">.after = -1</code>):</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Here we are excluding today!</span><span class="w">
+</span><span class="n">sales_tbl</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">filter</span><span class="p">(</span><span class="n">shop</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s1">'A'</span><span class="p">)</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">mutate</span><span class="p">(</span><span class="w">
+    </span><span class="n">sum_sold_right</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">slide_vec</span><span class="p">(</span><span class="n">.x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">units_sold</span><span class="p">,</span><span class="w"> </span><span class="n">.f</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sum</span><span class="p">,</span><span class="w"> </span><span class="n">.before</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">Inf</span><span class="p">,</span><span class="w"> </span><span class="n">.after</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">-1</span><span class="p">)</span><span class="w">
+  </span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>##   shop product       date units_sold sum_sold_right
+## 1    A  iogurt 2020-02-01         11              0
+## 2    A  iogurt 2020-02-02         15             11
+## 3    A  iogurt 2020-02-03         14             26
+</code></pre></div></div>
+
+<p>Setting <code class="highlighter-rouge">.after</code> to -1 is kind of dark but it will be used a lot when
+doing forecasting using slider. It is important to use a negative
+<code class="highlighter-rouge">.after</code> since we don’t want to leak information from the future into
+our pipeline.</p>
+
+<h3 id="feature-engineering-with-slider">Feature engineering with slider</h3>
+
+<p>Let’s say we want to compute features at shop level:</p>
+
+<ul>
+  <li>Mean of units sold during the last week for each shop.</li>
+  <li>Mean of units sold during the last month for each shop.</li>
+  <li>Mean of units sold over-all for each shop.</li>
+  <li>Max of units sold during the last week for each shop.</li>
+  <li>Max of units sold during the last month for each shop.</li>
+  <li>Max of units sold over-all for each shop.</li>
+</ul>
+
+<p>What I like about slider is that explaining the features takes more time
+than coding them:</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">sales_tbl</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">sales_tbl</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">group_by</span><span class="p">(</span><span class="n">shop</span><span class="p">)</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> </span><span class="c1"># Shop-level features</span><span class="w">
+  </span><span class="n">mutate</span><span class="p">(</span><span class="w">
+    </span><span class="c1"># Mean of units sold during the last week</span><span class="w">
+    </span><span class="n">mean_sold_shop_week</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">slide_vec</span><span class="p">(</span><span class="n">.x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">units_sold</span><span class="p">,</span><span class="w"> </span><span class="n">.f</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mean</span><span class="p">,</span><span class="w"> </span><span class="n">.before</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">7</span><span class="p">,</span><span class="w"> </span><span class="n">.after</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">-1</span><span class="p">),</span><span class="w">
+    </span><span class="c1"># Mean of units sold during the last month</span><span class="w">
+    </span><span class="n">mean_sold_shop_month</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">slide_vec</span><span class="p">(</span><span class="n">.x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">units_sold</span><span class="p">,</span><span class="w"> </span><span class="n">.f</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mean</span><span class="p">,</span><span class="w"> </span><span class="n">.before</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">30</span><span class="p">,</span><span class="w"> </span><span class="n">.after</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">-1</span><span class="p">),</span><span class="w">
+    </span><span class="c1"># Mean of units sold over-all</span><span class="w">
+    </span><span class="n">mean_sold_shop</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">slide_vec</span><span class="p">(</span><span class="n">.x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">units_sold</span><span class="p">,</span><span class="w"> </span><span class="n">.f</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mean</span><span class="p">,</span><span class="w"> </span><span class="n">.before</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">Inf</span><span class="p">,</span><span class="w"> </span><span class="n">.after</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">-1</span><span class="p">),</span><span class="w">
+    </span><span class="c1"># Max of units sold during the last week</span><span class="w">
+    </span><span class="n">max_sold_shop_week</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">slide_vec</span><span class="p">(</span><span class="n">.x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">units_sold</span><span class="p">,</span><span class="w"> </span><span class="n">.f</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">max</span><span class="p">,</span><span class="w"> </span><span class="n">.before</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">7</span><span class="p">,</span><span class="w"> </span><span class="n">.after</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">-1</span><span class="p">),</span><span class="w">
+    </span><span class="c1"># Max of units sold during the last month</span><span class="w">
+    </span><span class="n">max_sold_shop_month</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">slide_vec</span><span class="p">(</span><span class="n">.x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">units_sold</span><span class="p">,</span><span class="w"> </span><span class="n">.f</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">max</span><span class="p">,</span><span class="w"> </span><span class="n">.before</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">30</span><span class="p">,</span><span class="w"> </span><span class="n">.after</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">-1</span><span class="p">),</span><span class="w">
+    </span><span class="c1"># Max of units sold over-all</span><span class="w">
+    </span><span class="n">max_sold_shop</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">slide_vec</span><span class="p">(</span><span class="n">.x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">units_sold</span><span class="p">,</span><span class="w"> </span><span class="n">.f</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">max</span><span class="p">,</span><span class="w"> </span><span class="n">.before</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">Inf</span><span class="p">,</span><span class="w"> </span><span class="n">.after</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">-1</span><span class="p">)</span><span class="w">
+  </span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p>If we want to do the same at product level, we only have to change the
+grouping variable (and variable names):</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">sales_tbl</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">sales_tbl</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">group_by</span><span class="p">(</span><span class="n">product</span><span class="p">)</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> </span><span class="c1"># Product-level features</span><span class="w">
+  </span><span class="n">mutate</span><span class="p">(</span><span class="w">
+    </span><span class="c1"># Mean of units sold during the last week</span><span class="w">
+    </span><span class="n">mean_sold_product_week</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">slide_vec</span><span class="p">(</span><span class="n">.x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">units_sold</span><span class="p">,</span><span class="w"> </span><span class="n">.f</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mean</span><span class="p">,</span><span class="w"> </span><span class="n">.before</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">7</span><span class="p">,</span><span class="w"> </span><span class="n">.after</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">-1</span><span class="p">),</span><span class="w">
+    </span><span class="c1"># Mean of units sold during the last month</span><span class="w">
+    </span><span class="n">mean_sold_product_month</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">slide_vec</span><span class="p">(</span><span class="n">.x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">units_sold</span><span class="p">,</span><span class="w"> </span><span class="n">.f</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mean</span><span class="p">,</span><span class="w"> </span><span class="n">.before</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">30</span><span class="p">,</span><span class="w"> </span><span class="n">.after</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">-1</span><span class="p">),</span><span class="w">
+    </span><span class="c1"># Mean of units sold over-all</span><span class="w">
+    </span><span class="n">mean_sold_product</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">slide_vec</span><span class="p">(</span><span class="n">.x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">units_sold</span><span class="p">,</span><span class="w"> </span><span class="n">.f</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mean</span><span class="p">,</span><span class="w"> </span><span class="n">.before</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">Inf</span><span class="p">,</span><span class="w"> </span><span class="n">.after</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">-1</span><span class="p">),</span><span class="w">
+    </span><span class="c1"># Max of units sold during the last week</span><span class="w">
+    </span><span class="n">max_sold_product_week</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">slide_vec</span><span class="p">(</span><span class="n">.x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">units_sold</span><span class="p">,</span><span class="w"> </span><span class="n">.f</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">max</span><span class="p">,</span><span class="w"> </span><span class="n">.before</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">7</span><span class="p">,</span><span class="w"> </span><span class="n">.after</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">-1</span><span class="p">),</span><span class="w">
+    </span><span class="c1"># Max of units sold during the last month</span><span class="w">
+    </span><span class="n">max_sold_product_month</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">slide_vec</span><span class="p">(</span><span class="n">.x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">units_sold</span><span class="p">,</span><span class="w"> </span><span class="n">.f</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">max</span><span class="p">,</span><span class="w"> </span><span class="n">.before</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">30</span><span class="p">,</span><span class="w"> </span><span class="n">.after</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">-1</span><span class="p">),</span><span class="w">
+    </span><span class="c1"># Max of units sold over-all</span><span class="w">
+    </span><span class="n">max_sold_product</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">slide_vec</span><span class="p">(</span><span class="n">.x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">units_sold</span><span class="p">,</span><span class="w"> </span><span class="n">.f</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">max</span><span class="p">,</span><span class="w"> </span><span class="n">.before</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">Inf</span><span class="p">,</span><span class="w"> </span><span class="n">.after</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">-1</span><span class="p">)</span><span class="w">
+  </span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Same if we want features at shop and product level:</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">sales_tbl</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">sales_tbl</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">group_by</span><span class="p">(</span><span class="n">shop</span><span class="p">,</span><span class="w"> </span><span class="n">product</span><span class="p">)</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> </span><span class="c1"># Product-level features</span><span class="w">
+  </span><span class="n">mutate</span><span class="p">(</span><span class="w">
+    </span><span class="c1"># Mean of units sold during the last week</span><span class="w">
+    </span><span class="n">mean_sold_sh_product_week</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">slide_vec</span><span class="p">(</span><span class="n">.x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">units_sold</span><span class="p">,</span><span class="w"> </span><span class="n">.f</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mean</span><span class="p">,</span><span class="w"> </span><span class="n">.before</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">7</span><span class="p">,</span><span class="w"> </span><span class="n">.after</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">-1</span><span class="p">),</span><span class="w">
+    </span><span class="c1"># Mean of units sold during the last month</span><span class="w">
+    </span><span class="n">mean_sold_sh_product_month</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">slide_vec</span><span class="p">(</span><span class="n">.x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">units_sold</span><span class="p">,</span><span class="w"> </span><span class="n">.f</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mean</span><span class="p">,</span><span class="w"> </span><span class="n">.before</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">30</span><span class="p">,</span><span class="w"> </span><span class="n">.after</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">-1</span><span class="p">),</span><span class="w">
+    </span><span class="c1"># Mean of units sold over-all</span><span class="w">
+    </span><span class="n">mean_sold_sh_product</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">slide_vec</span><span class="p">(</span><span class="n">.x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">units_sold</span><span class="p">,</span><span class="w"> </span><span class="n">.f</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mean</span><span class="p">,</span><span class="w"> </span><span class="n">.before</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">Inf</span><span class="p">,</span><span class="w"> </span><span class="n">.after</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">-1</span><span class="p">),</span><span class="w">
+    </span><span class="c1"># Max of units sold during the last week</span><span class="w">
+    </span><span class="n">max_sold_sh_product_week</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">slide_vec</span><span class="p">(</span><span class="n">.x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">units_sold</span><span class="p">,</span><span class="w"> </span><span class="n">.f</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">max</span><span class="p">,</span><span class="w"> </span><span class="n">.before</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">7</span><span class="p">,</span><span class="w"> </span><span class="n">.after</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">-1</span><span class="p">),</span><span class="w">
+    </span><span class="c1"># Max of units sold during the last month</span><span class="w">
+    </span><span class="n">max_sold_sh_product_month</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">slide_vec</span><span class="p">(</span><span class="n">.x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">units_sold</span><span class="p">,</span><span class="w"> </span><span class="n">.f</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">max</span><span class="p">,</span><span class="w"> </span><span class="n">.before</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">30</span><span class="p">,</span><span class="w"> </span><span class="n">.after</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">-1</span><span class="p">),</span><span class="w">
+    </span><span class="c1"># Max of units sold over-all</span><span class="w">
+    </span><span class="n">max_sold_sh_product</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">slide_vec</span><span class="p">(</span><span class="n">.x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">units_sold</span><span class="p">,</span><span class="w"> </span><span class="n">.f</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">max</span><span class="p">,</span><span class="w"> </span><span class="n">.before</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">Inf</span><span class="p">,</span><span class="w"> </span><span class="n">.after</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">-1</span><span class="p">)</span><span class="w">
+  </span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p>If we want to take into consideration the day of week, we can use the
+<code class="highlighter-rouge">.step</code> parameter. The following call to <code class="highlighter-rouge">slide_vec</code> computes the mean
+of units sold of the last 4 days of that weekday.</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">sales_tbl</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">sales_tbl</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">ungroup</span><span class="p">()</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">mutate</span><span class="p">(</span><span class="w">
+    </span><span class="n">day_of_week_effect</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">slide_vec</span><span class="p">(</span><span class="n">.x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">units_sold</span><span class="p">,</span><span class="w"> </span><span class="n">.f</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mean</span><span class="p">,</span><span class="w"> </span><span class="n">.before</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">4</span><span class="p">,</span><span class="w"> </span><span class="n">.step</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">7</span><span class="p">,</span><span class="w"> </span><span class="n">.after</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">-1</span><span class="p">),</span><span class="w">
+  </span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p>With very few lines of code we’ve managed to build features that very
+predictive of our outcome. Moreover, we are <strong>not leaking information</strong>
+from the future. A supervised learning model could be trained on these
+features and we can have very quickly a very decent baseline to start
+iterating on.</p>
+
+<h3 id="why-slider">Why slider?</h3>
+
+<p>For some of this quantities, the use of slider seems kind of an
+over-kill. For instance, the over-all mean of units sold in a given shop
+can be done in two different ways:</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Slider way</span><span class="w">
+</span><span class="n">sales_tbl</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">sales_tbl</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">group_by</span><span class="p">(</span><span class="n">shop</span><span class="p">)</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">mutate</span><span class="p">(</span><span class="w">
+    </span><span class="n">mean_sold_shop</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">slide_vec</span><span class="p">(</span><span class="n">.x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">units_sold</span><span class="p">,</span><span class="w"> </span><span class="n">.f</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mean</span><span class="p">,</span><span class="w"> </span><span class="n">.before</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">Inf</span><span class="p">,</span><span class="w"> </span><span class="n">.after</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">-1</span><span class="p">)</span><span class="w">
+  </span><span class="p">)</span><span class="w">
+
+</span><span class="c1"># Simple way</span><span class="w">
+</span><span class="n">sales_tbl</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">sales_tbl</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">group_by</span><span class="p">(</span><span class="n">shop</span><span class="p">)</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">mutate</span><span class="p">(</span><span class="w">
+    </span><span class="n">mean_sold_shop</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mean</span><span class="p">(</span><span class="n">units_sold</span><span class="p">)</span><span class="w">
+  </span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Why would I rather use the slider way? The reason is that the simple way
+leaks information from the future. That is, it uses the target of a row
+to create a feature, and then we are going to use that feature to
+predict the target. We might end up over-trusting the <code class="highlighter-rouge">mean_sold_shop</code>
+feature. This might have two consequences:</p>
+
+<ul>
+  <li>If we do it right, by only using the train set to compute
+<code class="highlighter-rouge">mean_sold_shop</code> the model might degrade in the test set. This is
+not ideal, but we can live with it.</li>
+  <li>If we do it wrong, by using the test set to compute <code class="highlighter-rouge">mean_sold_shop</code>
+the model will degrade in production, which is a bigger trouble.</li>
+</ul>
+
+<p>With slider, you don’t have to worry about none of the above since you
+are only using information from the past.</p>
+
+  </div><!-- from https://github.com/utterance/utterances -->
+<script src="https://utteranc.es/client.js"
+        repo="david26694/david-masip-blog"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script><a class="u-url" href="/david-masip-blog/r/feature-engineering/2020/05/30/slider.html" hidden></a>
+</article>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/david-masip-blog/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/david-masip-blog/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/david-masip-blog/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p></p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/david26694" title="david26694"><svg class="svg-icon grey"><use xlink:href="/david-masip-blog/assets/minima-social-icons.svg#github"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
