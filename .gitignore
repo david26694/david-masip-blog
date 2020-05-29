@@ -18,7 +18,7 @@ __pycache__
 .Rproj.user
 *.Rproj
 .Rhistory
-.RData
+*.RData
 
 # Mac
 *.DS_Store

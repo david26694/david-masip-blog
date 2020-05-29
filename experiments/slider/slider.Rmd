@@ -1,0 +1,197 @@
+---
+toc: false
+layout: post
+description: The ultimate package for time-series feature engineering
+categories: [r, feature-engineering]
+comments: true
+title: slider package
+---
+
+[slider](https://davisvaughan.github.io/slider/) is an R package that allows to perform sliding window calculations. In this post we're going to see how slider can be used to perform feature engineering for sales forecasting problems.
+
+### Problem formulation
+
+Your are working on a demand prediction problem. You have sales data that has the following structure:
+
+```{r message=FALSE, warning=FALSE, echo=FALSE}
+library(dplyr)
+library(slider)
+```
+
+```{r, echo=FALSE}
+sales_tbl <- data.frame(
+  shop = c("A", "A", "A", "B", "B", "B"),
+  product = rep('iogurt', 6),
+  date = rep(seq.Date(as.Date("2020-02-01"), as.Date("2020-02-03"), 1), 2),
+  units_sold = c(11, 15, 14, 25, 33, 33)
+)
+
+sales_tbl
+```
+
+And you want to predict, for each shop and each product, the units that will be sold during the following day. 
+
+To do so, you'll create features like:
+
+- How much was the product sold on average during last week in that shop.
+- How much was the product sold on average during last week in all shops.
+- How much was the shop selling on average during last week.
+- Similar features but using last month data, instead of last week. Or maybe even using the over-all sales history that we have.
+- Perhaps we want compute averages by using the mean, but maybe we want the median, maximum and minimum units sold during the week.
+
+I think slider is one of the simplest ways of doing this.
+
+### Introduction to slider 
+
+Slider has a main function, `slide`, and variations of it. According to the documentation,
+
+> slide() iterates through .x using a sliding window, applying .f to each sub-window of .x.
+
+The sub-window of .x is highly customizable. The parameters to customize the sub-window are mainly `.before`, `.after`, `.step` and `.complete`. 
+
+Let's see it with some examples. Compute the over-all sales in shop A until today (this is not a feature we want to train our model on, but something to see the behaviour of slide):
+
+```{r}
+# Cumulative sold items until today
+sales_tbl %>% 
+  filter(shop == 'A') %>% 
+  mutate(
+    # (slightly technical warning) We're going to be using 
+    # slide_vec instead of slide, they're basically the same, 
+    # but slide_vec returns a vector, whereas slide returns a list
+    sum_sold_wrong = slide_vec(.x = units_sold, .f = sum, .before = Inf)
+  )
+```
+
+The `.before` parameter indicates how many days do we go back to aggregate the sold units. If we set it to `Inf`, it computes the units sold until today.
+
+The issue is that this `sum_sold_wrong` has the units that have been sold including today. If we want to exclude today's data, which makes sense as we want to predict without today's information, slider has this nice trick (setting `.after = -1`):
+
+```{r}
+# Here we are excluding today!
+sales_tbl %>% 
+  filter(shop == 'A') %>% 
+  mutate(
+    sum_sold_right = slide_vec(.x = units_sold, .f = sum, .before = Inf, .after = -1)
+  )
+```
+
+Setting `.after` to -1 is kind of dark but it will be used a lot when doing forecasting using slider. It is important to use a negative `.after` since we don't want to leak information from the future into our pipeline.
+
+
+### Feature engineering with slider
+
+Let's say we want to compute features at shop level:
+
+- Mean of units sold during the last week for each shop.
+- Mean of units sold during the last month for each shop.
+- Mean of units sold over-all for each shop.
+- Max of units sold during the last week for each shop.
+- Max of units sold during the last month for each shop.
+- Max of units sold over-all for each shop.
+
+What I like about slider is that explaining the features takes more time than coding them:
+
+```{r warning=FALSE}
+sales_tbl <- sales_tbl %>% 
+  group_by(shop) %>% # Shop-level features
+  mutate(
+    # Mean of units sold during the last week
+    mean_sold_shop_week = slide_vec(.x = units_sold, .f = mean, .before = 7, .after = -1),
+    # Mean of units sold during the last month
+    mean_sold_shop_month = slide_vec(.x = units_sold, .f = mean, .before = 30, .after = -1),
+    # Mean of units sold over-all
+    mean_sold_shop = slide_vec(.x = units_sold, .f = mean, .before = Inf, .after = -1),
+    # Max of units sold during the last week
+    max_sold_shop_week = slide_vec(.x = units_sold, .f = max, .before = 7, .after = -1),
+    # Max of units sold during the last month
+    max_sold_shop_month = slide_vec(.x = units_sold, .f = max, .before = 30, .after = -1),
+    # Max of units sold over-all
+    max_sold_shop = slide_vec(.x = units_sold, .f = max, .before = Inf, .after = -1)
+  )
+```
+
+If we want to do the same at product level, we only have to change the grouping variable (and variable names):
+
+```{r warning=FALSE}
+sales_tbl <- sales_tbl %>% 
+  group_by(product) %>% # Product-level features
+  mutate(
+    # Mean of units sold during the last week
+    mean_sold_product_week = slide_vec(.x = units_sold, .f = mean, .before = 7, .after = -1),
+    # Mean of units sold during the last month
+    mean_sold_product_month = slide_vec(.x = units_sold, .f = mean, .before = 30, .after = -1),
+    # Mean of units sold over-all
+    mean_sold_product = slide_vec(.x = units_sold, .f = mean, .before = Inf, .after = -1),
+    # Max of units sold during the last week
+    max_sold_product_week = slide_vec(.x = units_sold, .f = max, .before = 7, .after = -1),
+    # Max of units sold during the last month
+    max_sold_product_month = slide_vec(.x = units_sold, .f = max, .before = 30, .after = -1),
+    # Max of units sold over-all
+    max_sold_product = slide_vec(.x = units_sold, .f = max, .before = Inf, .after = -1)
+  )
+```
+
+Same if we want features at shop and product level:
+
+```{r warning=FALSE}
+sales_tbl <- sales_tbl %>% 
+  group_by(shop, product) %>% # Product-level features
+  mutate(
+    # Mean of units sold during the last week
+    mean_sold_sh_product_week = slide_vec(.x = units_sold, .f = mean, .before = 7, .after = -1),
+    # Mean of units sold during the last month
+    mean_sold_sh_product_month = slide_vec(.x = units_sold, .f = mean, .before = 30, .after = -1),
+    # Mean of units sold over-all
+    mean_sold_sh_product = slide_vec(.x = units_sold, .f = mean, .before = Inf, .after = -1),
+    # Max of units sold during the last week
+    max_sold_sh_product_week = slide_vec(.x = units_sold, .f = max, .before = 7, .after = -1),
+    # Max of units sold during the last month
+    max_sold_sh_product_month = slide_vec(.x = units_sold, .f = max, .before = 30, .after = -1),
+    # Max of units sold over-all
+    max_sold_sh_product = slide_vec(.x = units_sold, .f = max, .before = Inf, .after = -1)
+  )
+```
+
+If we want to take into consideration the day of week, we can use the `.step` parameter. The following call to `slide_vec` computes the mean of units sold of the last 4 days of that weekday.
+
+```{r warning=FALSE}
+sales_tbl <- sales_tbl %>% 
+  ungroup() %>% 
+  mutate(
+    day_of_week_effect = slide_vec(.x = units_sold, .f = mean, .before = 4, .step = 7, .after = -1),
+  )
+```
+
+
+With very few lines of code we've managed to build features that very predictive of our outcome. Moreover, we are **not leaking information** from the future. A supervised learning model could be trained on these features and we can have very quickly a very decent baseline to start iterating on.
+
+
+### Why slider?
+
+For some of this quantities, the use of slider seems kind of an over-kill. For instance, the over-all mean of units sold in a given shop can be done in two different ways:
+
+```{r}
+# Slider way
+sales_tbl <- sales_tbl %>% 
+  group_by(shop) %>% 
+  mutate(
+    mean_sold_shop = slide_vec(.x = units_sold, .f = mean, .before = Inf, .after = -1)
+  )
+
+# Simple way
+sales_tbl <- sales_tbl %>% 
+  group_by(shop) %>% 
+  mutate(
+    mean_sold_shop = mean(units_sold)
+  )
+
+```
+
+Why would I rather use the slider way? The reason is that the simple way leaks information from the future. That is, it uses the target of a row to create a feature, and then we are going to use that feature to predict the target. We might end up over-trusting the `mean_sold_shop` feature. This might have two consequences:
+
+- If we do it right, by only using the train set to compute `mean_sold_shop` the model might degrade in the test set. This is not ideal, but we can live with it.
+- If we do it wrong, by using the test set to compute `mean_sold_shop` the model will degrade in production, which is a bigger trouble.
+
+With slider, you don't have to worry about none of the above since you are only using information from the past.
+

@@ -1,0 +1,44 @@
+
+Image hackathon
+
+Bootstrap
+
+dvc
+
+Bayesian model comparison
+
+Autoencoders
+
+Kaggle fraud
+
+Kaggle time series
+
+Positive coefficient glmnet, offset glmnet (transfer learning -> okcupid dataset)
+
+Makefile
+
+sklego: 
+- gauss rank transformer
+- weighted auc
+
+python packages
+
+frequency encoding, damped target encoding
+
+Simpson's paradox
+
+Chron
+
+Gauss rank transform for linear model
+
+Covariate shift
+
+zsh
+
+Conda environments
+
+Lasso critique
+
+Wrap up feature selection
+
+Functional data analysis

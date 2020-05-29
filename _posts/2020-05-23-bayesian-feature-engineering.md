@@ -44,13 +44,12 @@ If we don't want to assume much about $p$, we can use Jeffreys prior. In the bet
 
 $$\hat{p} = \frac{x + 0.5}{n + 1} $$
 
+On the other hand, without the bayesian trick we would do $\hat{p} = \frac{x}{n}$.
+
 If we know something about the distribution of $p$, we can assume more and choose $\alpha$ and $\beta$ such that the beta distribution represents our prior belief (I know this is a bit heuristic), [here's an app to explore the possible priors for the beta distribution](https://r.amherst.edu/apps/nhorton/Shiny-Bayes/).
 
 ### Extras
 
-
-- This is not exclusive from estimating proportions, any feature that is an estimation of a parameter from a known distribution can be modelled in this way.
+- This is not exclusive from estimating proportions, any feature that is an estimation of a parameter from a known distribution can be modelled in this way, but using another bayesian prior and update rule.
 - A particular case of this is target encoding, which can be done using maximum likelihood or in a bayesian way.
-
-
 
