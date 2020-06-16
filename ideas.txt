@@ -20,6 +20,10 @@ Makefile
 sklego: 
 - gauss rank transformer
 - weighted auc
+- group difference featurizer
+- quantile regressor
+- bootstrap cv
+- random forest quantile sklearn
 
 python packages
 

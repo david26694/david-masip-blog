@@ -20,7 +20,13 @@ __pycache__
 .Rhistory
 *.RData
 
+# py
+*ipynb_checkpoints*
+
 # Mac
 *.DS_Store
 
 quick_tests/*
+
+# Data
+*.csv
