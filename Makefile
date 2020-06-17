@@ -1,4 +1,4 @@
-build_rmd: _posts/2020-05-09-feature-selection-part-1.md _posts/2020-05-16-feature-selection-part-2.md _posts/2020-05-30-slider.md _posts/2020-06-16-sampling-segmentation.md
+build_rmd: _posts/2020-05-09-feature-selection-part-1.md _posts/2020-05-16-feature-selection-part-2.md _posts/2020-05-30-slider.md 
 
 _posts/2020-05-09-feature-selection-part-1.md: experiments/lasso/lasso_vs_corr.Rmd
 	Rscript experiments/generate_mds.R experiments/lasso/lasso_vs_corr.Rmd
@@ -16,12 +16,6 @@ _posts/2020-05-30-slider.md: experiments/slider/slider.Rmd
 	Rscript experiments/generate_mds.R experiments/slider/slider.Rmd
 	cp experiments/slider/slider.md _posts/2020-05-30-slider.md
 	rm -rf experiments/slider/slider.md
-
-_posts/2020-06-16-sampling-segmentation.md: experiments/probs_segmentation/segments.Rmd
-	Rscript experiments/generate_mds.R experiments/probs_segmentation/segments.Rmd
-	cp experiments/probs_segmentation/segments.md _posts/2020-06-16-sampling-segmentation.md
-	rm -rf experiments/probs_segmentation/segments.md
-
 
 
 help:
