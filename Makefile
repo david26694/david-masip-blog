@@ -1,4 +1,4 @@
-build_rmd: _posts/2020-05-09-feature-selection-part-1.md _posts/2020-05-16-feature-selection-part-2.md _posts/2020-05-30-slider.md 
+build_rmd: _posts/2020-05-09-feature-selection-part-1.md _posts/2020-05-16-feature-selection-part-2.md _posts/2020-05-30-slider.md _posts/2020-07-24-sample-size.md
 
 _posts/2020-05-09-feature-selection-part-1.md: experiments/lasso/lasso_vs_corr.Rmd
 	Rscript experiments/generate_mds.R experiments/lasso/lasso_vs_corr.Rmd
@@ -16,6 +16,13 @@ _posts/2020-05-30-slider.md: experiments/slider/slider.Rmd
 	Rscript experiments/generate_mds.R experiments/slider/slider.Rmd
 	cp experiments/slider/slider.md _posts/2020-05-30-slider.md
 	rm -rf experiments/slider/slider.md
+
+_posts/2020-07-24-sample-size.md: experiments/sample_size/sample-size.Rmd
+	Rscript experiments/generate_mds.R experiments/sample_size/sample-size.Rmd
+	sed 's/\!\[\](/\!\[\](https\:\/\/raw.githubusercontent.com\/david26694\/david-masip-blog\/master\/experiments\/sample_size\//g' experiments/sample_size/sample-size.md > _posts/2020-07-24-sample-size.md
+	rm -rf _posts/sample-size_files
+	rm -rf sample-size_files
+	rm -rf experiments/sample_size/sample-size.md
 
 
 help:
