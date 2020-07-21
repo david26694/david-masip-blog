@@ -3,7 +3,7 @@ toc: false
 layout: post
 categories: [r, probability-theory, hypothesis-testing]
 comments: true
-title: p-values dependence on sample and effect sizes
+title: Sample and effect sizes in hypothesis testing
 ---
 
 One of the most troubling thing about p-values is the fact that if you
@@ -34,9 +34,8 @@ theme_set(theme_minimal())
 ``` r
 # Functions
 
-t_test_value <- function(n, effect, n_tries = 100) {
+t_test_value <- function(n, effect) {
   t.test(rnorm(n), rnorm(n, effect))$p.value
-  
 }
 
 lseq <- function(from=1, to=100000, length.out=6) {
@@ -81,3 +80,8 @@ We can see that, given enough data, we reject for almost all the effect
 sizes. And conversely, given an effect size, it’s only a matter of
 getting enough data to reject the null hypothesis. I find this very
 troubling.
+
+I even think one can analytically derive the equation of the curves in
+the effect and sample size space that have constant p-value, which
+should approximate the line that splits the red and blue dots in the
+picture, but I’ll leave that to the reader.
