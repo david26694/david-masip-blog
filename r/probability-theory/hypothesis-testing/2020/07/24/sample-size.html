@@ -124,7 +124,7 @@ window.onload = wrap_img;
        • <span class="read-time" title="Estimated read time">
     
     
-      1 min read
+      2 min read
     
 </span></p>
 
@@ -153,13 +153,7 @@ with more data I would be able to measure smaller effects. However, the
 whole effect size - data size coupling is what bothers me the most.
 Let’s make a quick experiment.</p>
 
-<p>We’ll load libraries, and create a function that, given a sample size
-and effect size, returns the p-value of the t-test that compares two
-normal distributions with variance 1 and difference in means equal to
-the given effect size.</p>
-
-<p>We can run this function for different sample and effect sizes and see
-when we would reject assuming a type 1 error of 5%.</p>
+<p>First of all, the libraries we’ll use have to be loaded.</p>
 
 <div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Libraries</span><span class="w">
 
@@ -170,33 +164,44 @@ when we would reject assuming a type 1 error of 5%.</p>
 </span><span class="n">theme_set</span><span class="p">(</span><span class="n">theme_minimal</span><span class="p">())</span><span class="w">
 </span></code></pre></div></div>
 
-<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Functions</span><span class="w">
+<p>Let’s create a function that, given a sample size and effect size,
+returns the p-value of the t-test that compares two normal distributions
+with variance 1 and difference in means equal to the given effect size.</p>
 
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Given sample size n and effect, compute the p-value of </span><span class="w">
+</span><span class="c1"># t-test generating the respective samples</span><span class="w">
 </span><span class="n">t_test_value</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="k">function</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="n">effect</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
   </span><span class="n">t.test</span><span class="p">(</span><span class="n">rnorm</span><span class="p">(</span><span class="n">n</span><span class="p">),</span><span class="w"> </span><span class="n">rnorm</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="n">effect</span><span class="p">))</span><span class="o">$</span><span class="n">p.value</span><span class="w">
 </span><span class="p">}</span><span class="w">
 
-</span><span class="n">lseq</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="k">function</span><span class="p">(</span><span class="n">from</span><span class="o">=</span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="n">to</span><span class="o">=</span><span class="m">100000</span><span class="p">,</span><span class="w"> </span><span class="n">length.out</span><span class="o">=</span><span class="m">6</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span><span class="c1"># Surprisingly logarithmic sequences don't exist in base R</span><span class="w">
+</span><span class="n">lseq</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="k">function</span><span class="p">(</span><span class="n">from</span><span class="p">,</span><span class="w"> </span><span class="n">to</span><span class="p">,</span><span class="w"> </span><span class="n">length.out</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
   </span><span class="c1"># logarithmic spaced sequence</span><span class="w">
   </span><span class="c1"># blatantly stolen from library("emdbook"), because need only this</span><span class="w">
   </span><span class="nf">exp</span><span class="p">(</span><span class="n">seq</span><span class="p">(</span><span class="nf">log</span><span class="p">(</span><span class="n">from</span><span class="p">),</span><span class="w"> </span><span class="nf">log</span><span class="p">(</span><span class="n">to</span><span class="p">),</span><span class="w"> </span><span class="n">length.out</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">length.out</span><span class="p">))</span><span class="w">
 </span><span class="p">}</span><span class="w">
 </span></code></pre></div></div>
 
+<p>We can run this function for different sample and effect sizes and see
+when we would reject assuming a type 1 error of 5%.</p>
+
 <div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Experiment </span><span class="w">
+
+</span><span class="c1"># Create pairs of samples sizes and effects</span><span class="w">
 </span><span class="n">results_tbl</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">expand.grid</span><span class="p">(</span><span class="w">
   </span><span class="nf">as.integer</span><span class="p">(</span><span class="n">lseq</span><span class="p">(</span><span class="m">50</span><span class="p">,</span><span class="w"> </span><span class="m">1e5</span><span class="p">,</span><span class="w"> </span><span class="m">100</span><span class="p">)),</span><span class="w">
   </span><span class="m">5</span><span class="o">:</span><span class="m">100</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="m">0.001</span><span class="w">
 </span><span class="p">)</span><span class="w">
 </span><span class="nf">names</span><span class="p">(</span><span class="n">results_tbl</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="s2">"n"</span><span class="p">,</span><span class="w"> </span><span class="s2">"effect"</span><span class="p">)</span><span class="w">
 
-</span><span class="n">p_values</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">map2_dbl</span><span class="p">(</span><span class="w">
+</span><span class="c1"># We make use of the elegant purrr</span><span class="w">
+</span><span class="c1"># to apply the funciton in the grid</span><span class="w">
+</span><span class="n">results_tbl</span><span class="o">$</span><span class="n">p_values</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">map2_dbl</span><span class="p">(</span><span class="w">
   </span><span class="n">.x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">results_tbl</span><span class="o">$</span><span class="n">n</span><span class="p">,</span><span class="w">
   </span><span class="n">.y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">results_tbl</span><span class="o">$</span><span class="n">effect</span><span class="p">,</span><span class="w">
   </span><span class="n">t_test_value</span><span class="w">
-</span><span class="p">)</span><span class="w">
+  </span><span class="p">)</span><span class="w">
 
-</span><span class="n">results_tbl</span><span class="o">$</span><span class="n">p_values</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">p_values</span><span class="w">
 </span><span class="n">results_tbl</span><span class="o">$</span><span class="n">hypothesis</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">if_else</span><span class="p">(</span><span class="w">
   </span><span class="n">results_tbl</span><span class="o">$</span><span class="n">p_values</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="m">0.05</span><span class="p">,</span><span class="w"> 
   </span><span class="s1">'rejects'</span><span class="p">,</span><span class="w"> 
