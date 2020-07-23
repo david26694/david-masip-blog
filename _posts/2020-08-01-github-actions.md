@@ -3,7 +3,7 @@ toc: false
 layout: post
 categories: [code]
 comments: true
-title: Github actions for CI/CD
+title: Github actions for automated testing
 description: A beginner's guide
 ---
 
