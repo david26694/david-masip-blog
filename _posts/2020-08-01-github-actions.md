@@ -4,7 +4,7 @@ layout: post
 categories: [code]
 comments: true
 title: Github actions for CI/CD
-subtitle: A beginner's guide
+description: A beginner's guide
 ---
 
 I recently started using github actions to test my python package [sktools](https://github.com/david26694/sktools/). It looks like a fairly easy tool to use, and I find it very powerful. 
