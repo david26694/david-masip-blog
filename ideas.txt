@@ -24,6 +24,16 @@ sklego:
 - quantile regressor
 - bootstrap cv
 - random forest quantile sklearn
+- real l1 forest
+- mix extratrees random forest -> 
+  - exploration parameter = 0 -> extra
+  - exploration parameter = 1 -> random
+- UnivariateSearchCV
+- cropped metrics  
+- robust metrics
+- postprocess:
+  - aggregate
+  - target transformation and inverse
 
 python packages
 
