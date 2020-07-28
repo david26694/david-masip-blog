@@ -3,34 +3,34 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.6.1 -->
-<title>Methods for handling imbalance | David Masip’s notes</title>
+<title>Handling imbalance in ML | David Masip’s notes</title>
 <meta name="generator" content="Jekyll v4.0.0" />
-<meta property="og:title" content="Methods for handling imbalance" />
+<meta property="og:title" content="Handling imbalance in ML" />
 <meta property="og:locale" content="en_US" />
-<meta name="description" content="A review" />
-<meta property="og:description" content="A review" />
+<meta name="description" content="A quick experiment" />
+<meta property="og:description" content="A quick experiment" />
 <link rel="canonical" href="https://david26694.github.io/david-masip-blog/machine-learning/classification/2020/08/15/imbalance.html" />
 <meta property="og:url" content="https://david26694.github.io/david-masip-blog/machine-learning/classification/2020/08/15/imbalance.html" />
 <meta property="og:site_name" content="David Masip’s notes" />
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2020-08-15T00:00:00-05:00" />
 <script type="application/ld+json">
-{"description":"A review","headline":"Methods for handling imbalance","dateModified":"2020-08-15T00:00:00-05:00","datePublished":"2020-08-15T00:00:00-05:00","@type":"BlogPosting","url":"https://david26694.github.io/david-masip-blog/machine-learning/classification/2020/08/15/imbalance.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://david26694.github.io/david-masip-blog/machine-learning/classification/2020/08/15/imbalance.html"},"@context":"https://schema.org"}</script>
+{"description":"A quick experiment","headline":"Handling imbalance in ML","dateModified":"2020-08-15T00:00:00-05:00","datePublished":"2020-08-15T00:00:00-05:00","@type":"BlogPosting","url":"https://david26694.github.io/david-masip-blog/machine-learning/classification/2020/08/15/imbalance.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://david26694.github.io/david-masip-blog/machine-learning/classification/2020/08/15/imbalance.html"},"@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 <link rel="stylesheet" href="/david-masip-blog/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://david26694.github.io/david-masip-blog/feed.xml" title="David Masip's notes" /><link rel="shortcut icon" type="image/x-icon" href="/david-masip-blog/images/favicon.ico"><!-- Begin Jekyll SEO tag v2.6.1 -->
-<title>Methods for handling imbalance | David Masip’s notes</title>
+<title>Handling imbalance in ML | David Masip’s notes</title>
 <meta name="generator" content="Jekyll v4.0.0" />
-<meta property="og:title" content="Methods for handling imbalance" />
+<meta property="og:title" content="Handling imbalance in ML" />
 <meta property="og:locale" content="en_US" />
-<meta name="description" content="A review" />
-<meta property="og:description" content="A review" />
+<meta name="description" content="A quick experiment" />
+<meta property="og:description" content="A quick experiment" />
 <link rel="canonical" href="https://david26694.github.io/david-masip-blog/machine-learning/classification/2020/08/15/imbalance.html" />
 <meta property="og:url" content="https://david26694.github.io/david-masip-blog/machine-learning/classification/2020/08/15/imbalance.html" />
 <meta property="og:site_name" content="David Masip’s notes" />
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2020-08-15T00:00:00-05:00" />
 <script type="application/ld+json">
-{"description":"A review","headline":"Methods for handling imbalance","dateModified":"2020-08-15T00:00:00-05:00","datePublished":"2020-08-15T00:00:00-05:00","@type":"BlogPosting","url":"https://david26694.github.io/david-masip-blog/machine-learning/classification/2020/08/15/imbalance.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://david26694.github.io/david-masip-blog/machine-learning/classification/2020/08/15/imbalance.html"},"@context":"https://schema.org"}</script>
+{"description":"A quick experiment","headline":"Handling imbalance in ML","dateModified":"2020-08-15T00:00:00-05:00","datePublished":"2020-08-15T00:00:00-05:00","@type":"BlogPosting","url":"https://david26694.github.io/david-masip-blog/machine-learning/classification/2020/08/15/imbalance.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://david26694.github.io/david-masip-blog/machine-learning/classification/2020/08/15/imbalance.html"},"@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 
 <link href="https://unpkg.com/@primer/css/dist/primer.css" rel="stylesheet" />
@@ -118,7 +118,7 @@ window.onload = wrap_img;
         <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
 
   <header class="post-header">
-    <h1 class="post-title p-name" itemprop="name headline">Methods for handling imbalance</h1><p class="page-description">A review</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2020-08-15T00:00:00-05:00" itemprop="datePublished">
+    <h1 class="post-title p-name" itemprop="name headline">Handling imbalance in ML</h1><p class="page-description">A quick experiment</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2020-08-15T00:00:00-05:00" itemprop="datePublished">
         Aug 15, 2020
       </time>
        • <span class="read-time" title="Estimated read time">
@@ -681,7 +681,7 @@ ROC test under-sampling, xgb: 0.6667
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>&lt;matplotlib.axes._subplots.AxesSubplot at 0x1a1ff19240&gt;</pre>
+<pre>&lt;matplotlib.axes._subplots.AxesSubplot at 0x1a18acb828&gt;</pre>
 </div>
 
 </div>
