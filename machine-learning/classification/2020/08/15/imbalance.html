@@ -6,7 +6,6 @@
 <title>Methods for handling imbalance | David Masip’s notes</title>
 <meta name="generator" content="Jekyll v4.0.0" />
 <meta property="og:title" content="Methods for handling imbalance" />
-<meta name="author" content="David Masip" />
 <meta property="og:locale" content="en_US" />
 <meta name="description" content="A review" />
 <meta property="og:description" content="A review" />
@@ -16,13 +15,12 @@
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2020-08-15T00:00:00-05:00" />
 <script type="application/ld+json">
-{"author":{"@type":"Person","name":"David Masip"},"description":"A review","headline":"Methods for handling imbalance","dateModified":"2020-08-15T00:00:00-05:00","datePublished":"2020-08-15T00:00:00-05:00","@type":"BlogPosting","url":"https://david26694.github.io/david-masip-blog/machine-learning/classification/2020/08/15/imbalance.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://david26694.github.io/david-masip-blog/machine-learning/classification/2020/08/15/imbalance.html"},"@context":"https://schema.org"}</script>
+{"description":"A review","headline":"Methods for handling imbalance","dateModified":"2020-08-15T00:00:00-05:00","datePublished":"2020-08-15T00:00:00-05:00","@type":"BlogPosting","url":"https://david26694.github.io/david-masip-blog/machine-learning/classification/2020/08/15/imbalance.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://david26694.github.io/david-masip-blog/machine-learning/classification/2020/08/15/imbalance.html"},"@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 <link rel="stylesheet" href="/david-masip-blog/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://david26694.github.io/david-masip-blog/feed.xml" title="David Masip's notes" /><link rel="shortcut icon" type="image/x-icon" href="/david-masip-blog/images/favicon.ico"><!-- Begin Jekyll SEO tag v2.6.1 -->
 <title>Methods for handling imbalance | David Masip’s notes</title>
 <meta name="generator" content="Jekyll v4.0.0" />
 <meta property="og:title" content="Methods for handling imbalance" />
-<meta name="author" content="David Masip" />
 <meta property="og:locale" content="en_US" />
 <meta name="description" content="A review" />
 <meta property="og:description" content="A review" />
@@ -32,7 +30,7 @@
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2020-08-15T00:00:00-05:00" />
 <script type="application/ld+json">
-{"author":{"@type":"Person","name":"David Masip"},"description":"A review","headline":"Methods for handling imbalance","dateModified":"2020-08-15T00:00:00-05:00","datePublished":"2020-08-15T00:00:00-05:00","@type":"BlogPosting","url":"https://david26694.github.io/david-masip-blog/machine-learning/classification/2020/08/15/imbalance.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://david26694.github.io/david-masip-blog/machine-learning/classification/2020/08/15/imbalance.html"},"@context":"https://schema.org"}</script>
+{"description":"A review","headline":"Methods for handling imbalance","dateModified":"2020-08-15T00:00:00-05:00","datePublished":"2020-08-15T00:00:00-05:00","@type":"BlogPosting","url":"https://david26694.github.io/david-masip-blog/machine-learning/classification/2020/08/15/imbalance.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://david26694.github.io/david-masip-blog/machine-learning/classification/2020/08/15/imbalance.html"},"@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 
 <link href="https://unpkg.com/@primer/css/dist/primer.css" rel="stylesheet" />
@@ -122,9 +120,7 @@ window.onload = wrap_img;
   <header class="post-header">
     <h1 class="post-title p-name" itemprop="name headline">Methods for handling imbalance</h1><p class="page-description">A review</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2020-08-15T00:00:00-05:00" itemprop="datePublished">
         Aug 15, 2020
-      </time>• 
-          <span itemprop="author" itemscope itemtype="http://schema.org/Person">
-            <span class="p-author h-card" itemprop="name">David Masip</span></span>
+      </time>
        • <span class="read-time" title="Estimated read time">
     
     
@@ -187,21 +183,21 @@ window.onload = wrap_img;
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>I read about handling imbalance in machine learning very often. Sometimes I don't understand the reasons to approach class imbalance. My main argument is, usually, that you should first try the simple solution (which is not approaching imbalance) before going to the most complex solution.</p>
+<p>I read about handling imbalance in machine learning very often. Sometimes I don't understand the reasons to approach class imbalance using fancy and sophisticated techniques. My main argument is, usually, that you should first try the simple solution (which is not approaching imbalance) before going to the most complex solution.</p>
 <p>I've decided to do an experiment to see the impact of applying over-sampling and under-sampling to answer the following questions:</p>
 <ul>
 <li>Does over and under-sampling help increase the AUC of a model?</li>
 <li>Does it depend on the algorithm used?</li>
 <li>How do the coefficients of logistic regression change when doing over and under sampling?</li>
 </ul>
-<p>First of all, let's load the packages that we are going to use</p>
 
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Data-preparation">Data preparation<a class="anchor-link" href="#Data-preparation"> </a></h3>
+<h3 id="Data-preparation">Data preparation<a class="anchor-link" href="#Data-preparation"> </a></h3><p>First of all, let's load the packages that we are going to use:</p>
+
 </div>
 </div>
 </div>
@@ -247,7 +243,7 @@ window.onload = wrap_img;
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>First of all, let's load the data. The data are on US arrests. These data are usually used to study ML bias. We are not going to focus on ML bias, because our interest is mainly the imbalance of the data.</p>
+<p>Also, let's load the data. The data are on US arrests. These data are usually used to study ML bias. We are not going to focus on ML bias, because our interest is mainly the imbalance of the data. Keep in mind that any model trained on this data will very likely be racist if the bias is not addressed.</p>
 
 </div>
 </div>
@@ -385,10 +381,9 @@ window.onload = wrap_img;
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="nb">round</span><span class="p">(</span>
-    <span class="mi">100</span> <span class="o">*</span> <span class="n">df_arrests</span><span class="o">.</span><span class="n">released</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span> <span class="o">/</span> <span class="n">df_arrests</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> 
-    <span class="mi">2</span>
-<span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">fraction</span> <span class="o">=</span> <span class="n">df_arrests</span><span class="o">.</span><span class="n">released</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span> <span class="o">/</span> <span class="n">df_arrests</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="nb">round</span><span class="p">(</span><span class="mi">100</span> <span class="o">*</span> <span class="n">fraction</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
 </pre></div>
 
     </div>
@@ -478,7 +473,8 @@ Name: released, dtype: float64</pre>
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>We're going to try several samplers: over-sampling, under-sampling and no-sampling together with several algorithms: logistic regression, lightgbm, random forest and xgboost.</p>
+<p>We're going to try several samplers: over-sampling, under-sampling and <em>no-sampling</em> together with several algorithms: logistic regression, lightgbm, random forest and xgboost.</p>
+<p>By <em>no-sampling</em> we mean not addressing the imbalance.</p>
 
 </div>
 </div>
@@ -602,7 +598,7 @@ ROC test under-sampling, xgb: 0.6667
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>For most methods datasets, the three methods have almost no difference.</p>
+<p>For most models and datasets, the three methods have almost no difference.</p>
 <ul>
 <li>Over-sampling doesn't win in any case, and it's the worst in 3 cases.</li>
 <li>Under-sampling wins twice, no sampling wins twice.</li>
@@ -658,7 +654,7 @@ ROC test under-sampling, xgb: 0.6667
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>We can see that most coefficients are very similar in the 3 cases, but the first coefficient changes significantly (in this case, the intercept). The effect on the coefficients of under or over-sampling is increasing the intercept. This completely makes sense - the intercept represents, in a way, the fraction of cases with target 1. By changing this fraction we are manually changing the intercept.</p>
+<p>We can see that most coefficients are very similar in the 3 cases, but the first coefficient changes significantly (in this case, the intercept). The effect on the coefficients of under or over-sampling is increasing the intercept. This completely makes sense - the intercept represents, in a way, the fraction of cases with target 1. By changing this fraction we are artificiallt increasing the intercept.</p>
 
 </div>
 </div>
