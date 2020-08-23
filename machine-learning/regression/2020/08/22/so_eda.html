@@ -1,0 +1,3772 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Stack-overflow developer survey | David Masip’s notes</title>
+<meta name="generator" content="Jekyll v4.0.0" />
+<meta property="og:title" content="Stack-overflow developer survey" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="EDA and salary modelling" />
+<meta property="og:description" content="EDA and salary modelling" />
+<link rel="canonical" href="https://david26694.github.io/david-masip-blog/machine-learning/regression/2020/08/22/so_eda.html" />
+<meta property="og:url" content="https://david26694.github.io/david-masip-blog/machine-learning/regression/2020/08/22/so_eda.html" />
+<meta property="og:site_name" content="David Masip’s notes" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-08-22T00:00:00-05:00" />
+<script type="application/ld+json">
+{"headline":"Stack-overflow developer survey","dateModified":"2020-08-22T00:00:00-05:00","datePublished":"2020-08-22T00:00:00-05:00","description":"EDA and salary modelling","mainEntityOfPage":{"@type":"WebPage","@id":"https://david26694.github.io/david-masip-blog/machine-learning/regression/2020/08/22/so_eda.html"},"@type":"BlogPosting","url":"https://david26694.github.io/david-masip-blog/machine-learning/regression/2020/08/22/so_eda.html","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/david-masip-blog/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://david26694.github.io/david-masip-blog/feed.xml" title="David Masip's notes" /><link rel="shortcut icon" type="image/x-icon" href="/david-masip-blog/images/favicon.ico"><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Stack-overflow developer survey | David Masip’s notes</title>
+<meta name="generator" content="Jekyll v4.0.0" />
+<meta property="og:title" content="Stack-overflow developer survey" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="EDA and salary modelling" />
+<meta property="og:description" content="EDA and salary modelling" />
+<link rel="canonical" href="https://david26694.github.io/david-masip-blog/machine-learning/regression/2020/08/22/so_eda.html" />
+<meta property="og:url" content="https://david26694.github.io/david-masip-blog/machine-learning/regression/2020/08/22/so_eda.html" />
+<meta property="og:site_name" content="David Masip’s notes" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-08-22T00:00:00-05:00" />
+<script type="application/ld+json">
+{"headline":"Stack-overflow developer survey","dateModified":"2020-08-22T00:00:00-05:00","datePublished":"2020-08-22T00:00:00-05:00","description":"EDA and salary modelling","mainEntityOfPage":{"@type":"WebPage","@id":"https://david26694.github.io/david-masip-blog/machine-learning/regression/2020/08/22/so_eda.html"},"@type":"BlogPosting","url":"https://david26694.github.io/david-masip-blog/machine-learning/regression/2020/08/22/so_eda.html","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+<link href="https://unpkg.com/@primer/css/dist/primer.css" rel="stylesheet" />
+<link rel="stylesheet" href="//use.fontawesome.com/releases/v5.0.7/css/all.css"><link type="application/atom+xml" rel="alternate" href="https://david26694.github.io/david-masip-blog/feed.xml" title="David Masip's notes" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"> </script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"></script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement( document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "[%", right: "%]", display: true},
+            {left: "$", right: "$", display: false}
+        ]}
+        );
+    });
+    </script>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js"></script>
+<script type="text/javascript">
+require.config({
+  paths: {
+    jquery: 'https://code.jquery.com/jquery-3.5.0.min',
+    plotly: 'https://cdn.plot.ly/plotly-latest.min'
+  },
+
+  shim: {
+    plotly: {
+      deps: ['jquery'],
+      exports: 'plotly'
+    }
+  }
+});
+</script>
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head><body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/david-masip-blog/">David Masip&#39;s notes</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/david-masip-blog/about/">About Me</a><a class="page-link" href="/david-masip-blog/search/">Search</a><a class="page-link" href="/david-masip-blog/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Stack-overflow developer survey</h1><p class="page-description">EDA and salary modelling</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2020-08-22T00:00:00-05:00" itemprop="datePublished">
+        Aug 22, 2020
+      </time>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      20 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/david-masip-blog/categories/#machine-learning">machine-learning</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/david-masip-blog/categories/#regression">regression</a>
+        
+      
+      </p>
+    
+
+    
+      
+        <div class="pb-5 d-flex flex-wrap flex-justify-end">
+          <div class="px-2">
+
+    <a href="https://github.com/david26694/david-masip-blog/tree/master/_notebooks/so_eda.ipynb" role="button" target="_blank">
+<img class="notebook-badge-image" src="/david-masip-blog/assets/badges/github.svg" alt="View On GitHub">
+    </a>
+</div>
+
+          <div class="px-2">
+    <a href="https://mybinder.org/v2/gh/david26694/david-masip-blog/master?filepath=_notebooks%2Fso_eda.ipynb" target="_blank">
+        <img class="notebook-badge-image" src="/david-masip-blog/assets/badges/binder.svg" alt="Open In Binder"/>
+    </a>
+</div>
+
+          <div class="px-2">
+    <a href="https://colab.research.google.com/github/david26694/david-masip-blog/blob/master/_notebooks/so_eda.ipynb" target="_blank">
+        <img class="notebook-badge-image" src="/david-masip-blog/assets/badges/colab.svg" alt="Open In Colab"/>
+    </a>
+</div>
+        </div>
+      </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <!--
+#################################################
+### THIS FILE WAS AUTOGENERATED! DO NOT EDIT! ###
+#################################################
+# file to edit: _notebooks/so_eda.ipynb
+-->
+
+<div class="container" id="notebook-container">
+        
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The aim of this post is to do some exploration of the <a href="https://www.kaggle.com/stackoverflow/stack-overflow-2018-developer-survey">stack overflow developer survey 2018 dataset</a> and some modelling regarding salary. As a bonus point, we'll discuss some properties of the mean absolute error.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s1">&#39;display.max_columns&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> 
+
+
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span><span class="p">,</span> <span class="n">cross_val_score</span>
+<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LinearRegression</span>
+<span class="kn">from</span> <span class="nn">sklearn.impute</span> <span class="kn">import</span> <span class="n">SimpleImputer</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">StandardScaler</span>
+<span class="kn">from</span> <span class="nn">sklego.preprocessing</span> <span class="kn">import</span> <span class="n">PandasTypeSelector</span>
+<span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="kn">import</span> <span class="n">Pipeline</span>
+
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">mean_absolute_error</span><span class="p">,</span> <span class="n">mean_squared_error</span>
+
+<span class="kn">from</span> <span class="nn">lightgbm</span> <span class="kn">import</span> <span class="n">LGBMRegressor</span>
+
+<span class="kn">from</span> <span class="nn">category_encoders</span> <span class="kn">import</span> <span class="n">TargetEncoder</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">so_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;stackoverflow.csv&#39;</span><span class="p">,</span> <span class="n">low_memory</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Exploratory-data-analysis">Exploratory data analysis<a class="anchor-link" href="#Exploratory-data-analysis"> </a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Let's have a quick look at the data that we have available</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">so_df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Respondent</th>
+      <th>Hobby</th>
+      <th>OpenSource</th>
+      <th>Country</th>
+      <th>Student</th>
+      <th>Employment</th>
+      <th>FormalEducation</th>
+      <th>UndergradMajor</th>
+      <th>CompanySize</th>
+      <th>DevType</th>
+      <th>YearsCoding</th>
+      <th>YearsCodingProf</th>
+      <th>JobSatisfaction</th>
+      <th>CareerSatisfaction</th>
+      <th>HopeFiveYears</th>
+      <th>JobSearchStatus</th>
+      <th>LastNewJob</th>
+      <th>AssessJob1</th>
+      <th>AssessJob2</th>
+      <th>AssessJob3</th>
+      <th>AssessJob4</th>
+      <th>AssessJob5</th>
+      <th>AssessJob6</th>
+      <th>AssessJob7</th>
+      <th>AssessJob8</th>
+      <th>AssessJob9</th>
+      <th>AssessJob10</th>
+      <th>AssessBenefits1</th>
+      <th>AssessBenefits2</th>
+      <th>AssessBenefits3</th>
+      <th>AssessBenefits4</th>
+      <th>AssessBenefits5</th>
+      <th>AssessBenefits6</th>
+      <th>AssessBenefits7</th>
+      <th>AssessBenefits8</th>
+      <th>AssessBenefits9</th>
+      <th>AssessBenefits10</th>
+      <th>AssessBenefits11</th>
+      <th>JobContactPriorities1</th>
+      <th>JobContactPriorities2</th>
+      <th>JobContactPriorities3</th>
+      <th>JobContactPriorities4</th>
+      <th>JobContactPriorities5</th>
+      <th>JobEmailPriorities1</th>
+      <th>JobEmailPriorities2</th>
+      <th>JobEmailPriorities3</th>
+      <th>JobEmailPriorities4</th>
+      <th>JobEmailPriorities5</th>
+      <th>JobEmailPriorities6</th>
+      <th>JobEmailPriorities7</th>
+      <th>UpdateCV</th>
+      <th>Currency</th>
+      <th>Salary</th>
+      <th>SalaryType</th>
+      <th>ConvertedSalary</th>
+      <th>CurrencySymbol</th>
+      <th>CommunicationTools</th>
+      <th>TimeFullyProductive</th>
+      <th>EducationTypes</th>
+      <th>SelfTaughtTypes</th>
+      <th>TimeAfterBootcamp</th>
+      <th>HackathonReasons</th>
+      <th>AgreeDisagree1</th>
+      <th>AgreeDisagree2</th>
+      <th>AgreeDisagree3</th>
+      <th>LanguageWorkedWith</th>
+      <th>LanguageDesireNextYear</th>
+      <th>DatabaseWorkedWith</th>
+      <th>DatabaseDesireNextYear</th>
+      <th>PlatformWorkedWith</th>
+      <th>PlatformDesireNextYear</th>
+      <th>FrameworkWorkedWith</th>
+      <th>FrameworkDesireNextYear</th>
+      <th>IDE</th>
+      <th>OperatingSystem</th>
+      <th>NumberMonitors</th>
+      <th>Methodology</th>
+      <th>VersionControl</th>
+      <th>CheckInCode</th>
+      <th>AdBlocker</th>
+      <th>AdBlockerDisable</th>
+      <th>AdBlockerReasons</th>
+      <th>AdsAgreeDisagree1</th>
+      <th>AdsAgreeDisagree2</th>
+      <th>AdsAgreeDisagree3</th>
+      <th>AdsActions</th>
+      <th>AdsPriorities1</th>
+      <th>AdsPriorities2</th>
+      <th>AdsPriorities3</th>
+      <th>AdsPriorities4</th>
+      <th>AdsPriorities5</th>
+      <th>AdsPriorities6</th>
+      <th>AdsPriorities7</th>
+      <th>AIDangerous</th>
+      <th>AIInteresting</th>
+      <th>AIResponsible</th>
+      <th>AIFuture</th>
+      <th>EthicsChoice</th>
+      <th>EthicsReport</th>
+      <th>EthicsResponsible</th>
+      <th>EthicalImplications</th>
+      <th>StackOverflowRecommend</th>
+      <th>StackOverflowVisit</th>
+      <th>StackOverflowHasAccount</th>
+      <th>StackOverflowParticipate</th>
+      <th>StackOverflowJobs</th>
+      <th>StackOverflowDevStory</th>
+      <th>StackOverflowJobsRecommend</th>
+      <th>StackOverflowConsiderMember</th>
+      <th>HypotheticalTools1</th>
+      <th>HypotheticalTools2</th>
+      <th>HypotheticalTools3</th>
+      <th>HypotheticalTools4</th>
+      <th>HypotheticalTools5</th>
+      <th>WakeTime</th>
+      <th>HoursComputer</th>
+      <th>HoursOutside</th>
+      <th>SkipMeals</th>
+      <th>ErgonomicDevices</th>
+      <th>Exercise</th>
+      <th>Gender</th>
+      <th>SexualOrientation</th>
+      <th>EducationParents</th>
+      <th>RaceEthnicity</th>
+      <th>Age</th>
+      <th>Dependents</th>
+      <th>MilitaryUS</th>
+      <th>SurveyTooLong</th>
+      <th>SurveyEasy</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>3</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>United Kingdom</td>
+      <td>No</td>
+      <td>Employed full-time</td>
+      <td>Bachelor’s degree (BA, BS, B.Eng., etc.)</td>
+      <td>A natural science (ex. biology, chemistry, phy...</td>
+      <td>10,000 or more employees</td>
+      <td>Database administrator;DevOps specialist;Full-...</td>
+      <td>30 or more years</td>
+      <td>18-20 years</td>
+      <td>Moderately dissatisfied</td>
+      <td>Neither satisfied nor dissatisfied</td>
+      <td>Working in a different or more specialized tec...</td>
+      <td>I am actively looking for a job</td>
+      <td>More than 4 years ago</td>
+      <td>1.0</td>
+      <td>7.0</td>
+      <td>10.0</td>
+      <td>8.0</td>
+      <td>2.0</td>
+      <td>5.0</td>
+      <td>4.0</td>
+      <td>3.0</td>
+      <td>6.0</td>
+      <td>9.0</td>
+      <td>1.0</td>
+      <td>5.0</td>
+      <td>3.0</td>
+      <td>7.0</td>
+      <td>10.0</td>
+      <td>4.0</td>
+      <td>11.0</td>
+      <td>9.0</td>
+      <td>6.0</td>
+      <td>2.0</td>
+      <td>8.0</td>
+      <td>3.0</td>
+      <td>1.0</td>
+      <td>5.0</td>
+      <td>2.0</td>
+      <td>4.0</td>
+      <td>1.0</td>
+      <td>3.0</td>
+      <td>4.0</td>
+      <td>5.0</td>
+      <td>2.0</td>
+      <td>6.0</td>
+      <td>7.0</td>
+      <td>I saw an employer’s advertisement</td>
+      <td>British pounds sterling (£)</td>
+      <td>51000</td>
+      <td>Yearly</td>
+      <td>70841.0</td>
+      <td>GBP</td>
+      <td>Confluence;Office / productivity suite (Micros...</td>
+      <td>One to three months</td>
+      <td>Taught yourself a new language, framework, or ...</td>
+      <td>The official documentation and/or standards fo...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>Agree</td>
+      <td>Agree</td>
+      <td>Neither Agree nor Disagree</td>
+      <td>JavaScript;Python;Bash/Shell</td>
+      <td>Go;Python</td>
+      <td>Redis;PostgreSQL;Memcached</td>
+      <td>PostgreSQL</td>
+      <td>Linux</td>
+      <td>Linux</td>
+      <td>Django</td>
+      <td>React</td>
+      <td>IPython / Jupyter;Sublime Text;Vim</td>
+      <td>Linux-based</td>
+      <td>2</td>
+      <td>NaN</td>
+      <td>Git;Subversion</td>
+      <td>A few times per week</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>The website I was visiting asked me to disable it</td>
+      <td>Somewhat agree</td>
+      <td>Neither agree nor disagree</td>
+      <td>Neither agree nor disagree</td>
+      <td>NaN</td>
+      <td>3.0</td>
+      <td>5.0</td>
+      <td>1.0</td>
+      <td>4.0</td>
+      <td>6.0</td>
+      <td>7.0</td>
+      <td>2.0</td>
+      <td>Increasing automation of jobs</td>
+      <td>Increasing automation of jobs</td>
+      <td>The developers or the people creating the AI</td>
+      <td>I'm excited about the possibilities more than ...</td>
+      <td>Depends on what it is</td>
+      <td>Depends on what it is</td>
+      <td>Upper management at the company/organization</td>
+      <td>Yes</td>
+      <td>10 (Very Likely)</td>
+      <td>A few times per month or weekly</td>
+      <td>Yes</td>
+      <td>A few times per month or weekly</td>
+      <td>Yes</td>
+      <td>No, I have one but it's out of date</td>
+      <td>7</td>
+      <td>Yes</td>
+      <td>A little bit interested</td>
+      <td>A little bit interested</td>
+      <td>A little bit interested</td>
+      <td>A little bit interested</td>
+      <td>A little bit interested</td>
+      <td>Between 6:01 - 7:00 AM</td>
+      <td>5 - 8 hours</td>
+      <td>30 - 59 minutes</td>
+      <td>Never</td>
+      <td>Ergonomic keyboard or mouse</td>
+      <td>Daily or almost every day</td>
+      <td>Male</td>
+      <td>Straight or heterosexual</td>
+      <td>Bachelor’s degree (BA, BS, B.Eng., etc.)</td>
+      <td>White or of European descent</td>
+      <td>35 - 44 years old</td>
+      <td>Yes</td>
+      <td>NaN</td>
+      <td>The survey was an appropriate length</td>
+      <td>Somewhat easy</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>7</td>
+      <td>Yes</td>
+      <td>No</td>
+      <td>South Africa</td>
+      <td>Yes, part-time</td>
+      <td>Employed full-time</td>
+      <td>Some college/university study without earning ...</td>
+      <td>Computer science, computer engineering, or sof...</td>
+      <td>10,000 or more employees</td>
+      <td>Data or business analyst;Desktop or enterprise...</td>
+      <td>6-8 years</td>
+      <td>0-2 years</td>
+      <td>Slightly satisfied</td>
+      <td>Moderately satisfied</td>
+      <td>Working in a different or more specialized tec...</td>
+      <td>I’m not actively looking, but I am open to new...</td>
+      <td>Between 1 and 2 years ago</td>
+      <td>8.0</td>
+      <td>5.0</td>
+      <td>7.0</td>
+      <td>1.0</td>
+      <td>2.0</td>
+      <td>6.0</td>
+      <td>4.0</td>
+      <td>3.0</td>
+      <td>10.0</td>
+      <td>9.0</td>
+      <td>1.0</td>
+      <td>10.0</td>
+      <td>2.0</td>
+      <td>4.0</td>
+      <td>8.0</td>
+      <td>3.0</td>
+      <td>11.0</td>
+      <td>7.0</td>
+      <td>5.0</td>
+      <td>9.0</td>
+      <td>6.0</td>
+      <td>2.0</td>
+      <td>1.0</td>
+      <td>4.0</td>
+      <td>5.0</td>
+      <td>3.0</td>
+      <td>7.0</td>
+      <td>3.0</td>
+      <td>6.0</td>
+      <td>2.0</td>
+      <td>1.0</td>
+      <td>4.0</td>
+      <td>5.0</td>
+      <td>My job status or other personal status changed</td>
+      <td>South African rands (R)</td>
+      <td>260000</td>
+      <td>Yearly</td>
+      <td>21426.0</td>
+      <td>ZAR</td>
+      <td>Office / productivity suite (Microsoft Office,...</td>
+      <td>Three to six months</td>
+      <td>Taken a part-time in-person course in programm...</td>
+      <td>The official documentation and/or standards fo...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>Strongly agree</td>
+      <td>Agree</td>
+      <td>Strongly disagree</td>
+      <td>C;C++;Java;Matlab;R;SQL;Bash/Shell</td>
+      <td>Assembly;C;C++;Matlab;SQL;Bash/Shell</td>
+      <td>SQL Server;PostgreSQL;Oracle;IBM Db2</td>
+      <td>PostgreSQL;Oracle;IBM Db2</td>
+      <td>Arduino;Windows Desktop or Server</td>
+      <td>Arduino;Windows Desktop or Server</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>Notepad++;Visual Studio;Visual Studio Code</td>
+      <td>Windows</td>
+      <td>2</td>
+      <td>Evidence-based software engineering;Formal sta...</td>
+      <td>Zip file back-ups</td>
+      <td>Weekly or a few times per month</td>
+      <td>No</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>Somewhat agree</td>
+      <td>Somewhat agree</td>
+      <td>Somewhat disagree</td>
+      <td>Clicked on an online advertisement;Saw an onli...</td>
+      <td>2.0</td>
+      <td>3.0</td>
+      <td>4.0</td>
+      <td>6.0</td>
+      <td>1.0</td>
+      <td>7.0</td>
+      <td>5.0</td>
+      <td>Algorithms making important decisions</td>
+      <td>Algorithms making important decisions</td>
+      <td>The developers or the people creating the AI</td>
+      <td>I'm excited about the possibilities more than ...</td>
+      <td>No</td>
+      <td>Yes, but only within the company</td>
+      <td>Upper management at the company/organization</td>
+      <td>Yes</td>
+      <td>10 (Very Likely)</td>
+      <td>Daily or almost daily</td>
+      <td>Yes</td>
+      <td>Less than once per month or monthly</td>
+      <td>No, I knew that Stack Overflow had a jobs boar...</td>
+      <td>No, I know what it is but I don't have one</td>
+      <td>NaN</td>
+      <td>Yes</td>
+      <td>Extremely interested</td>
+      <td>Extremely interested</td>
+      <td>Extremely interested</td>
+      <td>Extremely interested</td>
+      <td>Extremely interested</td>
+      <td>Before 5:00 AM</td>
+      <td>Over 12 hours</td>
+      <td>1 - 2 hours</td>
+      <td>Never</td>
+      <td>NaN</td>
+      <td>3 - 4 times per week</td>
+      <td>Male</td>
+      <td>Straight or heterosexual</td>
+      <td>Some college/university study without earning ...</td>
+      <td>White or of European descent</td>
+      <td>18 - 24 years old</td>
+      <td>Yes</td>
+      <td>NaN</td>
+      <td>The survey was an appropriate length</td>
+      <td>Somewhat easy</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>8</td>
+      <td>Yes</td>
+      <td>No</td>
+      <td>United Kingdom</td>
+      <td>No</td>
+      <td>Employed full-time</td>
+      <td>Bachelor’s degree (BA, BS, B.Eng., etc.)</td>
+      <td>Computer science, computer engineering, or sof...</td>
+      <td>10 to 19 employees</td>
+      <td>Back-end developer;Database administrator;Fron...</td>
+      <td>6-8 years</td>
+      <td>3-5 years</td>
+      <td>Moderately satisfied</td>
+      <td>Slightly satisfied</td>
+      <td>Working in a different or more specialized tec...</td>
+      <td>I am actively looking for a job</td>
+      <td>Between 2 and 4 years ago</td>
+      <td>8.0</td>
+      <td>5.0</td>
+      <td>4.0</td>
+      <td>9.0</td>
+      <td>1.0</td>
+      <td>3.0</td>
+      <td>6.0</td>
+      <td>2.0</td>
+      <td>10.0</td>
+      <td>7.0</td>
+      <td>1.0</td>
+      <td>3.0</td>
+      <td>4.0</td>
+      <td>10.0</td>
+      <td>9.0</td>
+      <td>2.0</td>
+      <td>6.0</td>
+      <td>5.0</td>
+      <td>11.0</td>
+      <td>7.0</td>
+      <td>8.0</td>
+      <td>4.0</td>
+      <td>2.0</td>
+      <td>5.0</td>
+      <td>1.0</td>
+      <td>3.0</td>
+      <td>2.0</td>
+      <td>6.0</td>
+      <td>7.0</td>
+      <td>3.0</td>
+      <td>1.0</td>
+      <td>5.0</td>
+      <td>4.0</td>
+      <td>I did not receive an expected change in compen...</td>
+      <td>British pounds sterling (£)</td>
+      <td>30000</td>
+      <td>NaN</td>
+      <td>41671.0</td>
+      <td>GBP</td>
+      <td>Confluence;Jira;Office / productivity suite (M...</td>
+      <td>Less than a month</td>
+      <td>Received on-the-job training in software devel...</td>
+      <td>The official documentation and/or standards fo...</td>
+      <td>NaN</td>
+      <td>To improve my general technical skills or prog...</td>
+      <td>Disagree</td>
+      <td>Neither Agree nor Disagree</td>
+      <td>Strongly disagree</td>
+      <td>Java;JavaScript;Python;TypeScript;HTML;CSS</td>
+      <td>C#;Go;Java;JavaScript;Python;SQL;TypeScript;HT...</td>
+      <td>MongoDB</td>
+      <td>PostgreSQL</td>
+      <td>Linux</td>
+      <td>Linux</td>
+      <td>Angular;Node.js</td>
+      <td>Node.js</td>
+      <td>IntelliJ;PyCharm;Visual Studio Code</td>
+      <td>Linux-based</td>
+      <td>2</td>
+      <td>Agile</td>
+      <td>Git</td>
+      <td>A few times per week</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>I wanted to support the website I was visiting...</td>
+      <td>Somewhat agree</td>
+      <td>Somewhat agree</td>
+      <td>Somewhat disagree</td>
+      <td>Saw an online advertisement and then researche...</td>
+      <td>1.0</td>
+      <td>3.0</td>
+      <td>4.0</td>
+      <td>2.0</td>
+      <td>7.0</td>
+      <td>5.0</td>
+      <td>6.0</td>
+      <td>Increasing automation of jobs</td>
+      <td>Algorithms making important decisions</td>
+      <td>A governmental or other regulatory body</td>
+      <td>I'm excited about the possibilities more than ...</td>
+      <td>Depends on what it is</td>
+      <td>Depends on what it is</td>
+      <td>Upper management at the company/organization</td>
+      <td>Unsure / I don't know</td>
+      <td>7</td>
+      <td>A few times per month or weekly</td>
+      <td>Yes</td>
+      <td>Less than once per month or monthly</td>
+      <td>Yes</td>
+      <td>No, I have one but it's out of date</td>
+      <td>8</td>
+      <td>No</td>
+      <td>A little bit interested</td>
+      <td>Not at all interested</td>
+      <td>Very interested</td>
+      <td>Very interested</td>
+      <td>Extremely interested</td>
+      <td>Between 7:01 - 8:00 AM</td>
+      <td>9 - 12 hours</td>
+      <td>30 - 59 minutes</td>
+      <td>1 - 2 times per week</td>
+      <td>NaN</td>
+      <td>1 - 2 times per week</td>
+      <td>Male</td>
+      <td>Straight or heterosexual</td>
+      <td>Secondary school (e.g. American high school, G...</td>
+      <td>White or of European descent</td>
+      <td>18 - 24 years old</td>
+      <td>No</td>
+      <td>NaN</td>
+      <td>The survey was an appropriate length</td>
+      <td>Somewhat easy</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>9</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>United States</td>
+      <td>No</td>
+      <td>Employed full-time</td>
+      <td>Some college/university study without earning ...</td>
+      <td>Computer science, computer engineering, or sof...</td>
+      <td>10,000 or more employees</td>
+      <td>Back-end developer;Front-end developer;Full-st...</td>
+      <td>9-11 years</td>
+      <td>0-2 years</td>
+      <td>Slightly satisfied</td>
+      <td>Moderately satisfied</td>
+      <td>Working as a founder or co-founder of my own c...</td>
+      <td>I’m not actively looking, but I am open to new...</td>
+      <td>Less than a year ago</td>
+      <td>5.0</td>
+      <td>3.0</td>
+      <td>9.0</td>
+      <td>4.0</td>
+      <td>1.0</td>
+      <td>8.0</td>
+      <td>2.0</td>
+      <td>7.0</td>
+      <td>10.0</td>
+      <td>6.0</td>
+      <td>1.0</td>
+      <td>3.0</td>
+      <td>2.0</td>
+      <td>9.0</td>
+      <td>11.0</td>
+      <td>4.0</td>
+      <td>8.0</td>
+      <td>6.0</td>
+      <td>7.0</td>
+      <td>10.0</td>
+      <td>5.0</td>
+      <td>3.0</td>
+      <td>1.0</td>
+      <td>5.0</td>
+      <td>4.0</td>
+      <td>2.0</td>
+      <td>1.0</td>
+      <td>5.0</td>
+      <td>3.0</td>
+      <td>4.0</td>
+      <td>2.0</td>
+      <td>6.0</td>
+      <td>7.0</td>
+      <td>My job status or other personal status changed</td>
+      <td>U.S. dollars ($)</td>
+      <td>120000</td>
+      <td>Yearly</td>
+      <td>120000.0</td>
+      <td>USD</td>
+      <td>Confluence;Office / productivity suite (Micros...</td>
+      <td>Six to nine months</td>
+      <td>Received on-the-job training in software devel...</td>
+      <td>The official documentation and/or standards fo...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>Disagree</td>
+      <td>Agree</td>
+      <td>Strongly disagree</td>
+      <td>JavaScript;HTML;CSS</td>
+      <td>C;Go;JavaScript;Python;HTML;CSS</td>
+      <td>MongoDB</td>
+      <td>NaN</td>
+      <td>Linux</td>
+      <td>Linux</td>
+      <td>Node.js;React</td>
+      <td>React;TensorFlow</td>
+      <td>Atom;Visual Studio Code</td>
+      <td>MacOS</td>
+      <td>2</td>
+      <td>Agile;Scrum</td>
+      <td>Git</td>
+      <td>Multiple times per day</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>The ad-blocking software was causing display i...</td>
+      <td>Somewhat disagree</td>
+      <td>Neither agree nor disagree</td>
+      <td>Somewhat disagree</td>
+      <td>Clicked on an online advertisement;Stopped goi...</td>
+      <td>1.0</td>
+      <td>4.0</td>
+      <td>2.0</td>
+      <td>5.0</td>
+      <td>3.0</td>
+      <td>7.0</td>
+      <td>6.0</td>
+      <td>Algorithms making important decisions</td>
+      <td>Artificial intelligence surpassing human intel...</td>
+      <td>The developers or the people creating the AI</td>
+      <td>I'm excited about the possibilities more than ...</td>
+      <td>Depends on what it is</td>
+      <td>Yes, but only within the company</td>
+      <td>Upper management at the company/organization</td>
+      <td>Yes</td>
+      <td>10 (Very Likely)</td>
+      <td>Multiple times per day</td>
+      <td>Yes</td>
+      <td>I have never participated in Q&amp;A on Stack Over...</td>
+      <td>Yes</td>
+      <td>No, I have one but it's out of date</td>
+      <td>7</td>
+      <td>No</td>
+      <td>Very interested</td>
+      <td>A little bit interested</td>
+      <td>Extremely interested</td>
+      <td>Very interested</td>
+      <td>Very interested</td>
+      <td>Between 9:01 - 10:00 AM</td>
+      <td>Over 12 hours</td>
+      <td>Less than 30 minutes</td>
+      <td>1 - 2 times per week</td>
+      <td>NaN</td>
+      <td>I don't typically exercise</td>
+      <td>Male</td>
+      <td>Straight or heterosexual</td>
+      <td>Master’s degree (MA, MS, M.Eng., MBA, etc.)</td>
+      <td>White or of European descent</td>
+      <td>18 - 24 years old</td>
+      <td>No</td>
+      <td>No</td>
+      <td>The survey was an appropriate length</td>
+      <td>Somewhat easy</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>11</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>United States</td>
+      <td>No</td>
+      <td>Employed full-time</td>
+      <td>Some college/university study without earning ...</td>
+      <td>Fine arts or performing arts (ex. graphic desi...</td>
+      <td>100 to 499 employees</td>
+      <td>Back-end developer;C-suite executive (CEO, CTO...</td>
+      <td>30 or more years</td>
+      <td>21-23 years</td>
+      <td>Moderately satisfied</td>
+      <td>Moderately satisfied</td>
+      <td>Doing the same work</td>
+      <td>I’m not actively looking, but I am open to new...</td>
+      <td>Between 2 and 4 years ago</td>
+      <td>6.0</td>
+      <td>3.0</td>
+      <td>7.0</td>
+      <td>4.0</td>
+      <td>1.0</td>
+      <td>5.0</td>
+      <td>10.0</td>
+      <td>8.0</td>
+      <td>9.0</td>
+      <td>2.0</td>
+      <td>1.0</td>
+      <td>3.0</td>
+      <td>2.0</td>
+      <td>9.0</td>
+      <td>11.0</td>
+      <td>5.0</td>
+      <td>8.0</td>
+      <td>4.0</td>
+      <td>10.0</td>
+      <td>7.0</td>
+      <td>6.0</td>
+      <td>5.0</td>
+      <td>1.0</td>
+      <td>2.0</td>
+      <td>3.0</td>
+      <td>4.0</td>
+      <td>3.0</td>
+      <td>7.0</td>
+      <td>2.0</td>
+      <td>4.0</td>
+      <td>1.0</td>
+      <td>6.0</td>
+      <td>5.0</td>
+      <td>My job status or other personal status changed</td>
+      <td>U.S. dollars ($)</td>
+      <td>250000</td>
+      <td>Yearly</td>
+      <td>250000.0</td>
+      <td>USD</td>
+      <td>Confluence;HipChat;Jira;Office / productivity ...</td>
+      <td>Three to six months</td>
+      <td>Taken an online course in programming or softw...</td>
+      <td>The official documentation and/or standards fo...</td>
+      <td>NaN</td>
+      <td>Because I find it enjoyable</td>
+      <td>Strongly agree</td>
+      <td>Strongly disagree</td>
+      <td>Strongly disagree</td>
+      <td>Assembly;CoffeeScript;Erlang;Go;JavaScript;Lua...</td>
+      <td>Erlang;Go;Python;Rust;SQL</td>
+      <td>Redis;PostgreSQL;Amazon DynamoDB;Apache HBase;...</td>
+      <td>Redis;PostgreSQL;Amazon DynamoDB;Apache Hive;A...</td>
+      <td>Amazon Echo;AWS;iOS;Linux;Mac OS;Serverless</td>
+      <td>AWS;Linux;Mac OS;Serverless</td>
+      <td>Hadoop;Node.js;React;Spark</td>
+      <td>NaN</td>
+      <td>IntelliJ;PyCharm;Sublime Text;Vim</td>
+      <td>MacOS</td>
+      <td>1</td>
+      <td>Agile;Evidence-based software engineering;Extr...</td>
+      <td>Git</td>
+      <td>Multiple times per day</td>
+      <td>No</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>Neither agree nor disagree</td>
+      <td>Somewhat agree</td>
+      <td>Neither agree nor disagree</td>
+      <td>Clicked on an online advertisement;Saw an onli...</td>
+      <td>1.0</td>
+      <td>3.0</td>
+      <td>5.0</td>
+      <td>4.0</td>
+      <td>2.0</td>
+      <td>7.0</td>
+      <td>6.0</td>
+      <td>Algorithms making important decisions</td>
+      <td>Artificial intelligence surpassing human intel...</td>
+      <td>The developers or the people creating the AI</td>
+      <td>I'm worried about the dangers more than I'm ex...</td>
+      <td>No</td>
+      <td>Yes, and publicly</td>
+      <td>The person who came up with the idea</td>
+      <td>Yes</td>
+      <td>7</td>
+      <td>A few times per month or weekly</td>
+      <td>Yes</td>
+      <td>Less than once per month or monthly</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>7</td>
+      <td>No</td>
+      <td>Not at all interested</td>
+      <td>Not at all interested</td>
+      <td>Not at all interested</td>
+      <td>Not at all interested</td>
+      <td>Not at all interested</td>
+      <td>Between 8:01 - 9:00 AM</td>
+      <td>9 - 12 hours</td>
+      <td>Less than 30 minutes</td>
+      <td>1 - 2 times per week</td>
+      <td>Standing desk;Fatigue-relieving floor mat</td>
+      <td>I don't typically exercise</td>
+      <td>Male</td>
+      <td>Straight or heterosexual</td>
+      <td>Some college/university study without earning ...</td>
+      <td>White or of European descent</td>
+      <td>35 - 44 years old</td>
+      <td>Yes</td>
+      <td>No</td>
+      <td>The survey was an appropriate length</td>
+      <td>Very easy</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We can see that most columns are non-numeric. Some of the few columns that are numeric are <code>AssessJob*</code>. Having a look at the <a href="https://www.kaggle.com/stackoverflow/stack-overflow-2018-developer-survey?select=survey_results_schema.csv">data schema</a>, we can see that users have to rank several features of the job that they're choosing from 1 to 10, where 1 is the most important and 10 is the least important.  In the case of <code>AssessJob5</code>, the thing that is being rated is <em>The compensation and benefits offered</em>. A natural question to ask is that if people who value compensation more actually make more. The answer is in the following query:</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="p">(</span><span class="n">so_df</span>
+ <span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;AssessJob5&#39;</span><span class="p">)</span>
+ <span class="o">.</span><span class="n">agg</span><span class="p">({</span><span class="s1">&#39;ConvertedSalary&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="s1">&#39;median&#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">]})</span>
+<span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead tr th {
+        text-align: left;
+    }
+
+    .dataframe thead tr:last-of-type th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr>
+      <th></th>
+      <th colspan="3" halign="left">ConvertedSalary</th>
+    </tr>
+    <tr>
+      <th></th>
+      <th>mean</th>
+      <th>median</th>
+      <th>len</th>
+    </tr>
+    <tr>
+      <th>AssessJob5</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1.0</th>
+      <td>114636.509475</td>
+      <td>67512.0</td>
+      <td>9235.0</td>
+    </tr>
+    <tr>
+      <th>2.0</th>
+      <td>104268.116033</td>
+      <td>63257.0</td>
+      <td>8782.0</td>
+    </tr>
+    <tr>
+      <th>3.0</th>
+      <td>94250.374226</td>
+      <td>58340.0</td>
+      <td>7263.0</td>
+    </tr>
+    <tr>
+      <th>4.0</th>
+      <td>89597.748557</td>
+      <td>52872.0</td>
+      <td>5719.0</td>
+    </tr>
+    <tr>
+      <th>5.0</th>
+      <td>89341.969460</td>
+      <td>51408.0</td>
+      <td>4355.0</td>
+    </tr>
+    <tr>
+      <th>6.0</th>
+      <td>81042.514268</td>
+      <td>45420.0</td>
+      <td>3259.0</td>
+    </tr>
+    <tr>
+      <th>7.0</th>
+      <td>88240.893902</td>
+      <td>41124.0</td>
+      <td>2460.0</td>
+    </tr>
+    <tr>
+      <th>8.0</th>
+      <td>74418.464066</td>
+      <td>37572.0</td>
+      <td>1948.0</td>
+    </tr>
+    <tr>
+      <th>9.0</th>
+      <td>80024.848718</td>
+      <td>35178.0</td>
+      <td>1560.0</td>
+    </tr>
+    <tr>
+      <th>10.0</th>
+      <td>66614.714586</td>
+      <td>28800.0</td>
+      <td>953.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Indeed, people who rate the compensation as more important make on average more, both in terms of mean and median.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Before asking and attempting to answer more questions regarding the salary, let's make some utility functions that will be useful.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">p10</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Function that returns the 10th percentile of a pandas Series&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="o">.</span><span class="mi">10</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">p90</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Function that returns the 90th percentile of a pandas Series&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="o">.</span><span class="mi">90</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">salary_summary</span><span class="p">(</span><span class="n">so_df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">var</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Summaries several statistics of the salary grouping by a variable&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">so_df</span>
+            <span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">agg</span><span class="p">({</span><span class="s1">&#39;ConvertedSalary&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;min&#39;</span><span class="p">,</span> <span class="n">p10</span><span class="p">,</span> <span class="s1">&#39;median&#39;</span><span class="p">,</span> <span class="n">p90</span><span class="p">,</span> <span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="s1">&#39;max&#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">]})</span>
+           <span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><code>salary_summary</code> describes some statistics with respect to some grouping variable. Let's use <code>YearsCoding</code> as that variable. We can see that more years coding generally imply higher salaries.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">salary_summary</span><span class="p">(</span><span class="n">so_df</span><span class="p">,</span> <span class="s1">&#39;YearsCoding&#39;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead tr th {
+        text-align: left;
+    }
+
+    .dataframe thead tr:last-of-type th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr>
+      <th></th>
+      <th colspan="7" halign="left">ConvertedSalary</th>
+    </tr>
+    <tr>
+      <th></th>
+      <th>min</th>
+      <th>p10</th>
+      <th>median</th>
+      <th>p90</th>
+      <th>mean</th>
+      <th>max</th>
+      <th>len</th>
+    </tr>
+    <tr>
+      <th>YearsCoding</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0-2 years</th>
+      <td>0.0</td>
+      <td>1200.0</td>
+      <td>13212.0</td>
+      <td>76119.1</td>
+      <td>51609.611982</td>
+      <td>2000000.0</td>
+      <td>3188.0</td>
+    </tr>
+    <tr>
+      <th>12-14 years</th>
+      <td>0.0</td>
+      <td>23094.3</td>
+      <td>67313.5</td>
+      <td>148801.9</td>
+      <td>109875.912365</td>
+      <td>2000000.0</td>
+      <td>4998.0</td>
+    </tr>
+    <tr>
+      <th>15-17 years</th>
+      <td>0.0</td>
+      <td>31300.6</td>
+      <td>76626.5</td>
+      <td>165000.0</td>
+      <td>124343.801985</td>
+      <td>2000000.0</td>
+      <td>3828.0</td>
+    </tr>
+    <tr>
+      <th>18-20 years</th>
+      <td>0.0</td>
+      <td>35244.0</td>
+      <td>85000.0</td>
+      <td>175000.0</td>
+      <td>128760.426768</td>
+      <td>2000000.0</td>
+      <td>3168.0</td>
+    </tr>
+    <tr>
+      <th>21-23 years</th>
+      <td>0.0</td>
+      <td>41229.0</td>
+      <td>95552.0</td>
+      <td>175000.0</td>
+      <td>133128.075183</td>
+      <td>2000000.0</td>
+      <td>1636.0</td>
+    </tr>
+    <tr>
+      <th>24-26 years</th>
+      <td>0.0</td>
+      <td>38798.4</td>
+      <td>96000.0</td>
+      <td>200000.0</td>
+      <td>145374.963762</td>
+      <td>2000000.0</td>
+      <td>1159.0</td>
+    </tr>
+    <tr>
+      <th>27-29 years</th>
+      <td>0.0</td>
+      <td>41671.0</td>
+      <td>96000.0</td>
+      <td>200000.0</td>
+      <td>153732.023772</td>
+      <td>2000000.0</td>
+      <td>631.0</td>
+    </tr>
+    <tr>
+      <th>3-5 years</th>
+      <td>0.0</td>
+      <td>4128.0</td>
+      <td>29376.0</td>
+      <td>96000.0</td>
+      <td>66707.942685</td>
+      <td>2000000.0</td>
+      <td>9788.0</td>
+    </tr>
+    <tr>
+      <th>30 or more years</th>
+      <td>0.0</td>
+      <td>48616.0</td>
+      <td>105000.0</td>
+      <td>205586.2</td>
+      <td>155413.456875</td>
+      <td>2000000.0</td>
+      <td>2029.0</td>
+    </tr>
+    <tr>
+      <th>6-8 years</th>
+      <td>0.0</td>
+      <td>7725.9</td>
+      <td>44287.0</td>
+      <td>115500.0</td>
+      <td>83373.084229</td>
+      <td>2000000.0</td>
+      <td>10234.0</td>
+    </tr>
+    <tr>
+      <th>9-11 years</th>
+      <td>0.0</td>
+      <td>14662.5</td>
+      <td>55392.0</td>
+      <td>130000.0</td>
+      <td>94310.455866</td>
+      <td>2000000.0</td>
+      <td>7024.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We can actually attempt to plot the evolution of the median salary in terms of years spent programming:</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">so_df</span><span class="p">[</span><span class="s1">&#39;years_coding_int&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">so_df</span><span class="o">.</span><span class="n">YearsCoding</span><span class="o">.</span><span class="n">map</span><span class="p">({</span>
+    <span class="s1">&#39;30 or more years&#39;</span><span class="p">:</span> <span class="mi">35</span><span class="p">,</span> 
+    <span class="s1">&#39;6-8 years&#39;</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span> 
+    <span class="s1">&#39;9-11 years&#39;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> 
+    <span class="s1">&#39;0-2 years&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s1">&#39;15-17 years&#39;</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span>
+    <span class="s1">&#39;18-20 years&#39;</span><span class="p">:</span> <span class="mi">19</span><span class="p">,</span>
+    <span class="s1">&#39;3-5 years&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+    <span class="s1">&#39;12-14 years&#39;</span><span class="p">:</span> <span class="mi">13</span><span class="p">,</span>
+    <span class="s1">&#39;24-26 years&#39;</span><span class="p">:</span> <span class="mi">25</span><span class="p">,</span> 
+    <span class="s1">&#39;21-23 years&#39;</span><span class="p">:</span> <span class="mi">22</span><span class="p">,</span> 
+    <span class="s1">&#39;27-29 years:&#39;</span><span class="p">:</span> <span class="mi">28</span>
+<span class="p">})</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">year_summary</span> <span class="o">=</span> <span class="n">salary_summary</span><span class="p">(</span><span class="n">so_df</span><span class="p">,</span> <span class="s1">&#39;years_coding_int&#39;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">lineplot</span><span class="p">(</span><span class="n">year_summary</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">year_summary</span><span class="o">.</span><span class="n">ConvertedSalary</span><span class="p">[</span><span class="s1">&#39;median&#39;</span><span class="p">])</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>&lt;matplotlib.axes._subplots.AxesSubplot at 0x1a210bd5c0&gt;</pre>
+</div>
+
+</div>
+
+<div class="output_area">
+
+
+
+<div class="output_png output_subarea ">
+<img src="data:image/png;base64,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
+" />
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>A somehow expected results, the median salary increases fast at first and it slows down after some years. I did expect the saturation to happen earlier, but I was wrong apparently.</p>
+<p>We also had a bit of a mess to get the median salary, so we'll create a helper function to create a tidier structure.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">flatten_columns</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Tidy the structure of the output of salary_summary&quot;&quot;&quot;</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;_&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="k">for</span> <span class="n">df</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">ravel</span><span class="p">()]</span>
+    <span class="k">return</span> <span class="n">df</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="Country-evaluation">Country evaluation<a class="anchor-link" href="#Country-evaluation"> </a></h4>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Let's see in which countries you can make more money in terms of the median. We'll use the <code>flatten_columns</code> function to be able to sort in an easier way:</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">flatten_columns</span><span class="p">(</span><span class="n">salary_summary</span><span class="p">(</span><span class="n">so_df</span><span class="p">,</span> <span class="s1">&#39;Country&#39;</span><span class="p">))</span><span class="o">.</span>\
+<span class="n">sort_values</span><span class="p">(</span><span class="s1">&#39;ConvertedSalary_median&#39;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>ConvertedSalary_min</th>
+      <th>ConvertedSalary_p10</th>
+      <th>ConvertedSalary_median</th>
+      <th>ConvertedSalary_p90</th>
+      <th>ConvertedSalary_mean</th>
+      <th>ConvertedSalary_max</th>
+      <th>ConvertedSalary_len</th>
+    </tr>
+    <tr>
+      <th>Country</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Andorra</th>
+      <td>48955.0</td>
+      <td>49689.4</td>
+      <td>525701.5</td>
+      <td>1000000.0</td>
+      <td>525089.500000</td>
+      <td>1000000.0</td>
+      <td>4.0</td>
+    </tr>
+    <tr>
+      <th>Botswana</th>
+      <td>140000.0</td>
+      <td>146000.0</td>
+      <td>170000.0</td>
+      <td>194000.0</td>
+      <td>170000.000000</td>
+      <td>200000.0</td>
+      <td>2.0</td>
+    </tr>
+    <tr>
+      <th>Saint Lucia</th>
+      <td>159852.0</td>
+      <td>159852.0</td>
+      <td>159852.0</td>
+      <td>159852.0</td>
+      <td>159852.000000</td>
+      <td>159852.0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <th>Togo</th>
+      <td>24000.0</td>
+      <td>51095.5</td>
+      <td>159477.5</td>
+      <td>267859.5</td>
+      <td>159477.500000</td>
+      <td>294955.0</td>
+      <td>2.0</td>
+    </tr>
+    <tr>
+      <th>Sierra Leone</th>
+      <td>120000.0</td>
+      <td>120000.0</td>
+      <td>120000.0</td>
+      <td>120000.0</td>
+      <td>120000.000000</td>
+      <td>120000.0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>Swaziland</th>
+      <td>1488.0</td>
+      <td>1586.4</td>
+      <td>1980.0</td>
+      <td>3564.0</td>
+      <td>2476.000000</td>
+      <td>3960.0</td>
+      <td>3.0</td>
+    </tr>
+    <tr>
+      <th>Cuba</th>
+      <td>156.0</td>
+      <td>794.4</td>
+      <td>1944.0</td>
+      <td>58800.0</td>
+      <td>62919.368421</td>
+      <td>1000000.0</td>
+      <td>19.0</td>
+    </tr>
+    <tr>
+      <th>Zambia</th>
+      <td>1824.0</td>
+      <td>1824.0</td>
+      <td>1824.0</td>
+      <td>1824.0</td>
+      <td>1824.000000</td>
+      <td>1824.0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <th>Dominica</th>
+      <td>1000.0</td>
+      <td>1000.0</td>
+      <td>1000.0</td>
+      <td>1000.0</td>
+      <td>1000.000000</td>
+      <td>1000.0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <th>Monaco</th>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.000000</td>
+      <td>0.0</td>
+      <td>1.0</td>
+    </tr>
+  </tbody>
+</table>
+<p>157 rows × 7 columns</p>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Let's stop for a moment and analyse the issues of what we are doing:</p>
+<ul>
+<li>The code starts to look messy, it's hard to read and reason about: We'll use cleaner code from now on.</li>
+<li>I'd never say that Togo is a top-earning country. An issue that we have is that top countries are the ones that have low statistical mass (the last column is the number of surveys answered in that country): We'll filter the countries that have more than <code>x</code> surveys to answer this question propperly.</li>
+</ul>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>To write cleaner code, we can use pandas pipes. This was a big lesson to me, now I'm able to write dplyr-like code in pandas.</p>
+<p>To solve the issue of low statistical mass, we only consider countries that have more than 40 surveys finished. The results make more sense from a macroeconomic perspective, being the US and Switzerland the top earning countries:</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="p">(</span><span class="n">so_df</span>
+ <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">salary_summary</span><span class="p">,</span> <span class="s1">&#39;Country&#39;</span><span class="p">)</span>
+ <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">flatten_columns</span><span class="p">)</span>
+ <span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;ConvertedSalary_len &gt; 40&#39;</span><span class="p">)</span>
+ <span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">&#39;ConvertedSalary_median&#39;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+ <span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+<span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>ConvertedSalary_min</th>
+      <th>ConvertedSalary_p10</th>
+      <th>ConvertedSalary_median</th>
+      <th>ConvertedSalary_p90</th>
+      <th>ConvertedSalary_mean</th>
+      <th>ConvertedSalary_max</th>
+      <th>ConvertedSalary_len</th>
+    </tr>
+    <tr>
+      <th>Country</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>United States</th>
+      <td>0.0</td>
+      <td>50000.0</td>
+      <td>100000.0</td>
+      <td>175000.0</td>
+      <td>154413.128506</td>
+      <td>2000000.0</td>
+      <td>12941.0</td>
+    </tr>
+    <tr>
+      <th>Switzerland</th>
+      <td>0.0</td>
+      <td>20938.4</td>
+      <td>93842.0</td>
+      <td>162451.6</td>
+      <td>138111.567812</td>
+      <td>1000000.0</td>
+      <td>553.0</td>
+    </tr>
+    <tr>
+      <th>Israel</th>
+      <td>0.0</td>
+      <td>35112.0</td>
+      <td>90642.0</td>
+      <td>140392.4</td>
+      <td>99560.527149</td>
+      <td>1248000.0</td>
+      <td>442.0</td>
+    </tr>
+    <tr>
+      <th>Norway</th>
+      <td>0.0</td>
+      <td>53152.0</td>
+      <td>82890.0</td>
+      <td>183633.2</td>
+      <td>150544.824926</td>
+      <td>1000000.0</td>
+      <td>337.0</td>
+    </tr>
+    <tr>
+      <th>Denmark</th>
+      <td>0.0</td>
+      <td>37640.0</td>
+      <td>82836.0</td>
+      <td>139878.0</td>
+      <td>100477.157303</td>
+      <td>1000000.0</td>
+      <td>356.0</td>
+    </tr>
+    <tr>
+      <th>Australia</th>
+      <td>0.0</td>
+      <td>41506.0</td>
+      <td>79973.0</td>
+      <td>149950.0</td>
+      <td>126623.720339</td>
+      <td>1000000.0</td>
+      <td>1180.0</td>
+    </tr>
+    <tr>
+      <th>Ireland</th>
+      <td>0.0</td>
+      <td>35492.0</td>
+      <td>74657.0</td>
+      <td>734328.0</td>
+      <td>186313.216718</td>
+      <td>1000000.0</td>
+      <td>323.0</td>
+    </tr>
+    <tr>
+      <th>New Zealand</th>
+      <td>0.0</td>
+      <td>33619.0</td>
+      <td>65776.0</td>
+      <td>166632.0</td>
+      <td>133835.951768</td>
+      <td>1000000.0</td>
+      <td>311.0</td>
+    </tr>
+    <tr>
+      <th>Canada</th>
+      <td>0.0</td>
+      <td>32209.0</td>
+      <td>64417.0</td>
+      <td>112730.0</td>
+      <td>100894.343419</td>
+      <td>2000000.0</td>
+      <td>1983.0</td>
+    </tr>
+    <tr>
+      <th>United Kingdom</th>
+      <td>0.0</td>
+      <td>31253.0</td>
+      <td>62507.0</td>
+      <td>287155.2</td>
+      <td>128216.930944</td>
+      <td>1200000.0</td>
+      <td>3794.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We can also measure salary inequality in a given country. A common approach is to divide the 90th quantile by the 10th quantile. The bigger this ratio, the higher the inequality. Venezuela, Viet Nam and Nigeria seem to be the most unequal countries:</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="p">(</span><span class="n">so_df</span>
+ <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">salary_summary</span><span class="p">,</span> <span class="s1">&#39;Country&#39;</span><span class="p">)</span>
+ <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">flatten_columns</span><span class="p">)</span>
+ <span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">inequality</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;ConvertedSalary_p90&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;ConvertedSalary_p10&#39;</span><span class="p">])</span>
+ <span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;ConvertedSalary_len &gt; 40&#39;</span><span class="p">)</span>
+ <span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">&#39;inequality&#39;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+ <span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+<span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>ConvertedSalary_min</th>
+      <th>ConvertedSalary_p10</th>
+      <th>ConvertedSalary_median</th>
+      <th>ConvertedSalary_p90</th>
+      <th>ConvertedSalary_mean</th>
+      <th>ConvertedSalary_max</th>
+      <th>ConvertedSalary_len</th>
+      <th>inequality</th>
+    </tr>
+    <tr>
+      <th>Country</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Venezuela, Bolivarian Republic of...</th>
+      <td>24.0</td>
+      <td>444.0</td>
+      <td>8100.0</td>
+      <td>1000000.0</td>
+      <td>241823.625000</td>
+      <td>1000000.0</td>
+      <td>48.0</td>
+      <td>2252.252252</td>
+    </tr>
+    <tr>
+      <th>Viet Nam</th>
+      <td>0.0</td>
+      <td>792.0</td>
+      <td>9516.0</td>
+      <td>38400.0</td>
+      <td>19001.617284</td>
+      <td>285744.0</td>
+      <td>81.0</td>
+      <td>48.484848</td>
+    </tr>
+    <tr>
+      <th>Nigeria</th>
+      <td>0.0</td>
+      <td>829.0</td>
+      <td>6000.0</td>
+      <td>39196.8</td>
+      <td>23543.699248</td>
+      <td>1000000.0</td>
+      <td>133.0</td>
+      <td>47.282027</td>
+    </tr>
+    <tr>
+      <th>Iran, Islamic Republic of...</th>
+      <td>0.0</td>
+      <td>660.0</td>
+      <td>10000.0</td>
+      <td>25509.6</td>
+      <td>15644.191419</td>
+      <td>1000000.0</td>
+      <td>303.0</td>
+      <td>38.650909</td>
+    </tr>
+    <tr>
+      <th>Other Country (Not Listed Above)</th>
+      <td>0.0</td>
+      <td>6273.6</td>
+      <td>35274.5</td>
+      <td>162512.0</td>
+      <td>94657.119048</td>
+      <td>1056000.0</td>
+      <td>42.0</td>
+      <td>25.904106</td>
+    </tr>
+    <tr>
+      <th>Kenya</th>
+      <td>0.0</td>
+      <td>1922.4</td>
+      <td>12000.0</td>
+      <td>44400.0</td>
+      <td>30356.666667</td>
+      <td>360000.0</td>
+      <td>57.0</td>
+      <td>23.096130</td>
+    </tr>
+    <tr>
+      <th>Morocco</th>
+      <td>0.0</td>
+      <td>2592.0</td>
+      <td>12000.0</td>
+      <td>54046.4</td>
+      <td>20565.981132</td>
+      <td>100000.0</td>
+      <td>53.0</td>
+      <td>20.851235</td>
+    </tr>
+    <tr>
+      <th>India</th>
+      <td>0.0</td>
+      <td>2256.0</td>
+      <td>9396.0</td>
+      <td>46963.0</td>
+      <td>27694.121486</td>
+      <td>2000000.0</td>
+      <td>4091.0</td>
+      <td>20.816933</td>
+    </tr>
+    <tr>
+      <th>Ireland</th>
+      <td>0.0</td>
+      <td>35492.0</td>
+      <td>74657.0</td>
+      <td>734328.0</td>
+      <td>186313.216718</td>
+      <td>1000000.0</td>
+      <td>323.0</td>
+      <td>20.689958</td>
+    </tr>
+    <tr>
+      <th>Italy</th>
+      <td>0.0</td>
+      <td>20235.6</td>
+      <td>39164.0</td>
+      <td>327506.4</td>
+      <td>95691.657754</td>
+      <td>1000000.0</td>
+      <td>748.0</td>
+      <td>16.184665</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="Skills-evaluation">Skills evaluation<a class="anchor-link" href="#Skills-evaluation"> </a></h4>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Some columns have information regarding past experience. For instance, we have <code>DatabaseWorkedWith</code></p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">na_performance</span><span class="p">(</span><span class="n">so_df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">var</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Summarizes the salary statistics grouping by a variable being empty&quot;&quot;&quot;</span>
+    
+    <span class="k">return</span> <span class="p">(</span><span class="n">so_df</span>
+            <span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">no_experience</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="n">var</span><span class="p">]</span><span class="o">.</span><span class="n">isnull</span><span class="p">())</span>
+            <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">salary_summary</span><span class="p">,</span> <span class="s1">&#39;no_experience&#39;</span><span class="p">)</span>
+    <span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="p">(</span><span class="n">so_df</span>
+ <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">na_performance</span><span class="p">,</span> <span class="s1">&#39;DatabaseWorkedWith&#39;</span><span class="p">)</span>
+<span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead tr th {
+        text-align: left;
+    }
+
+    .dataframe thead tr:last-of-type th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr>
+      <th></th>
+      <th colspan="7" halign="left">ConvertedSalary</th>
+    </tr>
+    <tr>
+      <th></th>
+      <th>min</th>
+      <th>q10</th>
+      <th>median</th>
+      <th>q90</th>
+      <th>mean</th>
+      <th>max</th>
+      <th>len</th>
+    </tr>
+    <tr>
+      <th>no_experience</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>False</th>
+      <td>0.0</td>
+      <td>7884.0</td>
+      <td>55447.5</td>
+      <td>140764.0</td>
+      <td>96172.055854</td>
+      <td>2000000.0</td>
+      <td>40588.0</td>
+    </tr>
+    <tr>
+      <th>True</th>
+      <td>0.0</td>
+      <td>5640.0</td>
+      <td>53851.0</td>
+      <td>146198.8</td>
+      <td>93548.955018</td>
+      <td>2000000.0</td>
+      <td>7114.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="p">(</span><span class="n">so_df</span>
+ <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">na_performance</span><span class="p">,</span> <span class="s1">&#39;FrameworkWorkedWith&#39;</span><span class="p">)</span>
+<span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead tr th {
+        text-align: left;
+    }
+
+    .dataframe thead tr:last-of-type th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr>
+      <th></th>
+      <th colspan="7" halign="left">ConvertedSalary</th>
+    </tr>
+    <tr>
+      <th></th>
+      <th>min</th>
+      <th>q10</th>
+      <th>median</th>
+      <th>q90</th>
+      <th>mean</th>
+      <th>max</th>
+      <th>len</th>
+    </tr>
+    <tr>
+      <th>no_experience</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>False</th>
+      <td>0.0</td>
+      <td>9012.0</td>
+      <td>57912.0</td>
+      <td>145000.0</td>
+      <td>99228.131023</td>
+      <td>2000000.0</td>
+      <td>32605.0</td>
+    </tr>
+    <tr>
+      <th>True</th>
+      <td>0.0</td>
+      <td>5640.0</td>
+      <td>50000.0</td>
+      <td>138660.0</td>
+      <td>88335.792343</td>
+      <td>2000000.0</td>
+      <td>15097.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="p">(</span><span class="n">so_df</span>
+ <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">na_performance</span><span class="p">,</span> <span class="s1">&#39;LanguageWorkedWith&#39;</span><span class="p">)</span>
+<span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead tr th {
+        text-align: left;
+    }
+
+    .dataframe thead tr:last-of-type th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr>
+      <th></th>
+      <th colspan="7" halign="left">ConvertedSalary</th>
+    </tr>
+    <tr>
+      <th></th>
+      <th>min</th>
+      <th>q10</th>
+      <th>median</th>
+      <th>q90</th>
+      <th>mean</th>
+      <th>max</th>
+      <th>len</th>
+    </tr>
+    <tr>
+      <th>no_experience</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>False</th>
+      <td>0.0</td>
+      <td>7827.0</td>
+      <td>55562.0</td>
+      <td>142360.8</td>
+      <td>96155.116540</td>
+      <td>2000000.0</td>
+      <td>46482.0</td>
+    </tr>
+    <tr>
+      <th>True</th>
+      <td>0.0</td>
+      <td>3534.0</td>
+      <td>35244.0</td>
+      <td>125001.4</td>
+      <td>81521.755738</td>
+      <td>2000000.0</td>
+      <td>1220.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="p">(</span><span class="n">so_df</span>
+ <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">na_performance</span><span class="p">,</span> <span class="s1">&#39;HackathonReasons&#39;</span><span class="p">)</span>
+<span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead tr th {
+        text-align: left;
+    }
+
+    .dataframe thead tr:last-of-type th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr>
+      <th></th>
+      <th colspan="7" halign="left">ConvertedSalary</th>
+    </tr>
+    <tr>
+      <th></th>
+      <th>min</th>
+      <th>q10</th>
+      <th>median</th>
+      <th>q90</th>
+      <th>mean</th>
+      <th>max</th>
+      <th>len</th>
+    </tr>
+    <tr>
+      <th>no_experience</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>False</th>
+      <td>0.0</td>
+      <td>8768.4</td>
+      <td>59172.0</td>
+      <td>146868.0</td>
+      <td>97721.787904</td>
+      <td>2000000.0</td>
+      <td>18105.0</td>
+    </tr>
+    <tr>
+      <th>True</th>
+      <td>0.0</td>
+      <td>7085.6</td>
+      <td>52872.0</td>
+      <td>140000.0</td>
+      <td>94593.563503</td>
+      <td>2000000.0</td>
+      <td>29597.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="p">(</span><span class="n">so_df</span>
+ <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">na_performance</span><span class="p">,</span> <span class="s1">&#39;TimeAfterBootcamp&#39;</span><span class="p">)</span>
+<span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead tr th {
+        text-align: left;
+    }
+
+    .dataframe thead tr:last-of-type th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr>
+      <th></th>
+      <th colspan="7" halign="left">ConvertedSalary</th>
+    </tr>
+    <tr>
+      <th></th>
+      <th>min</th>
+      <th>q10</th>
+      <th>median</th>
+      <th>q90</th>
+      <th>mean</th>
+      <th>max</th>
+      <th>len</th>
+    </tr>
+    <tr>
+      <th>no_experience</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>False</th>
+      <td>0.0</td>
+      <td>7015.2</td>
+      <td>60000.0</td>
+      <td>145000.0</td>
+      <td>97038.026176</td>
+      <td>2000000.0</td>
+      <td>4508.0</td>
+    </tr>
+    <tr>
+      <th>True</th>
+      <td>0.0</td>
+      <td>7615.2</td>
+      <td>55075.0</td>
+      <td>141000.0</td>
+      <td>95649.656133</td>
+      <td>2000000.0</td>
+      <td>43194.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">so_df</span><span class="p">[</span><span class="s1">&#39;cobol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">so_df</span><span class="o">.</span><span class="n">LanguageWorkedWith</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="s1">&#39;Cobol&#39;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">salary_summary</span><span class="p">(</span><span class="n">so_df</span><span class="p">,</span> <span class="s1">&#39;cobol&#39;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead tr th {
+        text-align: left;
+    }
+
+    .dataframe thead tr:last-of-type th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr>
+      <th></th>
+      <th colspan="7" halign="left">ConvertedSalary</th>
+    </tr>
+    <tr>
+      <th></th>
+      <th>min</th>
+      <th>q10</th>
+      <th>median</th>
+      <th>q90</th>
+      <th>mean</th>
+      <th>max</th>
+      <th>len</th>
+    </tr>
+    <tr>
+      <th>cobol</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>False</th>
+      <td>0.0</td>
+      <td>7827.0</td>
+      <td>55562.0</td>
+      <td>142000.0</td>
+      <td>95957.630165</td>
+      <td>2000000.0</td>
+      <td>46180.0</td>
+    </tr>
+    <tr>
+      <th>True</th>
+      <td>0.0</td>
+      <td>8078.1</td>
+      <td>58749.0</td>
+      <td>178830.0</td>
+      <td>126353.529801</td>
+      <td>2000000.0</td>
+      <td>302.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">so_df</span><span class="p">[</span><span class="s1">&#39;cobol_int&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">so_df</span><span class="p">[</span><span class="s1">&#39;cobol&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+<span class="c1"># so_df.groupby([&#39;years_coding_int&#39;, &#39;YearsCoding&#39;]).size()</span>
+<span class="n">so_df</span><span class="p">[</span><span class="s1">&#39;null_db&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">so_df</span><span class="p">[</span><span class="s1">&#39;DatabaseWorkedWith&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+<span class="n">so_df</span><span class="p">[</span><span class="s1">&#39;null_fwork&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">so_df</span><span class="p">[</span><span class="s1">&#39;FrameworkWorkedWith&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+<span class="n">so_df</span><span class="p">[</span><span class="s1">&#39;null_lang&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">so_df</span><span class="p">[</span><span class="s1">&#39;LanguageWorkedWith&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+<span class="n">so_df</span><span class="p">[</span><span class="s1">&#39;null_hck&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">so_df</span><span class="p">[</span><span class="s1">&#39;HackathonReasons&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+<span class="n">so_df</span><span class="p">[</span><span class="s1">&#39;null_boot&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">so_df</span><span class="p">[</span><span class="s1">&#39;TimeAfterBootcamp&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># print(so_df.cobol_int.dtypes)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">x_df</span> <span class="o">=</span> <span class="n">so_df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;ConvertedSalary&#39;</span><span class="p">,</span> <span class="s1">&#39;Salary&#39;</span><span class="p">])</span>
+<span class="n">y_df</span> <span class="o">=</span> <span class="n">so_df</span><span class="p">[</span><span class="s1">&#39;ConvertedSalary&#39;</span><span class="p">]</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">x_train</span><span class="p">,</span> <span class="n">x_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">x_df</span><span class="p">,</span> <span class="n">y_df</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Complex model</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="nb">dict</span><span class="p">(</span><span class="n">so_df</span><span class="o">.</span><span class="n">dtypes</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>{&#39;Respondent&#39;: dtype(&#39;int64&#39;),
+ &#39;Hobby&#39;: dtype(&#39;O&#39;),
+ &#39;OpenSource&#39;: dtype(&#39;O&#39;),
+ &#39;Country&#39;: dtype(&#39;O&#39;),
+ &#39;Student&#39;: dtype(&#39;O&#39;),
+ &#39;Employment&#39;: dtype(&#39;O&#39;),
+ &#39;FormalEducation&#39;: dtype(&#39;O&#39;),
+ &#39;UndergradMajor&#39;: dtype(&#39;O&#39;),
+ &#39;CompanySize&#39;: dtype(&#39;O&#39;),
+ &#39;DevType&#39;: dtype(&#39;O&#39;),
+ &#39;YearsCoding&#39;: dtype(&#39;O&#39;),
+ &#39;YearsCodingProf&#39;: dtype(&#39;O&#39;),
+ &#39;JobSatisfaction&#39;: dtype(&#39;O&#39;),
+ &#39;CareerSatisfaction&#39;: dtype(&#39;O&#39;),
+ &#39;HopeFiveYears&#39;: dtype(&#39;O&#39;),
+ &#39;JobSearchStatus&#39;: dtype(&#39;O&#39;),
+ &#39;LastNewJob&#39;: dtype(&#39;O&#39;),
+ &#39;AssessJob1&#39;: dtype(&#39;float64&#39;),
+ &#39;AssessJob2&#39;: dtype(&#39;float64&#39;),
+ &#39;AssessJob3&#39;: dtype(&#39;float64&#39;),
+ &#39;AssessJob4&#39;: dtype(&#39;float64&#39;),
+ &#39;AssessJob5&#39;: dtype(&#39;float64&#39;),
+ &#39;AssessJob6&#39;: dtype(&#39;float64&#39;),
+ &#39;AssessJob7&#39;: dtype(&#39;float64&#39;),
+ &#39;AssessJob8&#39;: dtype(&#39;float64&#39;),
+ &#39;AssessJob9&#39;: dtype(&#39;float64&#39;),
+ &#39;AssessJob10&#39;: dtype(&#39;float64&#39;),
+ &#39;AssessBenefits1&#39;: dtype(&#39;float64&#39;),
+ &#39;AssessBenefits2&#39;: dtype(&#39;float64&#39;),
+ &#39;AssessBenefits3&#39;: dtype(&#39;float64&#39;),
+ &#39;AssessBenefits4&#39;: dtype(&#39;float64&#39;),
+ &#39;AssessBenefits5&#39;: dtype(&#39;float64&#39;),
+ &#39;AssessBenefits6&#39;: dtype(&#39;float64&#39;),
+ &#39;AssessBenefits7&#39;: dtype(&#39;float64&#39;),
+ &#39;AssessBenefits8&#39;: dtype(&#39;float64&#39;),
+ &#39;AssessBenefits9&#39;: dtype(&#39;float64&#39;),
+ &#39;AssessBenefits10&#39;: dtype(&#39;float64&#39;),
+ &#39;AssessBenefits11&#39;: dtype(&#39;float64&#39;),
+ &#39;JobContactPriorities1&#39;: dtype(&#39;float64&#39;),
+ &#39;JobContactPriorities2&#39;: dtype(&#39;float64&#39;),
+ &#39;JobContactPriorities3&#39;: dtype(&#39;float64&#39;),
+ &#39;JobContactPriorities4&#39;: dtype(&#39;float64&#39;),
+ &#39;JobContactPriorities5&#39;: dtype(&#39;float64&#39;),
+ &#39;JobEmailPriorities1&#39;: dtype(&#39;float64&#39;),
+ &#39;JobEmailPriorities2&#39;: dtype(&#39;float64&#39;),
+ &#39;JobEmailPriorities3&#39;: dtype(&#39;float64&#39;),
+ &#39;JobEmailPriorities4&#39;: dtype(&#39;float64&#39;),
+ &#39;JobEmailPriorities5&#39;: dtype(&#39;float64&#39;),
+ &#39;JobEmailPriorities6&#39;: dtype(&#39;float64&#39;),
+ &#39;JobEmailPriorities7&#39;: dtype(&#39;float64&#39;),
+ &#39;UpdateCV&#39;: dtype(&#39;O&#39;),
+ &#39;Currency&#39;: dtype(&#39;O&#39;),
+ &#39;Salary&#39;: dtype(&#39;O&#39;),
+ &#39;SalaryType&#39;: dtype(&#39;O&#39;),
+ &#39;ConvertedSalary&#39;: dtype(&#39;float64&#39;),
+ &#39;CurrencySymbol&#39;: dtype(&#39;O&#39;),
+ &#39;CommunicationTools&#39;: dtype(&#39;O&#39;),
+ &#39;TimeFullyProductive&#39;: dtype(&#39;O&#39;),
+ &#39;EducationTypes&#39;: dtype(&#39;O&#39;),
+ &#39;SelfTaughtTypes&#39;: dtype(&#39;O&#39;),
+ &#39;TimeAfterBootcamp&#39;: dtype(&#39;O&#39;),
+ &#39;HackathonReasons&#39;: dtype(&#39;O&#39;),
+ &#39;AgreeDisagree1&#39;: dtype(&#39;O&#39;),
+ &#39;AgreeDisagree2&#39;: dtype(&#39;O&#39;),
+ &#39;AgreeDisagree3&#39;: dtype(&#39;O&#39;),
+ &#39;LanguageWorkedWith&#39;: dtype(&#39;O&#39;),
+ &#39;LanguageDesireNextYear&#39;: dtype(&#39;O&#39;),
+ &#39;DatabaseWorkedWith&#39;: dtype(&#39;O&#39;),
+ &#39;DatabaseDesireNextYear&#39;: dtype(&#39;O&#39;),
+ &#39;PlatformWorkedWith&#39;: dtype(&#39;O&#39;),
+ &#39;PlatformDesireNextYear&#39;: dtype(&#39;O&#39;),
+ &#39;FrameworkWorkedWith&#39;: dtype(&#39;O&#39;),
+ &#39;FrameworkDesireNextYear&#39;: dtype(&#39;O&#39;),
+ &#39;IDE&#39;: dtype(&#39;O&#39;),
+ &#39;OperatingSystem&#39;: dtype(&#39;O&#39;),
+ &#39;NumberMonitors&#39;: dtype(&#39;O&#39;),
+ &#39;Methodology&#39;: dtype(&#39;O&#39;),
+ &#39;VersionControl&#39;: dtype(&#39;O&#39;),
+ &#39;CheckInCode&#39;: dtype(&#39;O&#39;),
+ &#39;AdBlocker&#39;: dtype(&#39;O&#39;),
+ &#39;AdBlockerDisable&#39;: dtype(&#39;O&#39;),
+ &#39;AdBlockerReasons&#39;: dtype(&#39;O&#39;),
+ &#39;AdsAgreeDisagree1&#39;: dtype(&#39;O&#39;),
+ &#39;AdsAgreeDisagree2&#39;: dtype(&#39;O&#39;),
+ &#39;AdsAgreeDisagree3&#39;: dtype(&#39;O&#39;),
+ &#39;AdsActions&#39;: dtype(&#39;O&#39;),
+ &#39;AdsPriorities1&#39;: dtype(&#39;float64&#39;),
+ &#39;AdsPriorities2&#39;: dtype(&#39;float64&#39;),
+ &#39;AdsPriorities3&#39;: dtype(&#39;float64&#39;),
+ &#39;AdsPriorities4&#39;: dtype(&#39;float64&#39;),
+ &#39;AdsPriorities5&#39;: dtype(&#39;float64&#39;),
+ &#39;AdsPriorities6&#39;: dtype(&#39;float64&#39;),
+ &#39;AdsPriorities7&#39;: dtype(&#39;float64&#39;),
+ &#39;AIDangerous&#39;: dtype(&#39;O&#39;),
+ &#39;AIInteresting&#39;: dtype(&#39;O&#39;),
+ &#39;AIResponsible&#39;: dtype(&#39;O&#39;),
+ &#39;AIFuture&#39;: dtype(&#39;O&#39;),
+ &#39;EthicsChoice&#39;: dtype(&#39;O&#39;),
+ &#39;EthicsReport&#39;: dtype(&#39;O&#39;),
+ &#39;EthicsResponsible&#39;: dtype(&#39;O&#39;),
+ &#39;EthicalImplications&#39;: dtype(&#39;O&#39;),
+ &#39;StackOverflowRecommend&#39;: dtype(&#39;O&#39;),
+ &#39;StackOverflowVisit&#39;: dtype(&#39;O&#39;),
+ &#39;StackOverflowHasAccount&#39;: dtype(&#39;O&#39;),
+ &#39;StackOverflowParticipate&#39;: dtype(&#39;O&#39;),
+ &#39;StackOverflowJobs&#39;: dtype(&#39;O&#39;),
+ &#39;StackOverflowDevStory&#39;: dtype(&#39;O&#39;),
+ &#39;StackOverflowJobsRecommend&#39;: dtype(&#39;O&#39;),
+ &#39;StackOverflowConsiderMember&#39;: dtype(&#39;O&#39;),
+ &#39;HypotheticalTools1&#39;: dtype(&#39;O&#39;),
+ &#39;HypotheticalTools2&#39;: dtype(&#39;O&#39;),
+ &#39;HypotheticalTools3&#39;: dtype(&#39;O&#39;),
+ &#39;HypotheticalTools4&#39;: dtype(&#39;O&#39;),
+ &#39;HypotheticalTools5&#39;: dtype(&#39;O&#39;),
+ &#39;WakeTime&#39;: dtype(&#39;O&#39;),
+ &#39;HoursComputer&#39;: dtype(&#39;O&#39;),
+ &#39;HoursOutside&#39;: dtype(&#39;O&#39;),
+ &#39;SkipMeals&#39;: dtype(&#39;O&#39;),
+ &#39;ErgonomicDevices&#39;: dtype(&#39;O&#39;),
+ &#39;Exercise&#39;: dtype(&#39;O&#39;),
+ &#39;Gender&#39;: dtype(&#39;O&#39;),
+ &#39;SexualOrientation&#39;: dtype(&#39;O&#39;),
+ &#39;EducationParents&#39;: dtype(&#39;O&#39;),
+ &#39;RaceEthnicity&#39;: dtype(&#39;O&#39;),
+ &#39;Age&#39;: dtype(&#39;O&#39;),
+ &#39;Dependents&#39;: dtype(&#39;O&#39;),
+ &#39;MilitaryUS&#39;: dtype(&#39;O&#39;),
+ &#39;SurveyTooLong&#39;: dtype(&#39;O&#39;),
+ &#39;SurveyEasy&#39;: dtype(&#39;O&#39;),
+ &#39;cobol&#39;: dtype(&#39;O&#39;),
+ &#39;years_coding_int&#39;: dtype(&#39;float64&#39;),
+ &#39;cobol_int&#39;: dtype(&#39;float64&#39;),
+ &#39;null_db&#39;: dtype(&#39;float64&#39;),
+ &#39;null_fwork&#39;: dtype(&#39;float64&#39;),
+ &#39;null_lang&#39;: dtype(&#39;float64&#39;),
+ &#39;null_hck&#39;: dtype(&#39;float64&#39;),
+ &#39;null_boot&#39;: dtype(&#39;float64&#39;)}</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">so_df</span><span class="o">.</span><span class="n">OpenSource</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>No     26645
+Yes    21057
+Name: OpenSource, dtype: int64</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Ideas:</p>
+<ul>
+<li>all yes/no -&gt; convert to numeric</li>
+<li>search programming languages</li>
+<li>parameter tuning</li>
+<li>number monitors not int? object?</li>
+</ul>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">te</span> <span class="o">=</span> <span class="n">TargetEncoder</span><span class="p">(</span><span class="n">cols</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Country&#39;</span><span class="p">,</span> 
+                         <span class="s1">&#39;JobSatisfaction&#39;</span><span class="p">,</span> 
+                         <span class="s1">&#39;CareerSatisfaction&#39;</span><span class="p">,</span> 
+                         <span class="s1">&#39;RaceEthnicity&#39;</span><span class="p">,</span> 
+                         <span class="s1">&#39;CompanySize&#39;</span><span class="p">,</span> 
+                         <span class="s1">&#39;OperatingSystem&#39;</span>
+                        <span class="p">])</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">pipe_lgb</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">([</span>
+    <span class="p">(</span><span class="s1">&#39;endoer&#39;</span><span class="p">,</span> <span class="n">te</span><span class="p">),</span>
+    <span class="p">(</span><span class="s1">&#39;selector&#39;</span><span class="p">,</span> <span class="n">PandasTypeSelector</span><span class="p">(</span><span class="n">include</span><span class="o">=</span><span class="s1">&#39;float64&#39;</span><span class="p">)),</span>
+    <span class="p">(</span><span class="s1">&#39;imputer&#39;</span><span class="p">,</span> <span class="n">SimpleImputer</span><span class="p">(</span><span class="n">strategy</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">)),</span>
+    <span class="p">(</span><span class="s1">&#39;lr&#39;</span><span class="p">,</span> <span class="n">LGBMRegressor</span><span class="p">(</span><span class="n">objective</span><span class="o">=</span><span class="s1">&#39;regression_l1&#39;</span><span class="p">))</span>
+<span class="p">])</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">cv_lgb</span> <span class="o">=</span> <span class="n">cross_val_score</span><span class="p">(</span>
+    <span class="n">pipe_lgb</span><span class="p">,</span> 
+    <span class="n">x_train</span><span class="p">,</span> 
+    <span class="n">y_train</span><span class="p">,</span> 
+    <span class="n">scoring</span><span class="o">=</span><span class="s1">&#39;neg_mean_absolute_error&#39;</span><span class="p">,</span> 
+    <span class="n">cv</span><span class="o">=</span><span class="mi">3</span>
+<span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">-</span> <span class="n">cv_lgb</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>53086.352945243685</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Baselines</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">x_test</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>(11926, 128)</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">x_train</span><span class="o">.</span><span class="n">dtypes</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">20</span><span class="p">))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Respondent              int64
+Hobby                  object
+OpenSource             object
+Country                object
+Student                object
+Employment             object
+FormalEducation        object
+UndergradMajor         object
+CompanySize            object
+DevType                object
+YearsCoding            object
+YearsCodingProf        object
+JobSatisfaction        object
+CareerSatisfaction     object
+HopeFiveYears          object
+JobSearchStatus        object
+LastNewJob             object
+AssessJob1            float64
+AssessJob2            float64
+AssessJob3            float64
+dtype: object
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">pipe</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">([</span>
+    <span class="p">(</span><span class="s1">&#39;selector&#39;</span><span class="p">,</span> <span class="n">PandasTypeSelector</span><span class="p">(</span><span class="n">include</span><span class="o">=</span><span class="s1">&#39;float64&#39;</span><span class="p">)),</span>
+    <span class="p">(</span><span class="s1">&#39;imputer&#39;</span><span class="p">,</span> <span class="n">SimpleImputer</span><span class="p">(</span><span class="n">strategy</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">)),</span>
+    <span class="p">(</span><span class="s1">&#39;scaler&#39;</span><span class="p">,</span> <span class="n">StandardScaler</span><span class="p">()),</span>
+    <span class="p">(</span><span class="s1">&#39;lr&#39;</span><span class="p">,</span> <span class="n">LinearRegression</span><span class="p">())</span>
+<span class="p">])</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">pipe</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>Pipeline(steps=[(&#39;selector&#39;, PandasTypeSelector(include=&#39;float64&#39;)),
+                (&#39;imputer&#39;, SimpleImputer()), (&#39;scaler&#39;, StandardScaler()),
+                (&#39;lr&#39;, LinearRegression())])</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">mean_absolute_error</span><span class="p">(</span><span class="n">pipe</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">x_test</span><span class="p">),</span> <span class="n">y_test</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>78606.36024578908</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">simple_model</span> <span class="o">=</span> <span class="p">(</span><span class="n">x_train</span>
+ <span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="n">y_train</span><span class="p">)</span>
+ <span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;Country&#39;</span><span class="p">)</span>
+ <span class="o">.</span><span class="n">agg</span><span class="p">({</span><span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="s1">&#39;median&#39;</span><span class="p">})</span>
+ <span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+<span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">global_median</span> <span class="o">=</span> <span class="n">y_train</span><span class="o">.</span><span class="n">median</span><span class="p">()</span>
+<span class="n">global_median</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>55075.0</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">global_mean</span> <span class="o">=</span> <span class="n">y_train</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="n">global_mean</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>95646.96673747763</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">simple_predictions</span> <span class="o">=</span> <span class="p">(</span><span class="n">x_test</span>
+ <span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">simple_model</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">)</span>
+ <span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;y&#39;</span><span class="p">]</span>
+<span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">simple_predictions</span><span class="p">[</span><span class="n">simple_predictions</span><span class="o">.</span><span class="n">isnull</span><span class="p">()]</span> <span class="o">=</span> <span class="n">global_median</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">mean_absolute_error</span><span class="p">(</span><span class="n">simple_predictions</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>58623.49387892001</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># constant_prediction = y_test * 0 + global_median</span>
+<span class="n">constant_prediction</span> <span class="o">=</span> <span class="p">[</span><span class="n">global_median</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">y_test</span><span class="p">]</span>
+<span class="n">mean_absolute_error</span><span class="p">(</span><span class="n">constant_prediction</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>70951.85552574208</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">constant_prediction_mean</span> <span class="o">=</span> <span class="p">[</span><span class="n">global_mean</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">y_test</span><span class="p">]</span>
+<span class="n">mean_absolute_error</span><span class="p">(</span><span class="n">constant_prediction_mean</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>82711.68644191355</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">mean_squared_error</span><span class="p">(</span><span class="n">constant_prediction</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">mean_squared_error</span><span class="p">(</span><span class="n">constant_prediction_mean</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>204922.33426222083
+200757.61836689684
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># global mean</span>
+<span class="c1"># linear regression</span>
+<span class="c1"># global median</span>
+<span class="c1"># country median</span>
+
+<span class="c1"># mean absolute error -&gt; median optimizes -&gt; l1 world</span>
+<span class="c1"># mean squared error -&gt; mean optimizes -&gt; l2 world</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+</div>
+
+
+
+  </div><!-- from https://github.com/utterance/utterances -->
+<script src="https://utteranc.es/client.js"
+        repo="david26694/david-masip-blog"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script><a class="u-url" href="/david-masip-blog/machine-learning/regression/2020/08/22/so_eda.html" hidden></a>
+</article>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/david-masip-blog/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/david-masip-blog/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/david-masip-blog/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p></p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/david26694" title="david26694"><svg class="svg-icon grey"><use xlink:href="/david-masip-blog/assets/minima-social-icons.svg#github"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
