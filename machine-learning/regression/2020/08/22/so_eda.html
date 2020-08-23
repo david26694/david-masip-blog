@@ -124,7 +124,7 @@ window.onload = wrap_img;
        • <span class="read-time" title="Estimated read time">
     
     
-      20 min read
+      22 min read
     
 </span></p>
 
@@ -1555,7 +1555,7 @@ window.onload = wrap_img;
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>&lt;matplotlib.axes._subplots.AxesSubplot at 0x1a47d34400&gt;</pre>
+<pre>&lt;matplotlib.axes._subplots.AxesSubplot at 0x1a1f972f60&gt;</pre>
 </div>
 
 </div>
@@ -3183,6 +3183,13 @@ window.onload = wrap_img;
 </div>
     
 
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The last baseline that we are going to use is a simple linear regression with the numeric variables that we have. The linear regression model performs much worse than the dummy country model. I think this can be explained by the fact that the linear model optimizes the sum of squared errors, and this doesn't optimize the MAE in any way.</p>
+
+</div>
+</div>
+</div>
     
     
 <div class="cell border-box-sizing code_cell rendered">
@@ -3225,6 +3232,19 @@ window.onload = wrap_img;
 </div>
     
 
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Improve-the-baseline">Improve the baseline<a class="anchor-link" href="#Improve-the-baseline"> </a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We'll compute some features regarding the missingness of experience:</p>
+
+</div>
+</div>
+</div>
     
     
 <div class="cell border-box-sizing code_cell rendered">
@@ -3233,7 +3253,6 @@ window.onload = wrap_img;
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">so_df</span><span class="p">[</span><span class="s1">&#39;cobol_int&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">so_df</span><span class="p">[</span><span class="s1">&#39;cobol&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
-<span class="c1"># so_df.groupby([&#39;years_coding_int&#39;, &#39;YearsCoding&#39;]).size()</span>
 <span class="n">so_df</span><span class="p">[</span><span class="s1">&#39;null_db&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">so_df</span><span class="p">[</span><span class="s1">&#39;DatabaseWorkedWith&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
 <span class="n">so_df</span><span class="p">[</span><span class="s1">&#39;null_fwork&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">so_df</span><span class="p">[</span><span class="s1">&#39;FrameworkWorkedWith&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
 <span class="n">so_df</span><span class="p">[</span><span class="s1">&#39;null_lang&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">so_df</span><span class="p">[</span><span class="s1">&#39;LanguageWorkedWith&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
@@ -3248,23 +3267,13 @@ window.onload = wrap_img;
 </div>
     
 
-    
-    
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># print(so_df.cobol_int.dtypes)</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>And split the data again using the same split (<code>random_state = 42</code>).</p>
 
 </div>
-    
-
+</div>
+</div>
     
     
 <div class="cell border-box-sizing code_cell rendered">
@@ -3274,23 +3283,7 @@ window.onload = wrap_img;
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">x_df</span> <span class="o">=</span> <span class="n">so_df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;ConvertedSalary&#39;</span><span class="p">,</span> <span class="s1">&#39;Salary&#39;</span><span class="p">])</span>
 <span class="n">y_df</span> <span class="o">=</span> <span class="n">so_df</span><span class="p">[</span><span class="s1">&#39;ConvertedSalary&#39;</span><span class="p">]</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-</div>
-    
-
-    
-    
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">x_train</span><span class="p">,</span> <span class="n">x_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">x_df</span><span class="p">,</span> <span class="n">y_df</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">x_train</span><span class="p">,</span> <span class="n">x_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">x_df</span><span class="p">,</span> <span class="n">y_df</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
 </pre></div>
 
     </div>
@@ -3302,54 +3295,12 @@ window.onload = wrap_img;
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Complex model</p>
-
-</div>
-</div>
-</div>
-    
-    
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">so_df</span><span class="o">.</span><span class="n">OpenSource</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>No     26645
-Yes    21057
-Name: OpenSource, dtype: int64</pre>
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-    
-
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>Ideas:</p>
+<p>Now we use much better modelling techniques:</p>
 <ul>
-<li>all yes/no -&gt; convert to numeric</li>
-<li>search programming languages</li>
-<li>parameter tuning</li>
-<li>number monitors not int? object?</li>
+<li>New features as described above.</li>
+<li>Target encoding of categorical features.</li>
+<li>Lightgbm instead of linear model.
+And measure the cross-validation MAE</li>
 </ul>
 
 </div>
@@ -3389,6 +3340,77 @@ Name: OpenSource, dtype: int64</pre>
     <span class="p">(</span><span class="s1">&#39;endoer&#39;</span><span class="p">,</span> <span class="n">te</span><span class="p">),</span>
     <span class="p">(</span><span class="s1">&#39;selector&#39;</span><span class="p">,</span> <span class="n">PandasTypeSelector</span><span class="p">(</span><span class="n">include</span><span class="o">=</span><span class="s1">&#39;float64&#39;</span><span class="p">)),</span>
     <span class="p">(</span><span class="s1">&#39;imputer&#39;</span><span class="p">,</span> <span class="n">SimpleImputer</span><span class="p">(</span><span class="n">strategy</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">)),</span>
+    <span class="p">(</span><span class="s1">&#39;lr&#39;</span><span class="p">,</span> <span class="n">LGBMRegressor</span><span class="p">())</span>
+<span class="p">])</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">cv_lgb</span> <span class="o">=</span> <span class="n">cross_val_score</span><span class="p">(</span>
+    <span class="n">pipe_lgb</span><span class="p">,</span> 
+    <span class="n">x_train</span><span class="p">,</span> 
+    <span class="n">y_train</span><span class="p">,</span> 
+    <span class="n">scoring</span><span class="o">=</span><span class="s1">&#39;neg_mean_absolute_error&#39;</span><span class="p">,</span> 
+    <span class="n">cv</span><span class="o">=</span><span class="mi">3</span>
+<span class="p">)</span>
+
+<span class="o">-</span> <span class="n">cv_lgb</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>74719.25784492154</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Disappointingly, our model is better than the linear regression, but way worse than the country-level model. It looks like all the models that use the median are way better than the models that optimize sums of squares.</p>
+<p>Luckily, we can change the lightgbm objective from L2 to L1, and the lightgbm will optimize the mae.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">pipe_lgb</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">([</span>
+    <span class="p">(</span><span class="s1">&#39;endoer&#39;</span><span class="p">,</span> <span class="n">te</span><span class="p">),</span>
+    <span class="p">(</span><span class="s1">&#39;selector&#39;</span><span class="p">,</span> <span class="n">PandasTypeSelector</span><span class="p">(</span><span class="n">include</span><span class="o">=</span><span class="s1">&#39;float64&#39;</span><span class="p">)),</span>
+    <span class="p">(</span><span class="s1">&#39;imputer&#39;</span><span class="p">,</span> <span class="n">SimpleImputer</span><span class="p">(</span><span class="n">strategy</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">)),</span>
     <span class="p">(</span><span class="s1">&#39;lr&#39;</span><span class="p">,</span> <span class="n">LGBMRegressor</span><span class="p">(</span><span class="n">objective</span><span class="o">=</span><span class="s1">&#39;regression_l1&#39;</span><span class="p">))</span>
 <span class="p">])</span>
 </pre></div>
@@ -3414,23 +3436,8 @@ Name: OpenSource, dtype: int64</pre>
     <span class="n">scoring</span><span class="o">=</span><span class="s1">&#39;neg_mean_absolute_error&#39;</span><span class="p">,</span> 
     <span class="n">cv</span><span class="o">=</span><span class="mi">3</span>
 <span class="p">)</span>
-</pre></div>
 
-    </div>
-</div>
-</div>
-
-</div>
-    
-
-    
-    
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="o">-</span> <span class="n">cv_lgb</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="o">-</span> <span class="n">cv_lgb</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
 </pre></div>
 
     </div>
@@ -3456,6 +3463,103 @@ Name: OpenSource, dtype: int64</pre>
 </div>
     
 
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Now we're talking, the cross-validation MAE is lower than in all baselines. Let's see if this is still true in the test data.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">pipe_lgb</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>Pipeline(steps=[(&#39;endoer&#39;,
+                 TargetEncoder(cols=[&#39;Country&#39;, &#39;JobSatisfaction&#39;,
+                                     &#39;CareerSatisfaction&#39;, &#39;RaceEthnicity&#39;,
+                                     &#39;CompanySize&#39;, &#39;OperatingSystem&#39;])),
+                (&#39;selector&#39;, PandasTypeSelector(include=&#39;float64&#39;)),
+                (&#39;imputer&#39;, SimpleImputer()),
+                (&#39;lr&#39;, LGBMRegressor(objective=&#39;regression_l1&#39;))])</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">mean_absolute_error</span><span class="p">(</span><span class="n">pipe_lgb</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">x_test</span><span class="p">),</span> <span class="n">y_test</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>53234.00734285567</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Indeed, the model has improved on test data. MAE has gone from 58k (our best baseline) to 53k. The improvement is not huge, and in a production environment we'd ask if this is necessary, but we now have a slightly better model and we can iterate with more features to improve it even more.</p>
+<p>For instance, we haven't used programming language propperly as a feature and this can help the model significantly.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Summary">Summary<a class="anchor-link" href="#Summary"> </a></h3><ul>
+<li>Pandas pipes allow to have way cleaner code.</li>
+<li>When optimizing MAE, L1-like methods (least deviation regression, L1 optimization in lightgbm, median summaries) make more sense than standard methods.</li>
+</ul>
+
+</div>
+</div>
+</div>
 </div>
 
 
