@@ -3003,7 +3003,7 @@ window.onload = wrap_img;
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Our two dummiest baselines have a MAE of 70K anual dollar salary and 83k. This is pretty high, and we notice that the median is a way better estimator than the mean w.r.t the MAE. This makes sense as the <a href="https://math.stackexchange.com/questions/113270/the-median-minimizes-the-sum-of-absolute-deviations-the-l-1-norm">median minimizes the mae</a>.</p>
+<p>Our two dummiest baselines have a MAE of 70k anual dollar salary and 83k. This is pretty high, and we notice that the median is a way better estimator than the mean w.r.t the MAE. This makes sense as the <a href="https://math.stackexchange.com/questions/113270/the-median-minimizes-the-sum-of-absolute-deviations-the-l-1-norm">median minimizes the mae</a>.</p>
 
 </div>
 </div>
@@ -3299,9 +3299,9 @@ window.onload = wrap_img;
 <ul>
 <li>New features as described above.</li>
 <li>Target encoding of categorical features.</li>
-<li>Lightgbm instead of linear model.
-And measure the cross-validation MAE</li>
+<li>Lightgbm instead of linear model.</li>
 </ul>
+<p>And measure the cross-validation MAE before keeping a model.</p>
 
 </div>
 </div>
@@ -3554,7 +3554,7 @@ And measure the cross-validation MAE</li>
 <div class="text_cell_render border-box-sizing rendered_html">
 <h3 id="Summary">Summary<a class="anchor-link" href="#Summary"> </a></h3><ul>
 <li>Pandas pipes allow to have way cleaner code.</li>
-<li>When optimizing MAE, L1-like methods (least deviation regression, L1 optimization in lightgbm, median summaries) make more sense than standard methods.</li>
+<li>When optimizing MAE, L1-like methods (least deviation regression, L1 optimization in lightgbm, median summaries) might make more sense than standard methods.</li>
 </ul>
 
 </div>
