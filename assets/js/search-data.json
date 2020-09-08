@@ -117,7 +117,7 @@
   
       ,"page1": {
           "title": "About Me",
-          "content": "I’m David Masip, mathematician and physicist from Tarragona. . Currently working as a Data Scientist in Barcelona. . I plan to write about Machine Learning, and some Software Development and Mathematics. . . Other blogs I recommend way over mine: . Sharla Gelfand (mostly R stuff) | Vicki Boykis | Koaning (DS, theory) | Max Halford | Datanalytics (in spanish) | Rob Hydnman (forecasting) | Hamel (fast.ai contributor) | Statworkx. I particulary liked the ones on elasticity. | .",
+          "content": "I’m David Masip, mathematician and physicist from Tarragona. . Currently working as a Data Scientist in Barcelona. . I plan to write about Machine Learning, and some Software Development and Mathematics. . . Other blogs I recommend way over mine: . Sharla Gelfand (mostly R stuff) | Julia Silge | Vicki Boykis | Koaning (DS, theory) | Max Halford | Datanalytics (in spanish) | Rob Hydnman (forecasting) | Hamel (fast.ai contributor) | Statworkx. I particulary liked the ones on elasticity. | .",
           "url": "https://david26694.github.io/david-masip-blog/about/",
           "relUrl": "/about/",
           "date": ""
