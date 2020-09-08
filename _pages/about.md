@@ -15,6 +15,7 @@ I plan to write about Machine Learning, and some Software Development and Mathem
 Other blogs I recommend way over mine:
 
 * [Sharla Gelfand (mostly R stuff)](https://sharla.party/)
+* [Julia Silge](https://juliasilge.com/blog/)
 * [Vicki Boykis](http://veekaybee.github.io/)
 * [Koaning (DS, theory)](https://koaning.io/)
 * [Max Halford](https://maxhalford.github.io/)
