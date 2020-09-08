@@ -20,4 +20,5 @@ Other blogs I recommend way over mine:
 * [Max Halford](https://maxhalford.github.io/)
 * [Datanalytics (in spanish)](https://www.datanalytics.com/)
 * [Rob Hydnman (forecasting)](https://robjhyndman.com/hyndsight/)
+* [Hamel (fast.ai contributor)](https://hamel.dev/)
 * [Statworkx](https://www.statworx.com/de/blog/). I particulary liked the ones on [elasticity](https://www.statworx.com/de/tag/elastizitaet/).
