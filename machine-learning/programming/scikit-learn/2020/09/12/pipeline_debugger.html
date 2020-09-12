@@ -556,6 +556,7 @@ window.onload = wrap_img;
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
+<hr />
 <p>To be able to debug this error, we are going to build a class that is derived from <code>Pipeline</code>. As a first step, we'll build <code>DebugPipeline</code> with a <code>debug_fit</code> method such that it is able to reproduce the same error as in the standard <code>fit</code>. What we try to do is reproduce the <code>fit</code> method, and we know that the idea of the <code>fit</code> of a <code>Pipeline</code> is to run <code>fit_transform</code> for every transformer and run a <code>fit</code> with the learner:</p>
 
 </div>
@@ -714,6 +715,7 @@ window.onload = wrap_img;
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
+<hr />
 <p>Now we have a <code>debug_fit</code> method that we can control in an easier way than the <code>fit</code> method. The idea is to log several properties of our input data at each step in order to understand where is the pipeline failing and why is it failing at that step.</p>
 <p>As a bonus trick, we'll use <code>typedispatch</code> from <code>fastcore</code> to log the types of the input data depending on its type.</p>
 <p>Let's create the logging functions:</p>
@@ -915,6 +917,13 @@ scaler to be applied
 </div>
     
 
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<hr />
+
+</div>
+</div>
+</div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Let's solve this issue by applying one-hot encoding before running the pipeline:</p>
