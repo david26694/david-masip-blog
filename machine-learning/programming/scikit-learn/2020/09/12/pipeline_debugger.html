@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Debugging scikit-learn pipelines | David Masip’s notes</title>
+<meta name="generator" content="Jekyll v4.0.0" />
+<meta property="og:title" content="Debugging scikit-learn pipelines" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://david26694.github.io/david-masip-blog/machine-learning/programming/scikit-learn/2020/09/12/pipeline_debugger.html" />
+<meta property="og:url" content="https://david26694.github.io/david-masip-blog/machine-learning/programming/scikit-learn/2020/09/12/pipeline_debugger.html" />
+<meta property="og:site_name" content="David Masip’s notes" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-09-12T00:00:00-05:00" />
+<script type="application/ld+json">
+{"headline":"Debugging scikit-learn pipelines","dateModified":"2020-09-12T00:00:00-05:00","datePublished":"2020-09-12T00:00:00-05:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://david26694.github.io/david-masip-blog/machine-learning/programming/scikit-learn/2020/09/12/pipeline_debugger.html"},"@type":"BlogPosting","url":"https://david26694.github.io/david-masip-blog/machine-learning/programming/scikit-learn/2020/09/12/pipeline_debugger.html","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/david-masip-blog/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://david26694.github.io/david-masip-blog/feed.xml" title="David Masip's notes" /><link rel="shortcut icon" type="image/x-icon" href="/david-masip-blog/images/favicon.ico"><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Debugging scikit-learn pipelines | David Masip’s notes</title>
+<meta name="generator" content="Jekyll v4.0.0" />
+<meta property="og:title" content="Debugging scikit-learn pipelines" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://david26694.github.io/david-masip-blog/machine-learning/programming/scikit-learn/2020/09/12/pipeline_debugger.html" />
+<meta property="og:url" content="https://david26694.github.io/david-masip-blog/machine-learning/programming/scikit-learn/2020/09/12/pipeline_debugger.html" />
+<meta property="og:site_name" content="David Masip’s notes" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-09-12T00:00:00-05:00" />
+<script type="application/ld+json">
+{"headline":"Debugging scikit-learn pipelines","dateModified":"2020-09-12T00:00:00-05:00","datePublished":"2020-09-12T00:00:00-05:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://david26694.github.io/david-masip-blog/machine-learning/programming/scikit-learn/2020/09/12/pipeline_debugger.html"},"@type":"BlogPosting","url":"https://david26694.github.io/david-masip-blog/machine-learning/programming/scikit-learn/2020/09/12/pipeline_debugger.html","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+<link href="https://unpkg.com/@primer/css/dist/primer.css" rel="stylesheet" />
+<link rel="stylesheet" href="//use.fontawesome.com/releases/v5.0.7/css/all.css"><link type="application/atom+xml" rel="alternate" href="https://david26694.github.io/david-masip-blog/feed.xml" title="David Masip's notes" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"> </script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"></script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement( document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "[%", right: "%]", display: true},
+            {left: "$", right: "$", display: false}
+        ]}
+        );
+    });
+    </script>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js"></script>
+<script type="text/javascript">
+require.config({
+  paths: {
+    jquery: 'https://code.jquery.com/jquery-3.5.0.min',
+    plotly: 'https://cdn.plot.ly/plotly-latest.min'
+  },
+
+  shim: {
+    plotly: {
+      deps: ['jquery'],
+      exports: 'plotly'
+    }
+  }
+});
+</script>
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head><body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/david-masip-blog/">David Masip&#39;s notes</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/david-masip-blog/about/">About Me</a><a class="page-link" href="/david-masip-blog/search/">Search</a><a class="page-link" href="/david-masip-blog/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Debugging scikit-learn pipelines</h1><p class="post-meta post-meta-title"><time class="dt-published" datetime="2020-09-12T00:00:00-05:00" itemprop="datePublished">
+        Sep 12, 2020
+      </time>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      10 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/david-masip-blog/categories/#machine-learning">machine-learning</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/david-masip-blog/categories/#programming">programming</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/david-masip-blog/categories/#scikit-learn">scikit-learn</a>
+        
+      
+      </p>
+    
+
+    
+      
+        <div class="pb-5 d-flex flex-wrap flex-justify-end">
+          <div class="px-2">
+
+    <a href="https://github.com/david26694/david-masip-blog/tree/master/_notebooks/2020-09-12-pipeline_debugger.ipynb" role="button" target="_blank">
+<img class="notebook-badge-image" src="/david-masip-blog/assets/badges/github.svg" alt="View On GitHub">
+    </a>
+</div>
+
+          <div class="px-2">
+    <a href="https://mybinder.org/v2/gh/david26694/david-masip-blog/master?filepath=_notebooks%2F2020-09-12-pipeline_debugger.ipynb" target="_blank">
+        <img class="notebook-badge-image" src="/david-masip-blog/assets/badges/binder.svg" alt="Open In Binder"/>
+    </a>
+</div>
+
+          <div class="px-2">
+    <a href="https://colab.research.google.com/github/david26694/david-masip-blog/blob/master/_notebooks/2020-09-12-pipeline_debugger.ipynb" target="_blank">
+        <img class="notebook-badge-image" src="/david-masip-blog/assets/badges/colab.svg" alt="Open In Colab"/>
+    </a>
+</div>
+        </div>
+      </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <!--
+#################################################
+### THIS FILE WAS AUTOGENERATED! DO NOT EDIT! ###
+#################################################
+# file to edit: _notebooks/2020-09-12-pipeline_debugger.ipynb
+-->
+
+<div class="container" id="notebook-container">
+        
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Introduction">Introduction<a class="anchor-link" href="#Introduction"> </a></h3><p>The idea of this post is to show how we can alter scikit-learn pipelines behaviour in order to be easier to debug. For this purpose, we'll:</p>
+<ul>
+<li>Create a pipeline with a bug on it.</li>
+<li>Create a tool to debug such pipeline.</li>
+<li>Solve the error and see what the debugging tool offers us.</li>
+</ul>
+<p>We'll do this with the arrests data from <code>scikit-lego</code> library and a very simple pipeline.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Data-preparation">Data preparation<a class="anchor-link" href="#Data-preparation"> </a></h3><p>First of all, let's load the packages that we are going to use:</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Main tools</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+
+<span class="c1"># Data</span>
+<span class="kn">from</span> <span class="nn">sklego.datasets</span> <span class="kn">import</span> <span class="n">load_arrests</span>
+
+<span class="c1"># Scikit-learn classes</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">StandardScaler</span>
+<span class="kn">from</span> <span class="nn">sklearn.impute</span> <span class="kn">import</span> <span class="n">SimpleImputer</span>
+<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LogisticRegression</span>
+<span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="kn">import</span> <span class="n">Pipeline</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+
+<span class="c1"># Non-scikit learn classes</span>
+<span class="kn">from</span> <span class="nn">category_encoders</span> <span class="kn">import</span> <span class="n">OneHotEncoder</span>
+
+
+<span class="c1"># fastcore helpers</span>
+<span class="kn">from</span> <span class="nn">fastcore.dispatch</span> <span class="kn">import</span> <span class="n">typedispatch</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Also, let's load the data. The data are on US arrests. These data are usually used to study ML bias. We use this dataset in order to show how to debug a pipeline, but any other dataset would be completely valid. We can see that there are both numeric and categorical columns. We're going to try to predict the fact that an arrest was <code>released</code> or not.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df_arrests</span> <span class="o">=</span> <span class="n">load_arrests</span><span class="p">(</span><span class="n">as_frame</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">df_arrests</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>released</th>
+      <th>colour</th>
+      <th>year</th>
+      <th>age</th>
+      <th>sex</th>
+      <th>employed</th>
+      <th>citizen</th>
+      <th>checks</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Yes</td>
+      <td>White</td>
+      <td>2002</td>
+      <td>21</td>
+      <td>Male</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>No</td>
+      <td>Black</td>
+      <td>1999</td>
+      <td>17</td>
+      <td>Male</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Yes</td>
+      <td>White</td>
+      <td>2000</td>
+      <td>24</td>
+      <td>Male</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>No</td>
+      <td>Black</td>
+      <td>2000</td>
+      <td>46</td>
+      <td>Male</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Yes</td>
+      <td>Black</td>
+      <td>1999</td>
+      <td>27</td>
+      <td>Female</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Let's do a very basic preprocessing: split the dataset betwwen X and y:</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df_arrests_x</span> <span class="o">=</span> <span class="n">df_arrests</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="s1">&#39;released&#39;</span><span class="p">)</span>
+<span class="n">df_arrests_y</span> <span class="o">=</span> <span class="n">df_arrests</span><span class="p">[</span><span class="s1">&#39;released&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">({</span><span class="s1">&#39;Yes&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;No&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We want to train a ML model to predict <code>released</code>. For that purpose, we're going to use a scikit-learn pipeline, where we are going to scale data, impute missing values and train a logistic regression. Simple enough, it should work:</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Define pipeline</span>
+<span class="n">steps_list</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">(</span><span class="s1">&#39;scaler&#39;</span><span class="p">,</span> <span class="n">StandardScaler</span><span class="p">()),</span>
+    <span class="p">(</span><span class="s1">&#39;imputer&#39;</span><span class="p">,</span> <span class="n">SimpleImputer</span><span class="p">()),</span>
+    <span class="p">(</span><span class="s1">&#39;learner&#39;</span><span class="p">,</span> <span class="n">LogisticRegression</span><span class="p">())</span>
+<span class="p">]</span>
+<span class="n">pipe</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><span class="n">steps_list</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We try to train the model but we get an error, and unfortunately we get an error, which is hard to read (kind of):</p>
+<p><code>ValueError: could not convert string to float: 'White'</code></p>
+<p>I don't even know which is the step of the pipeline that failed, and this makes it hard to debug:</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">pipe</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">df_arrests_x</span><span class="p">,</span> <span class="n">df_arrests_y</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_text output_error">
+<pre>
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">ValueError</span>                                Traceback (most recent call last)
+<span class="ansi-green-fg">&lt;ipython-input-5-3ef09ec7e14e&gt;</span> in <span class="ansi-cyan-fg">&lt;module&gt;</span>
+<span class="ansi-green-fg">----&gt; 1</span><span class="ansi-red-fg"> </span>pipe<span class="ansi-blue-fg">.</span>fit<span class="ansi-blue-fg">(</span>df_arrests_x<span class="ansi-blue-fg">,</span> df_arrests_y<span class="ansi-blue-fg">)</span>
+
+<span class="ansi-green-fg">~/opt/anaconda3/envs/sk-experiments/lib/python3.7/site-packages/sklearn/pipeline.py</span> in <span class="ansi-cyan-fg">fit</span><span class="ansi-blue-fg">(self, X, y, **fit_params)</span>
+<span class="ansi-green-intense-fg ansi-bold">    328</span>         &#34;&#34;&#34;
+<span class="ansi-green-intense-fg ansi-bold">    329</span>         fit_params_steps <span class="ansi-blue-fg">=</span> self<span class="ansi-blue-fg">.</span>_check_fit_params<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">**</span>fit_params<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-fg">--&gt; 330</span><span class="ansi-red-fg">         </span>Xt <span class="ansi-blue-fg">=</span> self<span class="ansi-blue-fg">.</span>_fit<span class="ansi-blue-fg">(</span>X<span class="ansi-blue-fg">,</span> y<span class="ansi-blue-fg">,</span> <span class="ansi-blue-fg">**</span>fit_params_steps<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    331</span>         with _print_elapsed_time(&#39;Pipeline&#39;,
+<span class="ansi-green-intense-fg ansi-bold">    332</span>                                  self._log_message(len(self.steps) - 1)):
+
+<span class="ansi-green-fg">~/opt/anaconda3/envs/sk-experiments/lib/python3.7/site-packages/sklearn/pipeline.py</span> in <span class="ansi-cyan-fg">_fit</span><span class="ansi-blue-fg">(self, X, y, **fit_params_steps)</span>
+<span class="ansi-green-intense-fg ansi-bold">    294</span>                 message_clsname<span class="ansi-blue-fg">=</span><span class="ansi-blue-fg">&#39;Pipeline&#39;</span><span class="ansi-blue-fg">,</span>
+<span class="ansi-green-intense-fg ansi-bold">    295</span>                 message<span class="ansi-blue-fg">=</span>self<span class="ansi-blue-fg">.</span>_log_message<span class="ansi-blue-fg">(</span>step_idx<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">,</span>
+<span class="ansi-green-fg">--&gt; 296</span><span class="ansi-red-fg">                 **fit_params_steps[name])
+</span><span class="ansi-green-intense-fg ansi-bold">    297</span>             <span class="ansi-red-fg"># Replace the transformer of the step with the fitted</span>
+<span class="ansi-green-intense-fg ansi-bold">    298</span>             <span class="ansi-red-fg"># transformer. This is necessary when loading the transformer</span>
+
+<span class="ansi-green-fg">~/opt/anaconda3/envs/sk-experiments/lib/python3.7/site-packages/joblib/memory.py</span> in <span class="ansi-cyan-fg">__call__</span><span class="ansi-blue-fg">(self, *args, **kwargs)</span>
+<span class="ansi-green-intense-fg ansi-bold">    350</span> 
+<span class="ansi-green-intense-fg ansi-bold">    351</span>     <span class="ansi-green-fg">def</span> __call__<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">,</span> <span class="ansi-blue-fg">*</span>args<span class="ansi-blue-fg">,</span> <span class="ansi-blue-fg">**</span>kwargs<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-fg">--&gt; 352</span><span class="ansi-red-fg">         </span><span class="ansi-green-fg">return</span> self<span class="ansi-blue-fg">.</span>func<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">*</span>args<span class="ansi-blue-fg">,</span> <span class="ansi-blue-fg">**</span>kwargs<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    353</span> 
+<span class="ansi-green-intense-fg ansi-bold">    354</span>     <span class="ansi-green-fg">def</span> call_and_shelve<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">,</span> <span class="ansi-blue-fg">*</span>args<span class="ansi-blue-fg">,</span> <span class="ansi-blue-fg">**</span>kwargs<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
+
+<span class="ansi-green-fg">~/opt/anaconda3/envs/sk-experiments/lib/python3.7/site-packages/sklearn/pipeline.py</span> in <span class="ansi-cyan-fg">_fit_transform_one</span><span class="ansi-blue-fg">(transformer, X, y, weight, message_clsname, message, **fit_params)</span>
+<span class="ansi-green-intense-fg ansi-bold">    738</span>     <span class="ansi-green-fg">with</span> _print_elapsed_time<span class="ansi-blue-fg">(</span>message_clsname<span class="ansi-blue-fg">,</span> message<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-intense-fg ansi-bold">    739</span>         <span class="ansi-green-fg">if</span> hasattr<span class="ansi-blue-fg">(</span>transformer<span class="ansi-blue-fg">,</span> <span class="ansi-blue-fg">&#39;fit_transform&#39;</span><span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-fg">--&gt; 740</span><span class="ansi-red-fg">             </span>res <span class="ansi-blue-fg">=</span> transformer<span class="ansi-blue-fg">.</span>fit_transform<span class="ansi-blue-fg">(</span>X<span class="ansi-blue-fg">,</span> y<span class="ansi-blue-fg">,</span> <span class="ansi-blue-fg">**</span>fit_params<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    741</span>         <span class="ansi-green-fg">else</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-intense-fg ansi-bold">    742</span>             res <span class="ansi-blue-fg">=</span> transformer<span class="ansi-blue-fg">.</span>fit<span class="ansi-blue-fg">(</span>X<span class="ansi-blue-fg">,</span> y<span class="ansi-blue-fg">,</span> <span class="ansi-blue-fg">**</span>fit_params<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">.</span>transform<span class="ansi-blue-fg">(</span>X<span class="ansi-blue-fg">)</span>
+
+<span class="ansi-green-fg">~/opt/anaconda3/envs/sk-experiments/lib/python3.7/site-packages/sklearn/base.py</span> in <span class="ansi-cyan-fg">fit_transform</span><span class="ansi-blue-fg">(self, X, y, **fit_params)</span>
+<span class="ansi-green-intense-fg ansi-bold">    691</span>         <span class="ansi-green-fg">else</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-intense-fg ansi-bold">    692</span>             <span class="ansi-red-fg"># fit method of arity 2 (supervised transformation)</span>
+<span class="ansi-green-fg">--&gt; 693</span><span class="ansi-red-fg">             </span><span class="ansi-green-fg">return</span> self<span class="ansi-blue-fg">.</span>fit<span class="ansi-blue-fg">(</span>X<span class="ansi-blue-fg">,</span> y<span class="ansi-blue-fg">,</span> <span class="ansi-blue-fg">**</span>fit_params<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">.</span>transform<span class="ansi-blue-fg">(</span>X<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    694</span> 
+<span class="ansi-green-intense-fg ansi-bold">    695</span> 
+
+<span class="ansi-green-fg">~/opt/anaconda3/envs/sk-experiments/lib/python3.7/site-packages/sklearn/preprocessing/_data.py</span> in <span class="ansi-cyan-fg">fit</span><span class="ansi-blue-fg">(self, X, y)</span>
+<span class="ansi-green-intense-fg ansi-bold">    665</span>         <span class="ansi-red-fg"># Reset internal state before fitting</span>
+<span class="ansi-green-intense-fg ansi-bold">    666</span>         self<span class="ansi-blue-fg">.</span>_reset<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-fg">--&gt; 667</span><span class="ansi-red-fg">         </span><span class="ansi-green-fg">return</span> self<span class="ansi-blue-fg">.</span>partial_fit<span class="ansi-blue-fg">(</span>X<span class="ansi-blue-fg">,</span> y<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    668</span> 
+<span class="ansi-green-intense-fg ansi-bold">    669</span>     <span class="ansi-green-fg">def</span> partial_fit<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">,</span> X<span class="ansi-blue-fg">,</span> y<span class="ansi-blue-fg">=</span><span class="ansi-green-fg">None</span><span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
+
+<span class="ansi-green-fg">~/opt/anaconda3/envs/sk-experiments/lib/python3.7/site-packages/sklearn/preprocessing/_data.py</span> in <span class="ansi-cyan-fg">partial_fit</span><span class="ansi-blue-fg">(self, X, y)</span>
+<span class="ansi-green-intense-fg ansi-bold">    696</span>         X = self._validate_data(X, accept_sparse=(&#39;csr&#39;, &#39;csc&#39;),
+<span class="ansi-green-intense-fg ansi-bold">    697</span>                                 estimator<span class="ansi-blue-fg">=</span>self<span class="ansi-blue-fg">,</span> dtype<span class="ansi-blue-fg">=</span>FLOAT_DTYPES<span class="ansi-blue-fg">,</span>
+<span class="ansi-green-fg">--&gt; 698</span><span class="ansi-red-fg">                                 force_all_finite=&#39;allow-nan&#39;)
+</span><span class="ansi-green-intense-fg ansi-bold">    699</span> 
+<span class="ansi-green-intense-fg ansi-bold">    700</span>         <span class="ansi-red-fg"># Even in the case of `with_mean=False`, we update the mean anyway</span>
+
+<span class="ansi-green-fg">~/opt/anaconda3/envs/sk-experiments/lib/python3.7/site-packages/sklearn/base.py</span> in <span class="ansi-cyan-fg">_validate_data</span><span class="ansi-blue-fg">(self, X, y, reset, validate_separately, **check_params)</span>
+<span class="ansi-green-intense-fg ansi-bold">    418</span>                     <span class="ansi-blue-fg">f&#34;requires y to be passed, but the target y is None.&#34;</span>
+<span class="ansi-green-intense-fg ansi-bold">    419</span>                 )
+<span class="ansi-green-fg">--&gt; 420</span><span class="ansi-red-fg">             </span>X <span class="ansi-blue-fg">=</span> check_array<span class="ansi-blue-fg">(</span>X<span class="ansi-blue-fg">,</span> <span class="ansi-blue-fg">**</span>check_params<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    421</span>             out <span class="ansi-blue-fg">=</span> X
+<span class="ansi-green-intense-fg ansi-bold">    422</span>         <span class="ansi-green-fg">else</span><span class="ansi-blue-fg">:</span>
+
+<span class="ansi-green-fg">~/opt/anaconda3/envs/sk-experiments/lib/python3.7/site-packages/sklearn/utils/validation.py</span> in <span class="ansi-cyan-fg">inner_f</span><span class="ansi-blue-fg">(*args, **kwargs)</span>
+<span class="ansi-green-intense-fg ansi-bold">     71</span>                           FutureWarning)
+<span class="ansi-green-intense-fg ansi-bold">     72</span>         kwargs<span class="ansi-blue-fg">.</span>update<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">{</span>k<span class="ansi-blue-fg">:</span> arg <span class="ansi-green-fg">for</span> k<span class="ansi-blue-fg">,</span> arg <span class="ansi-green-fg">in</span> zip<span class="ansi-blue-fg">(</span>sig<span class="ansi-blue-fg">.</span>parameters<span class="ansi-blue-fg">,</span> args<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">}</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-fg">---&gt; 73</span><span class="ansi-red-fg">         </span><span class="ansi-green-fg">return</span> f<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">**</span>kwargs<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">     74</span>     <span class="ansi-green-fg">return</span> inner_f
+<span class="ansi-green-intense-fg ansi-bold">     75</span> 
+
+<span class="ansi-green-fg">~/opt/anaconda3/envs/sk-experiments/lib/python3.7/site-packages/sklearn/utils/validation.py</span> in <span class="ansi-cyan-fg">check_array</span><span class="ansi-blue-fg">(array, accept_sparse, accept_large_sparse, dtype, order, copy, force_all_finite, ensure_2d, allow_nd, ensure_min_samples, ensure_min_features, estimator)</span>
+<span class="ansi-green-intense-fg ansi-bold">    597</span>                     array <span class="ansi-blue-fg">=</span> array<span class="ansi-blue-fg">.</span>astype<span class="ansi-blue-fg">(</span>dtype<span class="ansi-blue-fg">,</span> casting<span class="ansi-blue-fg">=</span><span class="ansi-blue-fg">&#34;unsafe&#34;</span><span class="ansi-blue-fg">,</span> copy<span class="ansi-blue-fg">=</span><span class="ansi-green-fg">False</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    598</span>                 <span class="ansi-green-fg">else</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-fg">--&gt; 599</span><span class="ansi-red-fg">                     </span>array <span class="ansi-blue-fg">=</span> np<span class="ansi-blue-fg">.</span>asarray<span class="ansi-blue-fg">(</span>array<span class="ansi-blue-fg">,</span> order<span class="ansi-blue-fg">=</span>order<span class="ansi-blue-fg">,</span> dtype<span class="ansi-blue-fg">=</span>dtype<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    600</span>             <span class="ansi-green-fg">except</span> ComplexWarning<span class="ansi-blue-fg">:</span>
+<span class="ansi-green-intense-fg ansi-bold">    601</span>                 raise ValueError(&#34;Complex data not supported\n&#34;
+
+<span class="ansi-green-fg">~/.local/lib/python3.7/site-packages/numpy/core/_asarray.py</span> in <span class="ansi-cyan-fg">asarray</span><span class="ansi-blue-fg">(a, dtype, order)</span>
+<span class="ansi-green-intense-fg ansi-bold">     81</span> 
+<span class="ansi-green-intense-fg ansi-bold">     82</span>     &#34;&#34;&#34;
+<span class="ansi-green-fg">---&gt; 83</span><span class="ansi-red-fg">     </span><span class="ansi-green-fg">return</span> array<span class="ansi-blue-fg">(</span>a<span class="ansi-blue-fg">,</span> dtype<span class="ansi-blue-fg">,</span> copy<span class="ansi-blue-fg">=</span><span class="ansi-green-fg">False</span><span class="ansi-blue-fg">,</span> order<span class="ansi-blue-fg">=</span>order<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">     84</span> 
+<span class="ansi-green-intense-fg ansi-bold">     85</span> 
+
+<span class="ansi-green-fg">~/.local/lib/python3.7/site-packages/pandas/core/generic.py</span> in <span class="ansi-cyan-fg">__array__</span><span class="ansi-blue-fg">(self, dtype)</span>
+<span class="ansi-green-intense-fg ansi-bold">   1776</span> 
+<span class="ansi-green-intense-fg ansi-bold">   1777</span>     <span class="ansi-green-fg">def</span> __array__<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">,</span> dtype<span class="ansi-blue-fg">=</span><span class="ansi-green-fg">None</span><span class="ansi-blue-fg">)</span> <span class="ansi-blue-fg">-&gt;</span> np<span class="ansi-blue-fg">.</span>ndarray<span class="ansi-blue-fg">:</span>
+<span class="ansi-green-fg">-&gt; 1778</span><span class="ansi-red-fg">         </span><span class="ansi-green-fg">return</span> np<span class="ansi-blue-fg">.</span>asarray<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">.</span>_values<span class="ansi-blue-fg">,</span> dtype<span class="ansi-blue-fg">=</span>dtype<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">   1779</span> 
+<span class="ansi-green-intense-fg ansi-bold">   1780</span>     <span class="ansi-green-fg">def</span> __array_wrap__<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">,</span> result<span class="ansi-blue-fg">,</span> context<span class="ansi-blue-fg">=</span><span class="ansi-green-fg">None</span><span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
+
+<span class="ansi-green-fg">~/.local/lib/python3.7/site-packages/numpy/core/_asarray.py</span> in <span class="ansi-cyan-fg">asarray</span><span class="ansi-blue-fg">(a, dtype, order)</span>
+<span class="ansi-green-intense-fg ansi-bold">     81</span> 
+<span class="ansi-green-intense-fg ansi-bold">     82</span>     &#34;&#34;&#34;
+<span class="ansi-green-fg">---&gt; 83</span><span class="ansi-red-fg">     </span><span class="ansi-green-fg">return</span> array<span class="ansi-blue-fg">(</span>a<span class="ansi-blue-fg">,</span> dtype<span class="ansi-blue-fg">,</span> copy<span class="ansi-blue-fg">=</span><span class="ansi-green-fg">False</span><span class="ansi-blue-fg">,</span> order<span class="ansi-blue-fg">=</span>order<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">     84</span> 
+<span class="ansi-green-intense-fg ansi-bold">     85</span> 
+
+<span class="ansi-red-fg">ValueError</span>: could not convert string to float: &#39;White&#39;</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>To be able to debug this error, we are going to build a class that is derived from <code>Pipeline</code>. As a first step, we'll build <code>DebugPipeline</code> with a <code>debug_fit</code> method such that it is able to reproduce the same error as in the standard <code>fit</code>. What we try to do is reproduce the <code>fit</code> method, and we know that the idea of the <code>fit</code> of a <code>Pipeline</code> is to run <code>fit_transform</code> for every transformer and run a <code>fit</code> with the learner:</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">DebugPipeline</span><span class="p">(</span><span class="n">Pipeline</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">debug_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">transformer_name</span><span class="p">,</span> <span class="n">transformer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">steps</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="n">X</span> <span class="o">=</span> <span class="n">transformer</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">steps</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">pipe</span> <span class="o">=</span> <span class="n">DebugPipeline</span><span class="p">(</span><span class="n">steps_list</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Indeed, we get the same error:</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">pipe</span><span class="o">.</span><span class="n">debug_fit</span><span class="p">(</span><span class="n">df_arrests_x</span><span class="p">,</span> <span class="n">df_arrests_y</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_text output_error">
+<pre>
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">ValueError</span>                                Traceback (most recent call last)
+<span class="ansi-green-fg">&lt;ipython-input-8-04ff0f168997&gt;</span> in <span class="ansi-cyan-fg">&lt;module&gt;</span>
+<span class="ansi-green-fg">----&gt; 1</span><span class="ansi-red-fg"> </span>pipe<span class="ansi-blue-fg">.</span>debug_fit<span class="ansi-blue-fg">(</span>df_arrests_x<span class="ansi-blue-fg">,</span> df_arrests_y<span class="ansi-blue-fg">)</span>
+
+<span class="ansi-green-fg">&lt;ipython-input-6-c74b872fa0ed&gt;</span> in <span class="ansi-cyan-fg">debug_fit</span><span class="ansi-blue-fg">(self, X, y)</span>
+<span class="ansi-green-intense-fg ansi-bold">      3</span>     <span class="ansi-green-fg">def</span> debug_fit<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">,</span> X<span class="ansi-blue-fg">,</span> y<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-intense-fg ansi-bold">      4</span>         <span class="ansi-green-fg">for</span> transformer_name<span class="ansi-blue-fg">,</span> transformer <span class="ansi-green-fg">in</span> self<span class="ansi-blue-fg">.</span>steps<span class="ansi-blue-fg">[</span><span class="ansi-blue-fg">:</span><span class="ansi-blue-fg">-</span><span class="ansi-cyan-fg">1</span><span class="ansi-blue-fg">]</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-fg">----&gt; 5</span><span class="ansi-red-fg">             </span>X <span class="ansi-blue-fg">=</span> transformer<span class="ansi-blue-fg">.</span>fit_transform<span class="ansi-blue-fg">(</span>X<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">      6</span>         <span class="ansi-green-fg">return</span> self<span class="ansi-blue-fg">.</span>steps<span class="ansi-blue-fg">[</span><span class="ansi-blue-fg">-</span><span class="ansi-cyan-fg">1</span><span class="ansi-blue-fg">]</span><span class="ansi-blue-fg">[</span><span class="ansi-cyan-fg">1</span><span class="ansi-blue-fg">]</span><span class="ansi-blue-fg">.</span>fit<span class="ansi-blue-fg">(</span>X<span class="ansi-blue-fg">,</span> y<span class="ansi-blue-fg">)</span>
+
+<span class="ansi-green-fg">~/opt/anaconda3/envs/sk-experiments/lib/python3.7/site-packages/sklearn/base.py</span> in <span class="ansi-cyan-fg">fit_transform</span><span class="ansi-blue-fg">(self, X, y, **fit_params)</span>
+<span class="ansi-green-intense-fg ansi-bold">    688</span>         <span class="ansi-green-fg">if</span> y <span class="ansi-green-fg">is</span> <span class="ansi-green-fg">None</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-intense-fg ansi-bold">    689</span>             <span class="ansi-red-fg"># fit method of arity 1 (unsupervised transformation)</span>
+<span class="ansi-green-fg">--&gt; 690</span><span class="ansi-red-fg">             </span><span class="ansi-green-fg">return</span> self<span class="ansi-blue-fg">.</span>fit<span class="ansi-blue-fg">(</span>X<span class="ansi-blue-fg">,</span> <span class="ansi-blue-fg">**</span>fit_params<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">.</span>transform<span class="ansi-blue-fg">(</span>X<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    691</span>         <span class="ansi-green-fg">else</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-intense-fg ansi-bold">    692</span>             <span class="ansi-red-fg"># fit method of arity 2 (supervised transformation)</span>
+
+<span class="ansi-green-fg">~/opt/anaconda3/envs/sk-experiments/lib/python3.7/site-packages/sklearn/preprocessing/_data.py</span> in <span class="ansi-cyan-fg">fit</span><span class="ansi-blue-fg">(self, X, y)</span>
+<span class="ansi-green-intense-fg ansi-bold">    665</span>         <span class="ansi-red-fg"># Reset internal state before fitting</span>
+<span class="ansi-green-intense-fg ansi-bold">    666</span>         self<span class="ansi-blue-fg">.</span>_reset<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-fg">--&gt; 667</span><span class="ansi-red-fg">         </span><span class="ansi-green-fg">return</span> self<span class="ansi-blue-fg">.</span>partial_fit<span class="ansi-blue-fg">(</span>X<span class="ansi-blue-fg">,</span> y<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    668</span> 
+<span class="ansi-green-intense-fg ansi-bold">    669</span>     <span class="ansi-green-fg">def</span> partial_fit<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">,</span> X<span class="ansi-blue-fg">,</span> y<span class="ansi-blue-fg">=</span><span class="ansi-green-fg">None</span><span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
+
+<span class="ansi-green-fg">~/opt/anaconda3/envs/sk-experiments/lib/python3.7/site-packages/sklearn/preprocessing/_data.py</span> in <span class="ansi-cyan-fg">partial_fit</span><span class="ansi-blue-fg">(self, X, y)</span>
+<span class="ansi-green-intense-fg ansi-bold">    696</span>         X = self._validate_data(X, accept_sparse=(&#39;csr&#39;, &#39;csc&#39;),
+<span class="ansi-green-intense-fg ansi-bold">    697</span>                                 estimator<span class="ansi-blue-fg">=</span>self<span class="ansi-blue-fg">,</span> dtype<span class="ansi-blue-fg">=</span>FLOAT_DTYPES<span class="ansi-blue-fg">,</span>
+<span class="ansi-green-fg">--&gt; 698</span><span class="ansi-red-fg">                                 force_all_finite=&#39;allow-nan&#39;)
+</span><span class="ansi-green-intense-fg ansi-bold">    699</span> 
+<span class="ansi-green-intense-fg ansi-bold">    700</span>         <span class="ansi-red-fg"># Even in the case of `with_mean=False`, we update the mean anyway</span>
+
+<span class="ansi-green-fg">~/opt/anaconda3/envs/sk-experiments/lib/python3.7/site-packages/sklearn/base.py</span> in <span class="ansi-cyan-fg">_validate_data</span><span class="ansi-blue-fg">(self, X, y, reset, validate_separately, **check_params)</span>
+<span class="ansi-green-intense-fg ansi-bold">    418</span>                     <span class="ansi-blue-fg">f&#34;requires y to be passed, but the target y is None.&#34;</span>
+<span class="ansi-green-intense-fg ansi-bold">    419</span>                 )
+<span class="ansi-green-fg">--&gt; 420</span><span class="ansi-red-fg">             </span>X <span class="ansi-blue-fg">=</span> check_array<span class="ansi-blue-fg">(</span>X<span class="ansi-blue-fg">,</span> <span class="ansi-blue-fg">**</span>check_params<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    421</span>             out <span class="ansi-blue-fg">=</span> X
+<span class="ansi-green-intense-fg ansi-bold">    422</span>         <span class="ansi-green-fg">else</span><span class="ansi-blue-fg">:</span>
+
+<span class="ansi-green-fg">~/opt/anaconda3/envs/sk-experiments/lib/python3.7/site-packages/sklearn/utils/validation.py</span> in <span class="ansi-cyan-fg">inner_f</span><span class="ansi-blue-fg">(*args, **kwargs)</span>
+<span class="ansi-green-intense-fg ansi-bold">     71</span>                           FutureWarning)
+<span class="ansi-green-intense-fg ansi-bold">     72</span>         kwargs<span class="ansi-blue-fg">.</span>update<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">{</span>k<span class="ansi-blue-fg">:</span> arg <span class="ansi-green-fg">for</span> k<span class="ansi-blue-fg">,</span> arg <span class="ansi-green-fg">in</span> zip<span class="ansi-blue-fg">(</span>sig<span class="ansi-blue-fg">.</span>parameters<span class="ansi-blue-fg">,</span> args<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">}</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-fg">---&gt; 73</span><span class="ansi-red-fg">         </span><span class="ansi-green-fg">return</span> f<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">**</span>kwargs<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">     74</span>     <span class="ansi-green-fg">return</span> inner_f
+<span class="ansi-green-intense-fg ansi-bold">     75</span> 
+
+<span class="ansi-green-fg">~/opt/anaconda3/envs/sk-experiments/lib/python3.7/site-packages/sklearn/utils/validation.py</span> in <span class="ansi-cyan-fg">check_array</span><span class="ansi-blue-fg">(array, accept_sparse, accept_large_sparse, dtype, order, copy, force_all_finite, ensure_2d, allow_nd, ensure_min_samples, ensure_min_features, estimator)</span>
+<span class="ansi-green-intense-fg ansi-bold">    597</span>                     array <span class="ansi-blue-fg">=</span> array<span class="ansi-blue-fg">.</span>astype<span class="ansi-blue-fg">(</span>dtype<span class="ansi-blue-fg">,</span> casting<span class="ansi-blue-fg">=</span><span class="ansi-blue-fg">&#34;unsafe&#34;</span><span class="ansi-blue-fg">,</span> copy<span class="ansi-blue-fg">=</span><span class="ansi-green-fg">False</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    598</span>                 <span class="ansi-green-fg">else</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-fg">--&gt; 599</span><span class="ansi-red-fg">                     </span>array <span class="ansi-blue-fg">=</span> np<span class="ansi-blue-fg">.</span>asarray<span class="ansi-blue-fg">(</span>array<span class="ansi-blue-fg">,</span> order<span class="ansi-blue-fg">=</span>order<span class="ansi-blue-fg">,</span> dtype<span class="ansi-blue-fg">=</span>dtype<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    600</span>             <span class="ansi-green-fg">except</span> ComplexWarning<span class="ansi-blue-fg">:</span>
+<span class="ansi-green-intense-fg ansi-bold">    601</span>                 raise ValueError(&#34;Complex data not supported\n&#34;
+
+<span class="ansi-green-fg">~/.local/lib/python3.7/site-packages/numpy/core/_asarray.py</span> in <span class="ansi-cyan-fg">asarray</span><span class="ansi-blue-fg">(a, dtype, order)</span>
+<span class="ansi-green-intense-fg ansi-bold">     81</span> 
+<span class="ansi-green-intense-fg ansi-bold">     82</span>     &#34;&#34;&#34;
+<span class="ansi-green-fg">---&gt; 83</span><span class="ansi-red-fg">     </span><span class="ansi-green-fg">return</span> array<span class="ansi-blue-fg">(</span>a<span class="ansi-blue-fg">,</span> dtype<span class="ansi-blue-fg">,</span> copy<span class="ansi-blue-fg">=</span><span class="ansi-green-fg">False</span><span class="ansi-blue-fg">,</span> order<span class="ansi-blue-fg">=</span>order<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">     84</span> 
+<span class="ansi-green-intense-fg ansi-bold">     85</span> 
+
+<span class="ansi-green-fg">~/.local/lib/python3.7/site-packages/pandas/core/generic.py</span> in <span class="ansi-cyan-fg">__array__</span><span class="ansi-blue-fg">(self, dtype)</span>
+<span class="ansi-green-intense-fg ansi-bold">   1776</span> 
+<span class="ansi-green-intense-fg ansi-bold">   1777</span>     <span class="ansi-green-fg">def</span> __array__<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">,</span> dtype<span class="ansi-blue-fg">=</span><span class="ansi-green-fg">None</span><span class="ansi-blue-fg">)</span> <span class="ansi-blue-fg">-&gt;</span> np<span class="ansi-blue-fg">.</span>ndarray<span class="ansi-blue-fg">:</span>
+<span class="ansi-green-fg">-&gt; 1778</span><span class="ansi-red-fg">         </span><span class="ansi-green-fg">return</span> np<span class="ansi-blue-fg">.</span>asarray<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">.</span>_values<span class="ansi-blue-fg">,</span> dtype<span class="ansi-blue-fg">=</span>dtype<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">   1779</span> 
+<span class="ansi-green-intense-fg ansi-bold">   1780</span>     <span class="ansi-green-fg">def</span> __array_wrap__<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">,</span> result<span class="ansi-blue-fg">,</span> context<span class="ansi-blue-fg">=</span><span class="ansi-green-fg">None</span><span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
+
+<span class="ansi-green-fg">~/.local/lib/python3.7/site-packages/numpy/core/_asarray.py</span> in <span class="ansi-cyan-fg">asarray</span><span class="ansi-blue-fg">(a, dtype, order)</span>
+<span class="ansi-green-intense-fg ansi-bold">     81</span> 
+<span class="ansi-green-intense-fg ansi-bold">     82</span>     &#34;&#34;&#34;
+<span class="ansi-green-fg">---&gt; 83</span><span class="ansi-red-fg">     </span><span class="ansi-green-fg">return</span> array<span class="ansi-blue-fg">(</span>a<span class="ansi-blue-fg">,</span> dtype<span class="ansi-blue-fg">,</span> copy<span class="ansi-blue-fg">=</span><span class="ansi-green-fg">False</span><span class="ansi-blue-fg">,</span> order<span class="ansi-blue-fg">=</span>order<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">     84</span> 
+<span class="ansi-green-intense-fg ansi-bold">     85</span> 
+
+<span class="ansi-red-fg">ValueError</span>: could not convert string to float: &#39;White&#39;</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Now we have a <code>debug_fit</code> method that we can control in an easier way than the <code>fit</code> method. The idea is to log several properties of our input data at each step in order to understand where is the pipeline failing and why is it failing at that step.</p>
+<p>As a bonus trick, we'll use <code>typedispatch</code> from <code>fastcore</code> to log the types of the input data depending on its type.</p>
+<p>Let's create the logging functions:</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="nd">@typedispatch</span>
+<span class="k">def</span> <span class="nf">log_dtypes</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
+    <span class="n">types_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">dtypes</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+    <span class="n">dtypes_str</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+        <span class="s2">&quot;(</span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">dtype</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">dtype</span> <span class="ow">in</span> <span class="n">types_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;types=[</span><span class="si">{</span><span class="n">dtypes_str</span><span class="si">}</span><span class="s2">]&quot;</span>
+
+
+<span class="nd">@typedispatch</span>
+<span class="k">def</span> <span class="nf">log_dtypes</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+    <span class="n">types_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">i</span><span class="p">:</span> <span class="n">col</span><span class="o">.</span><span class="n">dtype</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">T</span><span class="p">)}</span>
+    <span class="n">dtypes_str</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+        <span class="s2">&quot;(</span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">dtype</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">dtype</span> <span class="ow">in</span> <span class="n">types_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;types=[</span><span class="si">{</span><span class="n">dtypes_str</span><span class="si">}</span><span class="s2">]&quot;</span>
+
+
+<span class="k">def</span> <span class="nf">log_shape</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;n_obs=</span><span class="si">{</span><span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> n_col=</span><span class="si">{</span><span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Let's use these functions before the <code>fit_transform</code>:</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">DebugPipeline</span><span class="p">(</span><span class="n">Pipeline</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">debug_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">transformer_name</span><span class="p">,</span> <span class="n">transformer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">steps</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">log_shape</span><span class="p">(</span><span class="n">X</span><span class="p">))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">log_dtypes</span><span class="p">(</span><span class="n">X</span><span class="p">))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">transformer_name</span><span class="si">}</span><span class="s2"> to be applied&quot;</span><span class="p">)</span>
+            <span class="n">X</span> <span class="o">=</span> <span class="n">transformer</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">steps</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>And use the <code>debug_fit</code>. We can see that the pipeline is failing in the scaler step, and that the input data at these step are of type <code>object</code>. It looks like we needed to transform the categorical variables to numeric, as the standard scaler cannot handle categories.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">pipe</span> <span class="o">=</span> <span class="n">DebugPipeline</span><span class="p">(</span><span class="n">steps_list</span><span class="p">)</span>
+<span class="n">pipe</span><span class="o">.</span><span class="n">debug_fit</span><span class="p">(</span><span class="n">df_arrests_x</span><span class="p">,</span> <span class="n">df_arrests_y</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>n_obs=5226 n_col=7
+types=[(colour, object), (year, int64), (age, int64), (sex, object), (employed, object), (citizen, object), (checks, int64)]
+scaler to be applied
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+<div class="output_subarea output_text output_error">
+<pre>
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">ValueError</span>                                Traceback (most recent call last)
+<span class="ansi-green-fg">&lt;ipython-input-11-2734d139122f&gt;</span> in <span class="ansi-cyan-fg">&lt;module&gt;</span>
+<span class="ansi-green-intense-fg ansi-bold">      1</span> pipe <span class="ansi-blue-fg">=</span> DebugPipeline<span class="ansi-blue-fg">(</span>steps_list<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-fg">----&gt; 2</span><span class="ansi-red-fg"> </span>pipe<span class="ansi-blue-fg">.</span>debug_fit<span class="ansi-blue-fg">(</span>df_arrests_x<span class="ansi-blue-fg">,</span> df_arrests_y<span class="ansi-blue-fg">)</span>
+
+<span class="ansi-green-fg">&lt;ipython-input-10-65fdaf99a313&gt;</span> in <span class="ansi-cyan-fg">debug_fit</span><span class="ansi-blue-fg">(self, X, y)</span>
+<span class="ansi-green-intense-fg ansi-bold">      6</span>             print<span class="ansi-blue-fg">(</span>log_dtypes<span class="ansi-blue-fg">(</span>X<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">      7</span>             print<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">f&#34;{transformer_name} to be applied&#34;</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-fg">----&gt; 8</span><span class="ansi-red-fg">             </span>X <span class="ansi-blue-fg">=</span> transformer<span class="ansi-blue-fg">.</span>fit_transform<span class="ansi-blue-fg">(</span>X<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">      9</span>         <span class="ansi-green-fg">return</span> self<span class="ansi-blue-fg">.</span>steps<span class="ansi-blue-fg">[</span><span class="ansi-blue-fg">-</span><span class="ansi-cyan-fg">1</span><span class="ansi-blue-fg">]</span><span class="ansi-blue-fg">[</span><span class="ansi-cyan-fg">1</span><span class="ansi-blue-fg">]</span><span class="ansi-blue-fg">.</span>fit<span class="ansi-blue-fg">(</span>X<span class="ansi-blue-fg">,</span> y<span class="ansi-blue-fg">)</span>
+
+<span class="ansi-green-fg">~/opt/anaconda3/envs/sk-experiments/lib/python3.7/site-packages/sklearn/base.py</span> in <span class="ansi-cyan-fg">fit_transform</span><span class="ansi-blue-fg">(self, X, y, **fit_params)</span>
+<span class="ansi-green-intense-fg ansi-bold">    688</span>         <span class="ansi-green-fg">if</span> y <span class="ansi-green-fg">is</span> <span class="ansi-green-fg">None</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-intense-fg ansi-bold">    689</span>             <span class="ansi-red-fg"># fit method of arity 1 (unsupervised transformation)</span>
+<span class="ansi-green-fg">--&gt; 690</span><span class="ansi-red-fg">             </span><span class="ansi-green-fg">return</span> self<span class="ansi-blue-fg">.</span>fit<span class="ansi-blue-fg">(</span>X<span class="ansi-blue-fg">,</span> <span class="ansi-blue-fg">**</span>fit_params<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">.</span>transform<span class="ansi-blue-fg">(</span>X<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    691</span>         <span class="ansi-green-fg">else</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-intense-fg ansi-bold">    692</span>             <span class="ansi-red-fg"># fit method of arity 2 (supervised transformation)</span>
+
+<span class="ansi-green-fg">~/opt/anaconda3/envs/sk-experiments/lib/python3.7/site-packages/sklearn/preprocessing/_data.py</span> in <span class="ansi-cyan-fg">fit</span><span class="ansi-blue-fg">(self, X, y)</span>
+<span class="ansi-green-intense-fg ansi-bold">    665</span>         <span class="ansi-red-fg"># Reset internal state before fitting</span>
+<span class="ansi-green-intense-fg ansi-bold">    666</span>         self<span class="ansi-blue-fg">.</span>_reset<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-fg">--&gt; 667</span><span class="ansi-red-fg">         </span><span class="ansi-green-fg">return</span> self<span class="ansi-blue-fg">.</span>partial_fit<span class="ansi-blue-fg">(</span>X<span class="ansi-blue-fg">,</span> y<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    668</span> 
+<span class="ansi-green-intense-fg ansi-bold">    669</span>     <span class="ansi-green-fg">def</span> partial_fit<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">,</span> X<span class="ansi-blue-fg">,</span> y<span class="ansi-blue-fg">=</span><span class="ansi-green-fg">None</span><span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
+
+<span class="ansi-green-fg">~/opt/anaconda3/envs/sk-experiments/lib/python3.7/site-packages/sklearn/preprocessing/_data.py</span> in <span class="ansi-cyan-fg">partial_fit</span><span class="ansi-blue-fg">(self, X, y)</span>
+<span class="ansi-green-intense-fg ansi-bold">    696</span>         X = self._validate_data(X, accept_sparse=(&#39;csr&#39;, &#39;csc&#39;),
+<span class="ansi-green-intense-fg ansi-bold">    697</span>                                 estimator<span class="ansi-blue-fg">=</span>self<span class="ansi-blue-fg">,</span> dtype<span class="ansi-blue-fg">=</span>FLOAT_DTYPES<span class="ansi-blue-fg">,</span>
+<span class="ansi-green-fg">--&gt; 698</span><span class="ansi-red-fg">                                 force_all_finite=&#39;allow-nan&#39;)
+</span><span class="ansi-green-intense-fg ansi-bold">    699</span> 
+<span class="ansi-green-intense-fg ansi-bold">    700</span>         <span class="ansi-red-fg"># Even in the case of `with_mean=False`, we update the mean anyway</span>
+
+<span class="ansi-green-fg">~/opt/anaconda3/envs/sk-experiments/lib/python3.7/site-packages/sklearn/base.py</span> in <span class="ansi-cyan-fg">_validate_data</span><span class="ansi-blue-fg">(self, X, y, reset, validate_separately, **check_params)</span>
+<span class="ansi-green-intense-fg ansi-bold">    418</span>                     <span class="ansi-blue-fg">f&#34;requires y to be passed, but the target y is None.&#34;</span>
+<span class="ansi-green-intense-fg ansi-bold">    419</span>                 )
+<span class="ansi-green-fg">--&gt; 420</span><span class="ansi-red-fg">             </span>X <span class="ansi-blue-fg">=</span> check_array<span class="ansi-blue-fg">(</span>X<span class="ansi-blue-fg">,</span> <span class="ansi-blue-fg">**</span>check_params<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    421</span>             out <span class="ansi-blue-fg">=</span> X
+<span class="ansi-green-intense-fg ansi-bold">    422</span>         <span class="ansi-green-fg">else</span><span class="ansi-blue-fg">:</span>
+
+<span class="ansi-green-fg">~/opt/anaconda3/envs/sk-experiments/lib/python3.7/site-packages/sklearn/utils/validation.py</span> in <span class="ansi-cyan-fg">inner_f</span><span class="ansi-blue-fg">(*args, **kwargs)</span>
+<span class="ansi-green-intense-fg ansi-bold">     71</span>                           FutureWarning)
+<span class="ansi-green-intense-fg ansi-bold">     72</span>         kwargs<span class="ansi-blue-fg">.</span>update<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">{</span>k<span class="ansi-blue-fg">:</span> arg <span class="ansi-green-fg">for</span> k<span class="ansi-blue-fg">,</span> arg <span class="ansi-green-fg">in</span> zip<span class="ansi-blue-fg">(</span>sig<span class="ansi-blue-fg">.</span>parameters<span class="ansi-blue-fg">,</span> args<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">}</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-fg">---&gt; 73</span><span class="ansi-red-fg">         </span><span class="ansi-green-fg">return</span> f<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">**</span>kwargs<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">     74</span>     <span class="ansi-green-fg">return</span> inner_f
+<span class="ansi-green-intense-fg ansi-bold">     75</span> 
+
+<span class="ansi-green-fg">~/opt/anaconda3/envs/sk-experiments/lib/python3.7/site-packages/sklearn/utils/validation.py</span> in <span class="ansi-cyan-fg">check_array</span><span class="ansi-blue-fg">(array, accept_sparse, accept_large_sparse, dtype, order, copy, force_all_finite, ensure_2d, allow_nd, ensure_min_samples, ensure_min_features, estimator)</span>
+<span class="ansi-green-intense-fg ansi-bold">    597</span>                     array <span class="ansi-blue-fg">=</span> array<span class="ansi-blue-fg">.</span>astype<span class="ansi-blue-fg">(</span>dtype<span class="ansi-blue-fg">,</span> casting<span class="ansi-blue-fg">=</span><span class="ansi-blue-fg">&#34;unsafe&#34;</span><span class="ansi-blue-fg">,</span> copy<span class="ansi-blue-fg">=</span><span class="ansi-green-fg">False</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    598</span>                 <span class="ansi-green-fg">else</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-fg">--&gt; 599</span><span class="ansi-red-fg">                     </span>array <span class="ansi-blue-fg">=</span> np<span class="ansi-blue-fg">.</span>asarray<span class="ansi-blue-fg">(</span>array<span class="ansi-blue-fg">,</span> order<span class="ansi-blue-fg">=</span>order<span class="ansi-blue-fg">,</span> dtype<span class="ansi-blue-fg">=</span>dtype<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    600</span>             <span class="ansi-green-fg">except</span> ComplexWarning<span class="ansi-blue-fg">:</span>
+<span class="ansi-green-intense-fg ansi-bold">    601</span>                 raise ValueError(&#34;Complex data not supported\n&#34;
+
+<span class="ansi-green-fg">~/.local/lib/python3.7/site-packages/numpy/core/_asarray.py</span> in <span class="ansi-cyan-fg">asarray</span><span class="ansi-blue-fg">(a, dtype, order)</span>
+<span class="ansi-green-intense-fg ansi-bold">     81</span> 
+<span class="ansi-green-intense-fg ansi-bold">     82</span>     &#34;&#34;&#34;
+<span class="ansi-green-fg">---&gt; 83</span><span class="ansi-red-fg">     </span><span class="ansi-green-fg">return</span> array<span class="ansi-blue-fg">(</span>a<span class="ansi-blue-fg">,</span> dtype<span class="ansi-blue-fg">,</span> copy<span class="ansi-blue-fg">=</span><span class="ansi-green-fg">False</span><span class="ansi-blue-fg">,</span> order<span class="ansi-blue-fg">=</span>order<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">     84</span> 
+<span class="ansi-green-intense-fg ansi-bold">     85</span> 
+
+<span class="ansi-green-fg">~/.local/lib/python3.7/site-packages/pandas/core/generic.py</span> in <span class="ansi-cyan-fg">__array__</span><span class="ansi-blue-fg">(self, dtype)</span>
+<span class="ansi-green-intense-fg ansi-bold">   1776</span> 
+<span class="ansi-green-intense-fg ansi-bold">   1777</span>     <span class="ansi-green-fg">def</span> __array__<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">,</span> dtype<span class="ansi-blue-fg">=</span><span class="ansi-green-fg">None</span><span class="ansi-blue-fg">)</span> <span class="ansi-blue-fg">-&gt;</span> np<span class="ansi-blue-fg">.</span>ndarray<span class="ansi-blue-fg">:</span>
+<span class="ansi-green-fg">-&gt; 1778</span><span class="ansi-red-fg">         </span><span class="ansi-green-fg">return</span> np<span class="ansi-blue-fg">.</span>asarray<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">.</span>_values<span class="ansi-blue-fg">,</span> dtype<span class="ansi-blue-fg">=</span>dtype<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">   1779</span> 
+<span class="ansi-green-intense-fg ansi-bold">   1780</span>     <span class="ansi-green-fg">def</span> __array_wrap__<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">,</span> result<span class="ansi-blue-fg">,</span> context<span class="ansi-blue-fg">=</span><span class="ansi-green-fg">None</span><span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
+
+<span class="ansi-green-fg">~/.local/lib/python3.7/site-packages/numpy/core/_asarray.py</span> in <span class="ansi-cyan-fg">asarray</span><span class="ansi-blue-fg">(a, dtype, order)</span>
+<span class="ansi-green-intense-fg ansi-bold">     81</span> 
+<span class="ansi-green-intense-fg ansi-bold">     82</span>     &#34;&#34;&#34;
+<span class="ansi-green-fg">---&gt; 83</span><span class="ansi-red-fg">     </span><span class="ansi-green-fg">return</span> array<span class="ansi-blue-fg">(</span>a<span class="ansi-blue-fg">,</span> dtype<span class="ansi-blue-fg">,</span> copy<span class="ansi-blue-fg">=</span><span class="ansi-green-fg">False</span><span class="ansi-blue-fg">,</span> order<span class="ansi-blue-fg">=</span>order<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">     84</span> 
+<span class="ansi-green-intense-fg ansi-bold">     85</span> 
+
+<span class="ansi-red-fg">ValueError</span>: could not convert string to float: &#39;White&#39;</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Let's solve this issue by applying one-hot encoding before running the pipeline:</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">steps_list</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">(</span><span class="s1">&#39;one-hot&#39;</span><span class="p">,</span> <span class="n">OneHotEncoder</span><span class="p">()),</span>
+    <span class="p">(</span><span class="s1">&#39;scaler&#39;</span><span class="p">,</span> <span class="n">StandardScaler</span><span class="p">()),</span>
+    <span class="p">(</span><span class="s1">&#39;imputer&#39;</span><span class="p">,</span> <span class="n">SimpleImputer</span><span class="p">()),</span>
+    <span class="p">(</span><span class="s1">&#39;learner&#39;</span><span class="p">,</span> <span class="n">LogisticRegression</span><span class="p">())</span>
+<span class="p">]</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">pipe</span> <span class="o">=</span> <span class="n">DebugPipeline</span><span class="p">(</span><span class="n">steps_list</span><span class="p">)</span>
+<span class="n">pipe</span><span class="o">.</span><span class="n">debug_fit</span><span class="p">(</span><span class="n">df_arrests_x</span><span class="p">,</span> <span class="n">df_arrests_y</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>n_obs=5226 n_col=7
+types=[(colour, object), (year, int64), (age, int64), (sex, object), (employed, object), (citizen, object), (checks, int64)]
+one-hot to be applied
+n_obs=5226 n_col=11
+types=[(colour_1, int64), (colour_2, int64), (year, int64), (age, int64), (sex_1, int64), (sex_2, int64), (employed_1, int64), (employed_2, int64), (citizen_1, int64), (citizen_2, int64), (checks, int64)]
+scaler to be applied
+n_obs=5226 n_col=11
+types=[(0, float64), (1, float64), (2, float64), (3, float64), (4, float64), (5, float64), (6, float64), (7, float64), (8, float64), (9, float64), (10, float64)]
+imputer to be applied
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>/Users/davidmasip/opt/anaconda3/envs/sk-experiments/lib/python3.7/site-packages/category_encoders/utils.py:21: FutureWarning: is_categorical is deprecated and will be removed in a future version.  Use is_categorical_dtype instead
+  elif pd.api.types.is_categorical(cols):
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>LogisticRegression()</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>And now, for free, we get to see which are the columns of the pipeline at each step. We can understand the features that our model is using better and have a more intuitive picture of our pipeline.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Summary">Summary<a class="anchor-link" href="#Summary"> </a></h3><ul>
+<li>With its current implementation, we can easily change scikit-learn's Pipeline to slightly change its behaviour and make it easier to debug.</li>
+<li>With this implementation, we're getting logging for free.</li>
+<li>We could even log the predictions by building a <code>debug_predict</code>.</li>
+</ul>
+
+</div>
+</div>
+</div>
+</div>
+
+
+
+  </div><!-- from https://github.com/utterance/utterances -->
+<script src="https://utteranc.es/client.js"
+        repo="david26694/david-masip-blog"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script><a class="u-url" href="/david-masip-blog/machine-learning/programming/scikit-learn/2020/09/12/pipeline_debugger.html" hidden></a>
+</article>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/david-masip-blog/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/david-masip-blog/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/david-masip-blog/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p></p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/david26694" title="david26694"><svg class="svg-icon grey"><use xlink:href="/david-masip-blog/assets/minima-social-icons.svg#github"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
