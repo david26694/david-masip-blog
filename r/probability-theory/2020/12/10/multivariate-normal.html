@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Distance to the origin in multivariate normal distributions | David Masip’s notes</title>
+<meta name="generator" content="Jekyll v4.0.0" />
+<meta property="og:title" content="Distance to the origin in multivariate normal distributions" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="I’ve been reading the Statistical Rethinking book by Richard McElreath. At some point, it mentions that in a centered multivariate normal distribution with high dimension, most of the points are far away from the origin. That is, the distance to the origin distribution is centered far away from the origin, and the higher the dimension the more far away from the origin we are." />
+<meta property="og:description" content="I’ve been reading the Statistical Rethinking book by Richard McElreath. At some point, it mentions that in a centered multivariate normal distribution with high dimension, most of the points are far away from the origin. That is, the distance to the origin distribution is centered far away from the origin, and the higher the dimension the more far away from the origin we are." />
+<link rel="canonical" href="https://david26694.github.io/david-masip-blog/r/probability-theory/2020/12/10/multivariate-normal.html" />
+<meta property="og:url" content="https://david26694.github.io/david-masip-blog/r/probability-theory/2020/12/10/multivariate-normal.html" />
+<meta property="og:site_name" content="David Masip’s notes" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-12-10T00:00:00-06:00" />
+<script type="application/ld+json">
+{"description":"I’ve been reading the Statistical Rethinking book by Richard McElreath. At some point, it mentions that in a centered multivariate normal distribution with high dimension, most of the points are far away from the origin. That is, the distance to the origin distribution is centered far away from the origin, and the higher the dimension the more far away from the origin we are.","@type":"BlogPosting","url":"https://david26694.github.io/david-masip-blog/r/probability-theory/2020/12/10/multivariate-normal.html","headline":"Distance to the origin in multivariate normal distributions","dateModified":"2020-12-10T00:00:00-06:00","datePublished":"2020-12-10T00:00:00-06:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://david26694.github.io/david-masip-blog/r/probability-theory/2020/12/10/multivariate-normal.html"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/david-masip-blog/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://david26694.github.io/david-masip-blog/feed.xml" title="David Masip's notes" /><link rel="shortcut icon" type="image/x-icon" href="/david-masip-blog/images/favicon.ico"><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Distance to the origin in multivariate normal distributions | David Masip’s notes</title>
+<meta name="generator" content="Jekyll v4.0.0" />
+<meta property="og:title" content="Distance to the origin in multivariate normal distributions" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="I’ve been reading the Statistical Rethinking book by Richard McElreath. At some point, it mentions that in a centered multivariate normal distribution with high dimension, most of the points are far away from the origin. That is, the distance to the origin distribution is centered far away from the origin, and the higher the dimension the more far away from the origin we are." />
+<meta property="og:description" content="I’ve been reading the Statistical Rethinking book by Richard McElreath. At some point, it mentions that in a centered multivariate normal distribution with high dimension, most of the points are far away from the origin. That is, the distance to the origin distribution is centered far away from the origin, and the higher the dimension the more far away from the origin we are." />
+<link rel="canonical" href="https://david26694.github.io/david-masip-blog/r/probability-theory/2020/12/10/multivariate-normal.html" />
+<meta property="og:url" content="https://david26694.github.io/david-masip-blog/r/probability-theory/2020/12/10/multivariate-normal.html" />
+<meta property="og:site_name" content="David Masip’s notes" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-12-10T00:00:00-06:00" />
+<script type="application/ld+json">
+{"description":"I’ve been reading the Statistical Rethinking book by Richard McElreath. At some point, it mentions that in a centered multivariate normal distribution with high dimension, most of the points are far away from the origin. That is, the distance to the origin distribution is centered far away from the origin, and the higher the dimension the more far away from the origin we are.","@type":"BlogPosting","url":"https://david26694.github.io/david-masip-blog/r/probability-theory/2020/12/10/multivariate-normal.html","headline":"Distance to the origin in multivariate normal distributions","dateModified":"2020-12-10T00:00:00-06:00","datePublished":"2020-12-10T00:00:00-06:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://david26694.github.io/david-masip-blog/r/probability-theory/2020/12/10/multivariate-normal.html"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+<link href="https://unpkg.com/@primer/css/dist/primer.css" rel="stylesheet" />
+<link rel="stylesheet" href="//use.fontawesome.com/releases/v5.0.7/css/all.css"><link type="application/atom+xml" rel="alternate" href="https://david26694.github.io/david-masip-blog/feed.xml" title="David Masip's notes" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"> </script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"></script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement( document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "[%", right: "%]", display: true},
+            {left: "$", right: "$", display: false}
+        ]}
+        );
+    });
+    </script>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js"></script>
+<script type="text/javascript">
+require.config({
+  paths: {
+    jquery: 'https://code.jquery.com/jquery-3.5.0.min',
+    plotly: 'https://cdn.plot.ly/plotly-latest.min'
+  },
+
+  shim: {
+    plotly: {
+      deps: ['jquery'],
+      exports: 'plotly'
+    }
+  }
+});
+</script>
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head><body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/david-masip-blog/">David Masip&#39;s notes</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/david-masip-blog/about/">About Me</a><a class="page-link" href="/david-masip-blog/search/">Search</a><a class="page-link" href="/david-masip-blog/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Distance to the origin in multivariate normal distributions</h1><p class="post-meta post-meta-title"><time class="dt-published" datetime="2020-12-10T00:00:00-06:00" itemprop="datePublished">
+        Dec 10, 2020
+      </time>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      1 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/david-masip-blog/categories/#r">r</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/david-masip-blog/categories/#probability-theory">probability-theory</a>
+        
+      
+      </p>
+    
+
+    </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p>I’ve been reading the <em>Statistical Rethinking</em> book by Richard
+McElreath. At some point, it mentions that in a centered multivariate
+normal distribution with high dimension, most of the points are far away
+from the origin. That is, the distance to the origin distribution is
+centered far away from the origin, and the higher the dimension the more
+far away from the origin we are.</p>
+
+<p>This has a brutal consequence, which is that, if you sample from a
+multivariate normal distribution with high dimension, you are very
+unlikely to get points that are very close to the</p>
+
+<p>Let’s do an experiment to check it. First we load the libraries that we
+are going to need:</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">library</span><span class="p">(</span><span class="n">MASS</span><span class="p">)</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="n">purrr</span><span class="p">)</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="n">ggplot2</span><span class="p">)</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="n">dplyr</span><span class="p">)</span><span class="w">
+
+</span><span class="n">theme_set</span><span class="p">(</span><span class="n">theme_minimal</span><span class="p">())</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Now we define a function that simulates <code class="highlighter-rouge">n_samples</code> points in a
+multivariate gaussian distribution with dimension <code class="highlighter-rouge">dimension</code>.</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">simulate_norm</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="k">function</span><span class="p">(</span><span class="n">dimension</span><span class="p">,</span><span class="w"> </span><span class="n">n_samples</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> 
+  
+  </span><span class="c1"># Sample multivariate normal distribution</span><span class="w">
+  </span><span class="c1"># with mean in the origin</span><span class="w">
+  </span><span class="c1"># and identity matrix standard deviation</span><span class="w">
+  </span><span class="n">sim_data</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">mvrnorm</span><span class="p">(</span><span class="n">n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">n_samples</span><span class="p">,</span><span class="w"> 
+                      </span><span class="n">mu</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">rep</span><span class="p">(</span><span class="m">0</span><span class="p">,</span><span class="w"> </span><span class="n">dimension</span><span class="p">),</span><span class="w"> 
+                      </span><span class="n">Sigma</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">diag</span><span class="p">(</span><span class="n">dimension</span><span class="p">))</span><span class="w">
+  
+  </span><span class="c1"># Compute, for each sample, the l2 distance to the origin</span><span class="w">
+  </span><span class="n">l2_norm</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">sqrt</span><span class="p">(</span><span class="n">rowSums</span><span class="p">(</span><span class="n">sim_data</span><span class="w"> </span><span class="o">**</span><span class="w"> </span><span class="m">2</span><span class="p">))</span><span class="w">
+  
+  </span><span class="c1"># Return the results organized in a data frame</span><span class="w">
+  </span><span class="n">data.frame</span><span class="p">(</span><span class="w">
+    </span><span class="n">l2_norm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">l2_norm</span><span class="p">,</span><span class="w">
+    </span><span class="n">dimension</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dimension</span><span class="w">
+  </span><span class="p">)</span><span class="w">
+  
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<p>For several dimensions, we sample 20000 points and compute their
+distances to the origin:</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">dims_sim</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="m">5</span><span class="p">,</span><span class="w"> </span><span class="m">10</span><span class="p">,</span><span class="w"> </span><span class="m">25</span><span class="p">,</span><span class="w"> </span><span class="m">100</span><span class="p">,</span><span class="w"> </span><span class="m">400</span><span class="p">)</span><span class="w">
+
+</span><span class="n">norm_simulations</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">map_dfr</span><span class="p">(</span><span class="n">dims_sim</span><span class="p">,</span><span class="w"> </span><span class="n">simulate_norm</span><span class="p">,</span><span class="w"> </span><span class="n">n_samples</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">20000</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Finally we plot, for each dimension, the distribution of the distances
+to the origin.</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">norm_simulations</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">mutate</span><span class="p">(</span><span class="n">`Multivariate normal dimension`</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">as.factor</span><span class="p">(</span><span class="n">dimension</span><span class="p">))</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">ggplot</span><span class="p">(</span><span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">l2_norm</span><span class="p">,</span><span class="w"> </span><span class="n">color</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">`Multivariate normal dimension`</span><span class="p">,</span><span class="w"> </span><span class="n">fill</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">`Multivariate normal dimension`</span><span class="p">))</span><span class="w"> </span><span class="o">+</span><span class="w"> 
+  </span><span class="n">geom_density</span><span class="p">(</span><span class="n">alpha</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0.3</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> 
+  </span><span class="n">geom_rug</span><span class="p">()</span><span class="w"> </span><span class="o">+</span><span class="w">
+  </span><span class="n">xlab</span><span class="p">(</span><span class="s2">"Distance to origin"</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p><img src="https://raw.githubusercontent.com/david26694/david-masip-blog/master/experiments/multi_normal_distance/multi_normal_distance_files/figure-gfm/unnamed-chunk-4-1.png" alt="" /><!-- --></p>
+
+<p>You can see that:</p>
+
+<ul>
+  <li>The probability of being below 1 is already very low with 10
+dimensions.</li>
+  <li>For 100 dimensions, we already have very few samples with distance
+below 7.5.</li>
+  <li>For a given dimension <code class="highlighter-rouge">k</code>, the distance to the origin distribution
+is centered around <code class="highlighter-rouge">sqrt(k)</code>. This is easy to prove mathematically,
+but not our goal.</li>
+</ul>
+
+  </div><!-- from https://github.com/utterance/utterances -->
+<script src="https://utteranc.es/client.js"
+        repo="david26694/david-masip-blog"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script><a class="u-url" href="/david-masip-blog/r/probability-theory/2020/12/10/multivariate-normal.html" hidden></a>
+</article>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/david-masip-blog/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/david-masip-blog/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/david-masip-blog/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p></p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/david26694" title="david26694"><svg class="svg-icon grey"><use xlink:href="/david-masip-blog/assets/minima-social-icons.svg#github"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
