@@ -16,7 +16,8 @@ far away from the origin we are.
 
 This has a brutal consequence, which is that, if you sample from a
 multivariate normal distribution with high dimension, you are very
-unlikely to get points that are very close to the
+unlikely to get points that are very close to the mean (and mode) of the
+distribution.
 
 Let’s do an experiment to check it. First we load the libraries that we
 are going to need:
