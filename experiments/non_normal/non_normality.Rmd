@@ -1,7 +1,7 @@
 ---
 toc: false
 layout: post
-categories: [r, probability-theory, hypothesis-testing]
+categories: [r, probability-theory]
 comments: true
 title: Non-normality
 description: It's not that bad
