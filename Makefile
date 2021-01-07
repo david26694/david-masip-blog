@@ -31,6 +31,13 @@ _posts/2020-12-10-multivariate-normal.md: experiments/multi_normal_distance/mult
 	rm -rf multi_normal_distance_files
 	rm -rf experiments/multi_normal_distance/multi_normal_distance.md
 
+_posts/2021-01-07-non-normality.md: experiments/non_normal/non_normality.Rmd
+	Rscript experiments/generate_mds.R experiments/non_normal/non_normality.Rmd
+	sed 's/\!\[\](/\!\[\](https\:\/\/raw.githubusercontent.com\/david26694\/david-masip-blog\/master\/experiments\/non_normal\//g' experiments/non_normal/non_normality.md > _posts/2021-01-07-non-normality.md
+	rm -rf _posts/non_normality_files
+	rm -rf non_normality_files
+	rm -rf experiments/non_normal/non_normality.md
+
 
 help:
 	cat Makefile

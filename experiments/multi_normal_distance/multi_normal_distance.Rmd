@@ -4,7 +4,7 @@ layout: post
 categories: [r, probability-theory]
 comments: true
 title: Distance to the origin in multivariate normal distributions
-subtitle: A dimension-related analysis
+description: A dimension-related analysis
 ---
 
 I've been reading the _Statistical Rethinking_ book by Richard McElreath. At some point, it mentions that in a centered multivariate normal distribution with high dimension, most of the points are far away from the origin. That is, the distance to the origin distribution is centered far away from the origin, and the higher the dimension the more far away from the origin we are.

@@ -4,7 +4,7 @@ layout: post
 categories: [r, probability-theory]
 comments: true
 title: Distance to the origin in multivariate normal distributions
-subtitle: A dimension-related analysis
+description: A dimension-related analysis
 ---
 
 I’ve been reading the *Statistical Rethinking* book by Richard
