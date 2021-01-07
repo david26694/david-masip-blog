@@ -10,15 +10,16 @@ description: It's not that bad
 I’m still reading the great *Statistical Rethinking* book by Richard
 McElreath, and I’m learning plenty of things. One thing it quickly
 mentions is that you shouldn’t worry about having non-normal data when
-using a linear regression. Linear regression can be defined as \[
-y \sim N(a_0 + a_1x_1 + \dots + a_nx_n, \sigma^2)
-\] This doesn’t imply that \(y\) has to be normally distributed in our
-data. It only means that \(y\) needs to be normally distributed
-conditional to \(x\). Let’s do an experiment to show this.
+using a linear regression. Linear regression can be defined as
 
-We’ll generate \(x\) using a beta distribution, thus generating a very
-skewed distribution for \(x\). We’ll generate \(y\) by adding some small
-noise to \(x\).
+*y* ∼ *N*(*a*<sub>0</sub> + *a*<sub>1</sub>*x*<sub>1</sub> + … + *a*<sub>*n*</sub>*x*<sub>*n*</sub>, *σ*<sup>2</sup>)
+ This doesn’t imply that *y* has to be normally distributed in our data.
+It only means that *y* needs to be normally distributed conditional to
+*x*. Let’s do an experiment to show this.
+
+We’ll generate *x* using a beta distribution, thus generating a very
+skewed distribution for *x*. We’ll generate *y* by adding some small
+noise to *x*.
 
 ``` r
 # Libraries
@@ -44,9 +45,9 @@ ggplot(df) +
   geom_density(aes(x = y))
 ```
 
-![](https://raw.githubusercontent.com/david26694/david-masip-blog/master/experiments/non_normal/non_normality_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
+![](https://raw.githubusercontent.com/david26694/david-masip-blog/master/experiments/non_normal/non_normality_files/figure-markdown_github/unnamed-chunk-2-1.png)
 
-As we can see, \(y\) is pretty skewed. A naive statistician might say
+As we can see, *y* is pretty skewed. A naive statistician might say
 that, being the data not normal, we should not fit a plain linear model,
 as this assumes normality of data. Keep in mind that the linear model
 assumes normality of the data conditioned on the predictors, so this
@@ -65,7 +66,7 @@ ggplot(df) +
   geom_density(aes(x = error))
 ```
 
-![](https://raw.githubusercontent.com/david26694/david-masip-blog/master/experiments/non_normal/non_normality_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
+![](https://raw.githubusercontent.com/david26694/david-masip-blog/master/experiments/non_normal/non_normality_files/figure-markdown_github/unnamed-chunk-3-1.png)
 
 As we can see, the distribution for the error is not skewed anymore, it
 looks like a normal. Let’s check it with a qqplot:
@@ -76,7 +77,7 @@ ggplot(df) +
   stat_qq_line(aes(sample = error))
 ```
 
-![](https://raw.githubusercontent.com/david26694/david-masip-blog/master/experiments/non_normal/non_normality_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
+![](https://raw.githubusercontent.com/david26694/david-masip-blog/master/experiments/non_normal/non_normality_files/figure-markdown_github/unnamed-chunk-4-1.png)
 
 Indeed, the residuals follow a normal distribution.
 

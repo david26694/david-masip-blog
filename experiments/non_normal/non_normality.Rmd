@@ -8,6 +8,7 @@ description: It's not that bad
 ---
 
 I'm still reading the great _Statistical Rethinking_ book by Richard McElreath, and I'm learning plenty of things. One thing it quickly mentions is that you shouldn't worry about having non-normal data when using a linear regression. Linear regression can be defined as
+
 $$
 y \sim N(a_0 + a_1x_1 + \dots + a_nx_n, \sigma^2)
 $$
