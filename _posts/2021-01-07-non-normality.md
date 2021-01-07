@@ -13,7 +13,8 @@ mentions is that you shouldn’t worry about having non-normal data when
 using a linear regression. Linear regression can be defined as
 
 *y* ∼ *N*(*a*<sub>0</sub> + *a*<sub>1</sub>*x*<sub>1</sub> + … + *a*<sub>*n*</sub>*x*<sub>*n*</sub>, *σ*<sup>2</sup>)
- This doesn’t imply that *y* has to be normally distributed in our data.
+
+This doesn’t imply that *y* has to be normally distributed in our data.
 It only means that *y* needs to be normally distributed conditional to
 *x*. Let’s do an experiment to show this.
 
