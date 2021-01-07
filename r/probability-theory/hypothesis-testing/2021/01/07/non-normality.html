@@ -149,15 +149,16 @@ window.onload = wrap_img;
     <p>I’m still reading the great <em>Statistical Rethinking</em> book by Richard
 McElreath, and I’m learning plenty of things. One thing it quickly
 mentions is that you shouldn’t worry about having non-normal data when
-using a linear regression. Linear regression can be defined as [
-y \sim N(a_0 + a_1x_1 + \dots + a_nx_n, \sigma^2)
-] This doesn’t imply that (y) has to be normally distributed in our
-data. It only means that (y) needs to be normally distributed
-conditional to (x). Let’s do an experiment to show this.</p>
+using a linear regression. Linear regression can be defined as</p>
 
-<p>We’ll generate (x) using a beta distribution, thus generating a very
-skewed distribution for (x). We’ll generate (y) by adding some small
-noise to (x).</p>
+<p><em>y</em> ∼ <em>N</em>(<em>a</em><sub>0</sub> + <em>a</em><sub>1</sub><em>x</em><sub>1</sub> + … + <em>a</em><sub><em>n</em></sub><em>x</em><sub><em>n</em></sub>, <em>σ</em><sup>2</sup>)
+ This doesn’t imply that <em>y</em> has to be normally distributed in our data.
+It only means that <em>y</em> needs to be normally distributed conditional to
+<em>x</em>. Let’s do an experiment to show this.</p>
+
+<p>We’ll generate <em>x</em> using a beta distribution, thus generating a very
+skewed distribution for <em>x</em>. We’ll generate <em>y</em> by adding some small
+noise to <em>x</em>.</p>
 
 <div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Libraries</span><span class="w">
 
@@ -181,9 +182,9 @@ noise to (x).</p>
   </span><span class="n">geom_density</span><span class="p">(</span><span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">y</span><span class="p">))</span><span class="w">
 </span></code></pre></div></div>
 
-<p><img src="https://raw.githubusercontent.com/david26694/david-masip-blog/master/experiments/non_normal/non_normality_files/figure-gfm/unnamed-chunk-2-1.png" alt="" /><!-- --></p>
+<p><img src="https://raw.githubusercontent.com/david26694/david-masip-blog/master/experiments/non_normal/non_normality_files/figure-markdown_github/unnamed-chunk-2-1.png" alt="" /></p>
 
-<p>As we can see, (y) is pretty skewed. A naive statistician might say
+<p>As we can see, <em>y</em> is pretty skewed. A naive statistician might say
 that, being the data not normal, we should not fit a plain linear model,
 as this assumes normality of data. Keep in mind that the linear model
 assumes normality of the data conditioned on the predictors, so this
@@ -201,7 +202,7 @@ might be a situation in which a linear model still makes sense.</p>
   </span><span class="n">geom_density</span><span class="p">(</span><span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">error</span><span class="p">))</span><span class="w">
 </span></code></pre></div></div>
 
-<p><img src="https://raw.githubusercontent.com/david26694/david-masip-blog/master/experiments/non_normal/non_normality_files/figure-gfm/unnamed-chunk-3-1.png" alt="" /><!-- --></p>
+<p><img src="https://raw.githubusercontent.com/david26694/david-masip-blog/master/experiments/non_normal/non_normality_files/figure-markdown_github/unnamed-chunk-3-1.png" alt="" /></p>
 
 <p>As we can see, the distribution for the error is not skewed anymore, it
 looks like a normal. Let’s check it with a qqplot:</p>
@@ -211,7 +212,7 @@ looks like a normal. Let’s check it with a qqplot:</p>
   </span><span class="n">stat_qq_line</span><span class="p">(</span><span class="n">aes</span><span class="p">(</span><span class="n">sample</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">error</span><span class="p">))</span><span class="w">
 </span></code></pre></div></div>
 
-<p><img src="https://raw.githubusercontent.com/david26694/david-masip-blog/master/experiments/non_normal/non_normality_files/figure-gfm/unnamed-chunk-4-1.png" alt="" /><!-- --></p>
+<p><img src="https://raw.githubusercontent.com/david26694/david-masip-blog/master/experiments/non_normal/non_normality_files/figure-markdown_github/unnamed-chunk-4-1.png" alt="" /></p>
 
 <p>Indeed, the residuals follow a normal distribution.</p>
 

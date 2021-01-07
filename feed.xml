@@ -1,15 +1,16 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.0.0">Jekyll</generator><link href="https://david26694.github.io/david-masip-blog/feed.xml" rel="self" type="application/atom+xml" /><link href="https://david26694.github.io/david-masip-blog/" rel="alternate" type="text/html" /><updated>2021-01-07T02:24:55-06:00</updated><id>https://david26694.github.io/david-masip-blog/feed.xml</id><title type="html">David Masip’s notes</title><entry><title type="html">Non-normality</title><link href="https://david26694.github.io/david-masip-blog/r/probability-theory/hypothesis-testing/2021/01/07/non-normality.html" rel="alternate" type="text/html" title="Non-normality" /><published>2021-01-07T00:00:00-06:00</published><updated>2021-01-07T00:00:00-06:00</updated><id>https://david26694.github.io/david-masip-blog/r/probability-theory/hypothesis-testing/2021/01/07/non-normality</id><content type="html" xml:base="https://david26694.github.io/david-masip-blog/r/probability-theory/hypothesis-testing/2021/01/07/non-normality.html">&lt;p&gt;I’m still reading the great &lt;em&gt;Statistical Rethinking&lt;/em&gt; book by Richard
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.0.0">Jekyll</generator><link href="https://david26694.github.io/david-masip-blog/feed.xml" rel="self" type="application/atom+xml" /><link href="https://david26694.github.io/david-masip-blog/" rel="alternate" type="text/html" /><updated>2021-01-07T02:47:23-06:00</updated><id>https://david26694.github.io/david-masip-blog/feed.xml</id><title type="html">David Masip’s notes</title><entry><title type="html">Non-normality</title><link href="https://david26694.github.io/david-masip-blog/r/probability-theory/hypothesis-testing/2021/01/07/non-normality.html" rel="alternate" type="text/html" title="Non-normality" /><published>2021-01-07T00:00:00-06:00</published><updated>2021-01-07T00:00:00-06:00</updated><id>https://david26694.github.io/david-masip-blog/r/probability-theory/hypothesis-testing/2021/01/07/non-normality</id><content type="html" xml:base="https://david26694.github.io/david-masip-blog/r/probability-theory/hypothesis-testing/2021/01/07/non-normality.html">&lt;p&gt;I’m still reading the great &lt;em&gt;Statistical Rethinking&lt;/em&gt; book by Richard
 McElreath, and I’m learning plenty of things. One thing it quickly
 mentions is that you shouldn’t worry about having non-normal data when
-using a linear regression. Linear regression can be defined as [
-y \sim N(a_0 + a_1x_1 + \dots + a_nx_n, \sigma^2)
-] This doesn’t imply that (y) has to be normally distributed in our
-data. It only means that (y) needs to be normally distributed
-conditional to (x). Let’s do an experiment to show this.&lt;/p&gt;
+using a linear regression. Linear regression can be defined as&lt;/p&gt;
 
-&lt;p&gt;We’ll generate (x) using a beta distribution, thus generating a very
-skewed distribution for (x). We’ll generate (y) by adding some small
-noise to (x).&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;y&lt;/em&gt; ∼ &lt;em&gt;N&lt;/em&gt;(&lt;em&gt;a&lt;/em&gt;&lt;sub&gt;0&lt;/sub&gt; + &lt;em&gt;a&lt;/em&gt;&lt;sub&gt;1&lt;/sub&gt;&lt;em&gt;x&lt;/em&gt;&lt;sub&gt;1&lt;/sub&gt; + … + &lt;em&gt;a&lt;/em&gt;&lt;sub&gt;&lt;em&gt;n&lt;/em&gt;&lt;/sub&gt;&lt;em&gt;x&lt;/em&gt;&lt;sub&gt;&lt;em&gt;n&lt;/em&gt;&lt;/sub&gt;, &lt;em&gt;σ&lt;/em&gt;&lt;sup&gt;2&lt;/sup&gt;)
+ This doesn’t imply that &lt;em&gt;y&lt;/em&gt; has to be normally distributed in our data.
+It only means that &lt;em&gt;y&lt;/em&gt; needs to be normally distributed conditional to
+&lt;em&gt;x&lt;/em&gt;. Let’s do an experiment to show this.&lt;/p&gt;
+
+&lt;p&gt;We’ll generate &lt;em&gt;x&lt;/em&gt; using a beta distribution, thus generating a very
+skewed distribution for &lt;em&gt;x&lt;/em&gt;. We’ll generate &lt;em&gt;y&lt;/em&gt; by adding some small
+noise to &lt;em&gt;x&lt;/em&gt;.&lt;/p&gt;
 
 &lt;div class=&quot;language-r highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;# Libraries&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
 
@@ -33,9 +34,9 @@ noise to (x).&lt;/p&gt;
   &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;geom_density&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;aes&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
 &lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/david26694/david-masip-blog/master/experiments/non_normal/non_normality_files/figure-gfm/unnamed-chunk-2-1.png&quot; alt=&quot;&quot; /&gt;&lt;!-- --&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/david26694/david-masip-blog/master/experiments/non_normal/non_normality_files/figure-markdown_github/unnamed-chunk-2-1.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
-&lt;p&gt;As we can see, (y) is pretty skewed. A naive statistician might say
+&lt;p&gt;As we can see, &lt;em&gt;y&lt;/em&gt; is pretty skewed. A naive statistician might say
 that, being the data not normal, we should not fit a plain linear model,
 as this assumes normality of data. Keep in mind that the linear model
 assumes normality of the data conditioned on the predictors, so this
@@ -53,7 +54,7 @@ might be a situation in which a linear model still makes sense.&lt;/p&gt;
   &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;geom_density&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;aes&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;error&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
 &lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/david26694/david-masip-blog/master/experiments/non_normal/non_normality_files/figure-gfm/unnamed-chunk-3-1.png&quot; alt=&quot;&quot; /&gt;&lt;!-- --&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/david26694/david-masip-blog/master/experiments/non_normal/non_normality_files/figure-markdown_github/unnamed-chunk-3-1.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;As we can see, the distribution for the error is not skewed anymore, it
 looks like a normal. Let’s check it with a qqplot:&lt;/p&gt;
@@ -63,13 +64,13 @@ looks like a normal. Let’s check it with a qqplot:&lt;/p&gt;
   &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;stat_qq_line&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;aes&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sample&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;error&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
 &lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/david26694/david-masip-blog/master/experiments/non_normal/non_normality_files/figure-gfm/unnamed-chunk-4-1.png&quot; alt=&quot;&quot; /&gt;&lt;!-- --&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/david26694/david-masip-blog/master/experiments/non_normal/non_normality_files/figure-markdown_github/unnamed-chunk-4-1.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;Indeed, the residuals follow a normal distribution.&lt;/p&gt;
 
 &lt;p&gt;To sum up, having a non-normal target doesn’t mean that the linear model
 is not suitable. If the residuals from the linear model follow a normal
-distribution, then the linear model is an appropiate one.&lt;/p&gt;</content><author><name></name></author><summary type="html">I’m still reading the great Statistical Rethinking book by Richard McElreath, and I’m learning plenty of things. One thing it quickly mentions is that you shouldn’t worry about having non-normal data when using a linear regression. Linear regression can be defined as [ y \sim N(a_0 + a_1x_1 + \dots + a_nx_n, \sigma^2) ] This doesn’t imply that (y) has to be normally distributed in our data. It only means that (y) needs to be normally distributed conditional to (x). Let’s do an experiment to show this.</summary></entry><entry><title type="html">Distance to the origin in multivariate normal distributions</title><link href="https://david26694.github.io/david-masip-blog/r/probability-theory/2020/12/10/multivariate-normal.html" rel="alternate" type="text/html" title="Distance to the origin in multivariate normal distributions" /><published>2020-12-10T00:00:00-06:00</published><updated>2020-12-10T00:00:00-06:00</updated><id>https://david26694.github.io/david-masip-blog/r/probability-theory/2020/12/10/multivariate-normal</id><content type="html" xml:base="https://david26694.github.io/david-masip-blog/r/probability-theory/2020/12/10/multivariate-normal.html">&lt;p&gt;I’ve been reading the &lt;em&gt;Statistical Rethinking&lt;/em&gt; book by Richard
+distribution, then the linear model is an appropiate one.&lt;/p&gt;</content><author><name></name></author><summary type="html">I’m still reading the great Statistical Rethinking book by Richard McElreath, and I’m learning plenty of things. One thing it quickly mentions is that you shouldn’t worry about having non-normal data when using a linear regression. Linear regression can be defined as</summary></entry><entry><title type="html">Distance to the origin in multivariate normal distributions</title><link href="https://david26694.github.io/david-masip-blog/r/probability-theory/2020/12/10/multivariate-normal.html" rel="alternate" type="text/html" title="Distance to the origin in multivariate normal distributions" /><published>2020-12-10T00:00:00-06:00</published><updated>2020-12-10T00:00:00-06:00</updated><id>https://david26694.github.io/david-masip-blog/r/probability-theory/2020/12/10/multivariate-normal</id><content type="html" xml:base="https://david26694.github.io/david-masip-blog/r/probability-theory/2020/12/10/multivariate-normal.html">&lt;p&gt;I’ve been reading the &lt;em&gt;Statistical Rethinking&lt;/em&gt; book by Richard
 McElreath. At some point, it mentions that in a centered multivariate
 normal distribution with high dimension, most of the points are far away
 from the origin. That is, the distance to the origin distribution is
