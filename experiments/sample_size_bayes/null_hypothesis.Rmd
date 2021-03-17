@@ -1,0 +1,123 @@
+---
+title: "Null hypothesis and probabilities"
+output: html_document
+---
+
+```{r message=FALSE, warning=FALSE}
+library(dplyr)
+library(ggplot2)
+theme_set(theme_minimal())
+set.seed(42)
+
+flip_0_1 <- function(x) {
+  x_aux <- x
+  x_aux[x == 0] <- 1
+  x_aux[x == 1] <- 0
+  x_aux
+}
+```
+
+```{r}
+p_covid <- 0.02
+fpr <- 0.01
+fnr <- 0.01
+n <- 100000
+
+
+covid <- rbinom(n, 1, p_covid)
+results_test <- covid
+
+df <- data.frame(
+  id = 1:n,
+  covid = covid,
+  results_test = results_test
+)
+
+n_covid <- sum(df$covid == 1)
+fn <- rbinom(n_covid, 1, fnr) %>% flip_0_1
+
+n_no_covid <- sum(df$covid == 0)
+fp <- rbinom(n_no_covid, 1, fpr)
+
+
+df$results_test[df$covid == 1] <- fn
+df$results_test[df$covid == 0] <- fp
+
+```
+
+
+
+```{r}
+df %>% count(results_test, covid)
+```
+
+
+
+```{r}
+df %>% 
+  filter(results_test == 1) %>% 
+  count(covid) %>% 
+  mutate(prop = 100 * n / sum(n))
+
+```
+
+```{r}
+df %>% 
+  filter(results_test == 0) %>% 
+  count(covid) %>% 
+  mutate(prop = 100 * n / sum(n))
+
+```
+
+Using bayes formula
+
+$$
+P(covid | +) = \frac{P(+ | covid) P(covid)}{P(+|covid)P(covid) + P(+|no\space covid)P(no\space covid)}
+
+$$
+
+```{r}
+p_pos_covid <- 0.99
+p_covid <- 0.02
+p_pos_no_covid <- 0.01
+p_no_covid <- 0.98
+
+# It's not 2/3
+100 * (p_pos_covid * p_covid) / (p_pos_covid * p_covid + p_pos_no_covid * p_no_covid)
+
+```
+
+### Now with null hypotheses
+
+
+In hypothesis testing, the p-value is 
+$$
+p = P(T >= t | H_0)
+$$
+
+$$
+1 - p = P(T < t | H_0)
+$$
+
+
+$$
+P(H_0 | T >= t) = \frac{P(T >= t|H_0)P(H_0)}{P(T >= t|H_0)P(H_0) + P(T >= t|H_1)P(H_1)} = \frac{p \cdot P(H_0)}{p \cdot P(H_0) + P(T >= t|H_1)P(H_1)}
+$$
+
+
+```{r}
+p_val <- 0.03
+p_ho <- 0.99
+p_h1 <- 0.01
+p_val_h1 <- 0:100 / 100
+
+# It's not 2/3
+prob_df <- data.frame(p_val_h1 = p_val_h1)
+prob_df$p_ho_d <- 100 * (p_val * p_ho) / (p_val * p_ho + p_val_h1 * p_h1)
+
+ggplot(prob_df, aes(x = p_val_h1, y = p_ho_d)) + 
+  geom_line()
+
+```
+
+
