@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Group by operations comparison in pandas, dplyr and SQL | David Masip’s notes</title>
+<meta name="generator" content="Jekyll v4.0.0" />
+<meta property="og:title" content="Group by operations comparison in pandas, dplyr and SQL" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="This is a comparison of the interfaces of pandas, dplyr and SQL to do several calculations based on groups. I’ve come accross many of these calculations very often at work." />
+<meta property="og:description" content="This is a comparison of the interfaces of pandas, dplyr and SQL to do several calculations based on groups. I’ve come accross many of these calculations very often at work." />
+<link rel="canonical" href="https://david26694.github.io/david-masip-blog/r/python/sql/2021/05/16/group-bys.html" />
+<meta property="og:url" content="https://david26694.github.io/david-masip-blog/r/python/sql/2021/05/16/group-bys.html" />
+<meta property="og:site_name" content="David Masip’s notes" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-05-16T00:00:00-05:00" />
+<script type="application/ld+json">
+{"description":"This is a comparison of the interfaces of pandas, dplyr and SQL to do several calculations based on groups. I’ve come accross many of these calculations very often at work.","@type":"BlogPosting","url":"https://david26694.github.io/david-masip-blog/r/python/sql/2021/05/16/group-bys.html","headline":"Group by operations comparison in pandas, dplyr and SQL","dateModified":"2021-05-16T00:00:00-05:00","datePublished":"2021-05-16T00:00:00-05:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://david26694.github.io/david-masip-blog/r/python/sql/2021/05/16/group-bys.html"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/david-masip-blog/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://david26694.github.io/david-masip-blog/feed.xml" title="David Masip's notes" /><link rel="shortcut icon" type="image/x-icon" href="/david-masip-blog/images/favicon.ico"><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Group by operations comparison in pandas, dplyr and SQL | David Masip’s notes</title>
+<meta name="generator" content="Jekyll v4.0.0" />
+<meta property="og:title" content="Group by operations comparison in pandas, dplyr and SQL" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="This is a comparison of the interfaces of pandas, dplyr and SQL to do several calculations based on groups. I’ve come accross many of these calculations very often at work." />
+<meta property="og:description" content="This is a comparison of the interfaces of pandas, dplyr and SQL to do several calculations based on groups. I’ve come accross many of these calculations very often at work." />
+<link rel="canonical" href="https://david26694.github.io/david-masip-blog/r/python/sql/2021/05/16/group-bys.html" />
+<meta property="og:url" content="https://david26694.github.io/david-masip-blog/r/python/sql/2021/05/16/group-bys.html" />
+<meta property="og:site_name" content="David Masip’s notes" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-05-16T00:00:00-05:00" />
+<script type="application/ld+json">
+{"description":"This is a comparison of the interfaces of pandas, dplyr and SQL to do several calculations based on groups. I’ve come accross many of these calculations very often at work.","@type":"BlogPosting","url":"https://david26694.github.io/david-masip-blog/r/python/sql/2021/05/16/group-bys.html","headline":"Group by operations comparison in pandas, dplyr and SQL","dateModified":"2021-05-16T00:00:00-05:00","datePublished":"2021-05-16T00:00:00-05:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://david26694.github.io/david-masip-blog/r/python/sql/2021/05/16/group-bys.html"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+<link href="https://unpkg.com/@primer/css/dist/primer.css" rel="stylesheet" />
+<link rel="stylesheet" href="//use.fontawesome.com/releases/v5.0.7/css/all.css"><link type="application/atom+xml" rel="alternate" href="https://david26694.github.io/david-masip-blog/feed.xml" title="David Masip's notes" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"> </script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"></script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement( document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "[%", right: "%]", display: true},
+            {left: "$", right: "$", display: false}
+        ]}
+        );
+    });
+    </script>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js"></script>
+<script type="text/javascript">
+require.config({
+  paths: {
+    jquery: 'https://code.jquery.com/jquery-3.5.0.min',
+    plotly: 'https://cdn.plot.ly/plotly-latest.min'
+  },
+
+  shim: {
+    plotly: {
+      deps: ['jquery'],
+      exports: 'plotly'
+    }
+  }
+});
+</script>
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head><body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/david-masip-blog/">David Masip&#39;s notes</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/david-masip-blog/about/">About Me</a><a class="page-link" href="/david-masip-blog/search/">Search</a><a class="page-link" href="/david-masip-blog/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Group by operations comparison in pandas, dplyr and SQL</h1><p class="post-meta post-meta-title"><time class="dt-published" datetime="2021-05-16T00:00:00-05:00" itemprop="datePublished">
+        May 16, 2021
+      </time>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      10 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/david-masip-blog/categories/#r">r</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/david-masip-blog/categories/#python">python</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/david-masip-blog/categories/#sql">sql</a>
+        
+      
+      </p>
+    
+
+    </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p>This is a comparison of the interfaces of pandas, dplyr and SQL to do
+several calculations based on groups. I’ve come accross many of these
+calculations very often at work.</p>
+
+<p>The goal is to see which one is simpler to use in each cases. Time
+benchmarks are done very often of several data analysis libraries, like
+dplyr, data.table, pandas, dask, etc. What is less common is to see how
+the API of these libraries compare and I think this is key when choosing
+one of them.</p>
+
+<p>I’ve attempted to do things as simple as possible in each of the three
+languages, don’t hesitate to tell me if you’ve come up with simpler
+ways. I’ve also committed to the outputs of each of my calculations to
+be “tidy”. That is, if a dataframe comes in, I want a dataframe to come
+out. I don’t want the calculation to return a vector, array, series or
+matrix. I also don’t want to keep any row names or indexes, the indexing
+of the rows should always keep being from 1 to the number of rows.</p>
+
+<h2 id="load-libraries-and-data">Load libraries and data</h2>
+
+<p>First we load the Palmer Penguins dataset both in python and R. In SQL,
+we have a table called <code class="highlighter-rouge">penguins</code> on our database.</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">library</span><span class="p">(</span><span class="n">dplyr</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>## 
+## Attaching package: 'dplyr'
+
+## The following objects are masked from 'package:stats':
+## 
+##     filter, lag
+
+## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union
+</code></pre></div></div>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">library</span><span class="p">(</span><span class="n">palmerpenguins</span><span class="p">)</span><span class="w">
+
+</span><span class="n">df</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">palmerpenguins</span><span class="o">::</span><span class="n">penguins</span><span class="w">
+</span></code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+<span class="kn">from</span> <span class="nn">palmerpenguins</span> <span class="kn">import</span> <span class="n">load_penguins</span>
+
+<span class="n">df_py</span> <span class="o">=</span> <span class="n">load_penguins</span><span class="p">()</span>
+<span class="n">df_py</span>
+</code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>##        species     island  bill_length_mm  bill_depth_mm  flipper_length_mm  body_mass_g     sex  year
+## 0       Adelie  Torgersen            39.1           18.7              181.0       3750.0    male  2007
+## 1       Adelie  Torgersen            39.5           17.4              186.0       3800.0  female  2007
+## 2       Adelie  Torgersen            40.3           18.0              195.0       3250.0  female  2007
+## 3       Adelie  Torgersen             NaN            NaN                NaN          NaN     NaN  2007
+## 4       Adelie  Torgersen            36.7           19.3              193.0       3450.0  female  2007
+## ..         ...        ...             ...            ...                ...          ...     ...   ...
+## 339  Chinstrap      Dream            55.8           19.8              207.0       4000.0    male  2009
+## 340  Chinstrap      Dream            43.5           18.1              202.0       3400.0  female  2009
+## 341  Chinstrap      Dream            49.6           18.2              193.0       3775.0    male  2009
+## 342  Chinstrap      Dream            50.8           19.0              210.0       4100.0    male  2009
+## 343  Chinstrap      Dream            50.2           18.7              198.0       3775.0  female  2009
+## 
+## [344 rows x 8 columns]
+</code></pre></div></div>
+
+<h2 id="count-based-on-1-column">Count based on 1 column</h2>
+
+<p>This is by far the simplest of the calculations. We want to count how
+many penguins are there for each of the <code class="highlighter-rouge">species</code>. Python seems to be
+the more complicated in this case. This is mainly because the <code class="highlighter-rouge">size</code>
+method returns a series, and we have to rename it to have a meaningful
+name for the count.</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">SELECT</span> <span class="n">species</span><span class="p">,</span> <span class="k">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span> <span class="k">FROM</span> <span class="nv">"penguins"</span> <span class="k">group</span> <span class="k">by</span> <span class="mi">1</span>
+</code></pre></div></div>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> </span><span class="n">count</span><span class="p">(</span><span class="n">species</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>## # A tibble: 3 x 2
+##   species       n
+##   &lt;fct&gt;     &lt;int&gt;
+## 1 Adelie      152
+## 2 Chinstrap    68
+## 3 Gentoo      124
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span>
+    <span class="n">df_py</span>
+    <span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">"species"</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">size</span><span class="p">()</span>
+    <span class="o">.</span><span class="n">to_frame</span><span class="p">()</span>
+    <span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+    <span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="s">'n'</span><span class="p">})</span>
+<span class="p">)</span>
+</code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>##      species    n
+## 0     Adelie  152
+## 1  Chinstrap   68
+## 2     Gentoo  124
+</code></pre></div></div>
+
+<h2 id="count-based-on-2-columns">Count based on 2 columns</h2>
+
+<p>This is a very similar case as the previous one. The only difference is
+that we’re counting the number of penguins by <code class="highlighter-rouge">species</code> and <code class="highlighter-rouge">island</code>.</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">SELECT</span> <span class="n">species</span><span class="p">,</span> <span class="n">island</span><span class="p">,</span> <span class="k">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span> <span class="k">FROM</span> <span class="nv">"penguins"</span> <span class="k">group</span> <span class="k">by</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span>
+</code></pre></div></div>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> </span><span class="n">count</span><span class="p">(</span><span class="n">species</span><span class="p">,</span><span class="w"> </span><span class="n">island</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>## # A tibble: 5 x 3
+##   species   island        n
+##   &lt;fct&gt;     &lt;fct&gt;     &lt;int&gt;
+## 1 Adelie    Biscoe       44
+## 2 Adelie    Dream        56
+## 3 Adelie    Torgersen    52
+## 4 Chinstrap Dream        68
+## 5 Gentoo    Biscoe      124
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span>
+    <span class="n">df_py</span>
+    <span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s">"species"</span><span class="p">,</span> <span class="s">"island"</span><span class="p">])</span>
+    <span class="o">.</span><span class="n">size</span><span class="p">()</span>
+    <span class="o">.</span><span class="n">to_frame</span><span class="p">()</span>
+    <span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+    <span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="s">'n'</span><span class="p">})</span>
+<span class="p">)</span>
+</code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>##      species     island    n
+## 0     Adelie     Biscoe   44
+## 1     Adelie      Dream   56
+## 2     Adelie  Torgersen   52
+## 3  Chinstrap      Dream   68
+## 4     Gentoo     Biscoe  124
+</code></pre></div></div>
+
+<h2 id="manny-aggregates-per-column">Manny aggregates per column</h2>
+
+<p>In here we want to compute several aggregations on different columns.
+For every <code class="highlighter-rouge">species</code> and <code class="highlighter-rouge">island</code> we want: * The average
+<code class="highlighter-rouge">bill_length_mm</code> * The median <code class="highlighter-rouge">bill_length_mm</code> * The number of
+penguins whose <code class="highlighter-rouge">flipper_length_mm</code> is not null.</p>
+
+<p>Python has a nice thing that allows to compute several aggregations
+functions for a given column. However, the price to pay is that the
+obtained dataframe is not tidy. This is because we have multiindexed
+columns, and we can use the <code class="highlighter-rouge">flatten_cols</code> to transform the columns to a
+list. I use it very often to tidy my multiindexed dataframes.</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">SELECT</span> 
+    <span class="n">species</span><span class="p">,</span> 
+    <span class="n">island</span><span class="p">,</span> 
+    <span class="k">avg</span><span class="p">(</span><span class="n">bill_length_mm</span><span class="p">),</span>
+    <span class="n">median</span><span class="p">(</span><span class="n">bill_length_mm</span><span class="p">),</span> 
+    <span class="k">sum</span><span class="p">(</span><span class="n">flipper_length_mm</span> <span class="k">is</span> <span class="k">not</span> <span class="k">null</span><span class="p">)</span> <span class="k">FROM</span> <span class="nv">"penguins"</span> 
+<span class="k">group</span> <span class="k">by</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span>
+</code></pre></div></div>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">group_by</span><span class="p">(</span><span class="n">species</span><span class="p">,</span><span class="w"> </span><span class="n">island</span><span class="p">)</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">summarise</span><span class="p">(</span><span class="w">
+    </span><span class="n">mean_bill_length_mm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mean</span><span class="p">(</span><span class="n">bill_length_mm</span><span class="p">,</span><span class="w"> </span><span class="n">na.rm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">T</span><span class="p">),</span><span class="w">
+    </span><span class="n">median_bill_length_mm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">median</span><span class="p">(</span><span class="n">bill_length_mm</span><span class="p">,</span><span class="w"> </span><span class="n">na.rm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">T</span><span class="p">),</span><span class="w">
+    </span><span class="n">not_null_flipper</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">sum</span><span class="p">(</span><span class="o">!</span><span class="nf">is.na</span><span class="p">(</span><span class="n">flipper_length_mm</span><span class="p">))</span><span class="w">
+  </span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>## `summarise()` has grouped output by 'species'. You can override using the `.groups` argument.
+
+## # A tibble: 5 x 5
+## # Groups:   species [3]
+##   species   island    mean_bill_length_mm median_bill_length_mm not_null_flipper
+##   &lt;fct&gt;     &lt;fct&gt;                   &lt;dbl&gt;                 &lt;dbl&gt;            &lt;int&gt;
+## 1 Adelie    Biscoe                   39.0                  38.7               44
+## 2 Adelie    Dream                    38.5                  38.6               56
+## 3 Adelie    Torgersen                39.0                  38.9               51
+## 4 Chinstrap Dream                    48.8                  49.6               68
+## 5 Gentoo    Biscoe                   47.5                  47.3              123
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">flatten_cols</span><span class="p">(</span><span class="n">df_py</span><span class="p">):</span>
+    <span class="n">df_py</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s">' '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">col</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">df_py</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">values</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">df_py</span>
+
+<span class="p">(</span>
+    <span class="n">df_py</span>
+    <span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s">"species"</span><span class="p">,</span> <span class="s">"island"</span><span class="p">],</span> <span class="n">as_index</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">agg</span><span class="p">({</span>
+        <span class="s">"bill_length_mm"</span><span class="p">:</span> <span class="p">[</span><span class="s">"mean"</span><span class="p">,</span> <span class="s">"median"</span><span class="p">],</span>
+        <span class="s">"flipper_length_mm"</span><span class="p">:</span> <span class="p">[</span><span class="s">"count"</span><span class="p">]</span>
+    <span class="p">})</span>
+    <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">flatten_cols</span><span class="p">)</span>
+<span class="p">)</span>
+</code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>##      species     island  bill_length_mm mean  bill_length_mm median  flipper_length_mm count
+## 0     Adelie     Biscoe            38.975000                  38.70                       44
+## 1     Adelie      Dream            38.501786                  38.55                       56
+## 2     Adelie  Torgersen            38.950980                  38.90                       51
+## 3  Chinstrap      Dream            48.833824                  49.55                       68
+## 4     Gentoo     Biscoe            47.504878                  47.30                      123
+</code></pre></div></div>
+
+<h2 id="keep-only-groups-with-an-aggregate-condition">Keep only groups with an aggregate condition</h2>
+
+<p>Here we want to keep groups of <code class="highlighter-rouge">species</code> and <code class="highlighter-rouge">islands</code> with more than 70
+penguins in them. In this case, dplyr and python have a very similar
+API, the most complicated in here is the SQL one.</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">with</span> <span class="n">high_penguins</span> <span class="k">as</span> <span class="p">(</span>
+    <span class="k">select</span> <span class="n">species</span><span class="p">,</span> <span class="n">island</span> <span class="k">from</span> <span class="n">penguins</span> <span class="k">group</span> <span class="k">by</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span> <span class="k">having</span> <span class="k">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">70</span>
+<span class="p">)</span> <span class="k">select</span> <span class="n">p</span><span class="p">.</span><span class="o">*</span> 
+<span class="k">from</span> <span class="n">penguins</span> <span class="n">p</span>
+<span class="k">inner</span> <span class="k">join</span> <span class="n">high_penguins</span> <span class="k">using</span><span class="p">(</span><span class="n">species</span><span class="p">,</span> <span class="n">island</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">group_by</span><span class="p">(</span><span class="n">species</span><span class="p">,</span><span class="w"> </span><span class="n">island</span><span class="p">)</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w">
+  </span><span class="n">filter</span><span class="p">(</span><span class="n">n</span><span class="p">()</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="m">70</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>## # A tibble: 124 x 8
+## # Groups:   species, island [1]
+##    species island bill_length_mm bill_depth_mm flipper_length_mm body_mass_g
+##    &lt;fct&gt;   &lt;fct&gt;           &lt;dbl&gt;         &lt;dbl&gt;             &lt;int&gt;       &lt;int&gt;
+##  1 Gentoo  Biscoe           46.1          13.2               211        4500
+##  2 Gentoo  Biscoe           50            16.3               230        5700
+##  3 Gentoo  Biscoe           48.7          14.1               210        4450
+##  4 Gentoo  Biscoe           50            15.2               218        5700
+##  5 Gentoo  Biscoe           47.6          14.5               215        5400
+##  6 Gentoo  Biscoe           46.5          13.5               210        4550
+##  7 Gentoo  Biscoe           45.4          14.6               211        4800
+##  8 Gentoo  Biscoe           46.7          15.3               219        5200
+##  9 Gentoo  Biscoe           43.3          13.4               209        4400
+## 10 Gentoo  Biscoe           46.8          15.4               215        5150
+## # … with 114 more rows, and 2 more variables: sex &lt;fct&gt;, year &lt;int&gt;
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span>
+    <span class="n">df_py</span>
+    <span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s">"species"</span><span class="p">,</span> <span class="s">"island"</span><span class="p">],</span> <span class="n">as_index</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    <span class="o">.</span><span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">70</span><span class="p">)</span>
+<span class="p">)</span>
+</code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>##     species  island  bill_length_mm  bill_depth_mm  flipper_length_mm  body_mass_g     sex  year
+## 152  Gentoo  Biscoe            46.1           13.2              211.0       4500.0  female  2007
+## 153  Gentoo  Biscoe            50.0           16.3              230.0       5700.0    male  2007
+## 154  Gentoo  Biscoe            48.7           14.1              210.0       4450.0  female  2007
+## 155  Gentoo  Biscoe            50.0           15.2              218.0       5700.0    male  2007
+## 156  Gentoo  Biscoe            47.6           14.5              215.0       5400.0    male  2007
+## ..      ...     ...             ...            ...                ...          ...     ...   ...
+## 271  Gentoo  Biscoe             NaN            NaN                NaN          NaN     NaN  2009
+## 272  Gentoo  Biscoe            46.8           14.3              215.0       4850.0  female  2009
+## 273  Gentoo  Biscoe            50.4           15.7              222.0       5750.0    male  2009
+## 274  Gentoo  Biscoe            45.2           14.8              212.0       5200.0  female  2009
+## 275  Gentoo  Biscoe            49.9           16.1              213.0       5400.0    male  2009
+## 
+## [124 rows x 8 columns]
+</code></pre></div></div>
+
+<h2 id="create-a-column-based-on-an-aggregate-calculation">Create a column based on an aggregate calculation</h2>
+
+<p>Here we want to compute the average <code class="highlighter-rouge">bill_length_mm</code> by <code class="highlighter-rouge">species</code> and
+<code class="highlighter-rouge">island</code> as an extra column of the penguins dataframe, not just as a
+summarised table. My least favorite is python since I cannot use a list
+of chained operations, but I have to store partial results and assign
+them later.</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">-- Doesn't work in sqlite</span>
+<span class="k">select</span> 
+    <span class="o">*</span><span class="p">,</span> 
+    <span class="k">avg</span><span class="p">(</span><span class="n">bill_length_mm</span><span class="p">)</span> <span class="n">over</span> <span class="p">(</span><span class="n">partition</span> <span class="k">by</span> <span class="n">species</span><span class="p">,</span> <span class="n">island</span><span class="p">)</span> 
+<span class="k">from</span> <span class="n">penguins</span>
+</code></pre></div></div>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">group_by</span><span class="p">(</span><span class="n">species</span><span class="p">,</span><span class="w"> </span><span class="n">island</span><span class="p">)</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">mutate</span><span class="p">(</span><span class="w">
+    </span><span class="n">mean_bill_length</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mean</span><span class="p">(</span><span class="n">bill_length_mm</span><span class="p">,</span><span class="w"> </span><span class="n">na.rm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">T</span><span class="p">)</span><span class="w">
+  </span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>## # A tibble: 344 x 9
+## # Groups:   species, island [5]
+##    species island    bill_length_mm bill_depth_mm flipper_length_mm body_mass_g
+##    &lt;fct&gt;   &lt;fct&gt;              &lt;dbl&gt;         &lt;dbl&gt;             &lt;int&gt;       &lt;int&gt;
+##  1 Adelie  Torgersen           39.1          18.7               181        3750
+##  2 Adelie  Torgersen           39.5          17.4               186        3800
+##  3 Adelie  Torgersen           40.3          18                 195        3250
+##  4 Adelie  Torgersen           NA            NA                  NA          NA
+##  5 Adelie  Torgersen           36.7          19.3               193        3450
+##  6 Adelie  Torgersen           39.3          20.6               190        3650
+##  7 Adelie  Torgersen           38.9          17.8               181        3625
+##  8 Adelie  Torgersen           39.2          19.6               195        4675
+##  9 Adelie  Torgersen           34.1          18.1               193        3475
+## 10 Adelie  Torgersen           42            20.2               190        4250
+## # … with 334 more rows, and 3 more variables: sex &lt;fct&gt;, year &lt;int&gt;,
+## #   mean_bill_length &lt;dbl&gt;
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">mean_bill_length</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">df_py</span>
+    <span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="p">[</span><span class="s">"species"</span><span class="p">,</span> <span class="s">"island"</span><span class="p">,</span> <span class="s">"bill_length_mm"</span><span class="p">]]</span>
+    <span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s">"species"</span><span class="p">,</span> <span class="s">"island"</span><span class="p">],</span> <span class="n">as_index</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
+<span class="p">)</span>
+
+<span class="n">df_py</span><span class="p">[</span><span class="s">"mean_bill_length"</span><span class="p">]</span> <span class="o">=</span> <span class="n">mean_bill_length</span>
+
+<span class="n">df_py</span>
+</code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>##        species     island  bill_length_mm  bill_depth_mm  flipper_length_mm  body_mass_g     sex  year  mean_bill_length
+## 0       Adelie  Torgersen            39.1           18.7              181.0       3750.0    male  2007         38.950980
+## 1       Adelie  Torgersen            39.5           17.4              186.0       3800.0  female  2007         38.950980
+## 2       Adelie  Torgersen            40.3           18.0              195.0       3250.0  female  2007         38.950980
+## 3       Adelie  Torgersen             NaN            NaN                NaN          NaN     NaN  2007         38.950980
+## 4       Adelie  Torgersen            36.7           19.3              193.0       3450.0  female  2007         38.950980
+## ..         ...        ...             ...            ...                ...          ...     ...   ...               ...
+## 339  Chinstrap      Dream            55.8           19.8              207.0       4000.0    male  2009         48.833824
+## 340  Chinstrap      Dream            43.5           18.1              202.0       3400.0  female  2009         48.833824
+## 341  Chinstrap      Dream            49.6           18.2              193.0       3775.0    male  2009         48.833824
+## 342  Chinstrap      Dream            50.8           19.0              210.0       4100.0    male  2009         48.833824
+## 343  Chinstrap      Dream            50.2           18.7              198.0       3775.0  female  2009         48.833824
+## 
+## [344 rows x 9 columns]
+</code></pre></div></div>
+
+<h2 id="count-relative">Count relative</h2>
+
+<p>For each <code class="highlighter-rouge">species</code> I want to know the fraction of penguins of that
+<code class="highlighter-rouge">species</code> living in each <code class="highlighter-rouge">island</code>.</p>
+
+<p>In this case, dplyr is the clear winner since both in python and SQL it
+is overly complicated to calculate this.</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">with</span> <span class="n">species_island_counts</span> <span class="k">as</span> <span class="p">(</span>
+    <span class="k">select</span> <span class="n">species</span><span class="p">,</span> <span class="n">island</span><span class="p">,</span> <span class="k">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span> <span class="k">as</span> <span class="n">n</span> <span class="k">from</span> <span class="n">penguins</span>
+<span class="p">),</span> <span class="n">species_counts</span> <span class="k">as</span> <span class="p">(</span>
+    <span class="k">select</span> 
+        <span class="n">species</span><span class="p">,</span> 
+        <span class="n">island</span><span class="p">,</span> 
+        <span class="k">sum</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="n">over</span> <span class="p">(</span><span class="n">partition</span> <span class="k">by</span> <span class="n">species</span><span class="p">)</span> <span class="k">as</span> <span class="n">species_n</span><span class="p">,</span>
+        <span class="n">n</span>
+    <span class="k">from</span> <span class="n">species_island_counts</span>
+<span class="p">)</span> <span class="k">select</span> 
+    <span class="n">species</span><span class="p">,</span> 
+    <span class="n">island</span><span class="p">,</span> 
+    <span class="n">n</span> <span class="o">/</span> <span class="n">species_n</span> <span class="k">as</span> <span class="n">fraction</span> 
+    <span class="k">from</span> <span class="n">species_counts</span>
+</code></pre></div></div>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">count</span><span class="p">(</span><span class="n">species</span><span class="p">,</span><span class="w"> </span><span class="n">island</span><span class="p">)</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">group_by</span><span class="p">(</span><span class="n">species</span><span class="p">)</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">mutate</span><span class="p">(</span><span class="n">fraction</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="nf">sum</span><span class="p">(</span><span class="n">n</span><span class="p">))</span><span class="w">
+</span></code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>## # A tibble: 5 x 4
+## # Groups:   species [3]
+##   species   island        n fraction
+##   &lt;fct&gt;     &lt;fct&gt;     &lt;int&gt;    &lt;dbl&gt;
+## 1 Adelie    Biscoe       44    0.289
+## 2 Adelie    Dream        56    0.368
+## 3 Adelie    Torgersen    52    0.342
+## 4 Chinstrap Dream        68    1    
+## 5 Gentoo    Biscoe      124    1
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">full_counts</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">df_py</span>
+    <span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s">"species"</span><span class="p">,</span> <span class="s">"island"</span><span class="p">])</span>
+    <span class="o">.</span><span class="n">size</span><span class="p">()</span>
+    <span class="o">.</span><span class="n">to_frame</span><span class="p">()</span>
+    <span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+    <span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="s">'n'</span><span class="p">})</span>
+<span class="p">)</span>
+
+<span class="n">agg_counts</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">full_counts</span>
+    <span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">"species"</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="nb">sum</span><span class="p">())[</span><span class="s">"n"</span><span class="p">]</span>
+<span class="p">)</span>
+
+<span class="n">full_counts</span><span class="p">[</span><span class="s">"agg_counts"</span><span class="p">]</span> <span class="o">=</span> <span class="n">agg_counts</span>
+
+<span class="n">full_counts</span><span class="p">[</span><span class="s">"fraction"</span><span class="p">]</span> <span class="o">=</span> <span class="n">full_counts</span><span class="p">[</span><span class="s">"n"</span><span class="p">]</span> <span class="o">/</span> <span class="n">full_counts</span><span class="p">[</span><span class="s">"agg_counts"</span><span class="p">]</span>
+
+<span class="n">full_counts</span>
+</code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>##      species     island    n agg_counts  fraction
+## 0     Adelie     Biscoe   44        152  0.289474
+## 1     Adelie      Dream   56        152  0.368421
+## 2     Adelie  Torgersen   52        152  0.342105
+## 3  Chinstrap      Dream   68         68         1
+## 4     Gentoo     Biscoe  124        124         1
+</code></pre></div></div>
+
+<h2 id="agg-with-two-columns">Agg with two columns</h2>
+
+<p>I want to compute the average of the ratio of <code class="highlighter-rouge">bill_length_mm</code> and
+<code class="highlighter-rouge">bill_depth_mm</code>.</p>
+
+<p>This is pretty easy in the three of them although a bit of tidying needs
+to be done in python to obtain a tidy dataframe.</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">SELECT</span> <span class="n">species</span><span class="p">,</span> <span class="n">island</span><span class="p">,</span> <span class="k">avg</span><span class="p">(</span><span class="n">bill_depth_mm</span> <span class="o">/</span> <span class="n">bill_length_mm</span><span class="p">)</span> <span class="k">FROM</span> <span class="nv">"penguins"</span> <span class="k">group</span> <span class="k">by</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span>
+</code></pre></div></div>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">group_by</span><span class="p">(</span><span class="n">species</span><span class="p">)</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">summarise</span><span class="p">(</span><span class="w">
+    </span><span class="n">depth_length_ratio</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mean</span><span class="p">(</span><span class="n">bill_depth_mm</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">bill_length_mm</span><span class="p">,</span><span class="w"> </span><span class="n">na.rm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">T</span><span class="p">)</span><span class="w">
+  </span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>## # A tibble: 3 x 2
+##   species   depth_length_ratio
+##   &lt;fct&gt;                  &lt;dbl&gt;
+## 1 Adelie                 0.474
+## 2 Chinstrap              0.378
+## 3 Gentoo                 0.316
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span>
+    <span class="n">df_py</span>
+    <span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">"species"</span><span class="p">)</span>
+    <span class="o">.</span><span class="nb">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">d</span><span class="p">:</span> <span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s">"bill_depth_mm"</span><span class="p">]</span> <span class="o">/</span> <span class="n">d</span><span class="p">[</span><span class="s">"bill_length_mm"</span><span class="p">])</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
+    <span class="o">.</span><span class="n">to_frame</span><span class="p">()</span>
+    <span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+    <span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="s">"depth_length_ratio"</span><span class="p">})</span>
+<span class="p">)</span>
+</code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>##      species  depth_length_ratio
+## 0     Adelie            0.474333
+## 1  Chinstrap            0.377923
+## 2     Gentoo            0.315829
+</code></pre></div></div>
+
+  </div><!-- from https://github.com/utterance/utterances -->
+<script src="https://utteranc.es/client.js"
+        repo="david26694/david-masip-blog"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script><a class="u-url" href="/david-masip-blog/r/python/sql/2021/05/16/group-bys.html" hidden></a>
+</article>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/david-masip-blog/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/david-masip-blog/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/david-masip-blog/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p></p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/david26694" title="david26694"><svg class="svg-icon grey"><use xlink:href="/david-masip-blog/assets/minima-social-icons.svg#github"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
