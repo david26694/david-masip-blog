@@ -10,7 +10,7 @@ title: Group by operations comparison in pandas, dplyr and SQL
 This is a comparison of the interfaces of pandas, dplyr and SQL to do several calculations based on groups.
 I've come accross many of these calculations very often at work.
 
-The goal is to see which one is simpler to use in each cases. Time benchmarks are done very often of several
+The goal is to see which one is simpler to use in each case. Time benchmarks are done very often of several
 data analysis libraries, like dplyr, data.table, pandas, dask, etc. What is less common is to see how the API of these libraries compare and I think this is key when choosing one of them.
 
 I've attempted to do things as simple as possible in each of the three languages, don't hesitate to tell me if you've come up with simpler ways.
@@ -88,6 +88,7 @@ df %>% count(species, island)
 ## Manny aggregates per column
 
 In here we want to compute several aggregations on different columns. For every `species` and `island` we want:
+
 * The average `bill_length_mm`
 * The median `bill_length_mm`
 * The number of penguins whose `flipper_length_mm` is not null.
@@ -197,7 +198,7 @@ df_py
 
 For each `species` I want to know the fraction of penguins of that `species` living in each `island`.
 
-In this case, dplyr is the clear winner since both in python and SQL it is overly complicated to calculate this.
+In this case, dplyr is the clear winner since neither python nor SQL provide a very simple way of calcuating this.
 
 
 ```{sql eval=FALSE, include=TRUE}
@@ -275,3 +276,11 @@ df %>%
     .rename(columns={0: "depth_length_ratio"})
 )
 ```
+
+
+## Conclusion
+
+The main conclusion is that dplyr tends to be the easiest to use, with less code needed for most of the calculations.
+
+The issue with pandas seems to be that the outpus are never tidy enough to keep working with them.
+
