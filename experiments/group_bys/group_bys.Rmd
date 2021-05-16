@@ -1,0 +1,277 @@
+---
+toc: false
+layout: post
+categories: [r, python, sql]
+comments: true
+title: Group by operations comparison in pandas, dplyr and SQL
+---
+
+
+This is a comparison of the interfaces of pandas, dplyr and SQL to do several calculations based on groups.
+I've come accross many of these calculations very often at work.
+
+The goal is to see which one is simpler to use in each cases. Time benchmarks are done very often of several
+data analysis libraries, like dplyr, data.table, pandas, dask, etc. What is less common is to see how the API of these libraries compare and I think this is key when choosing one of them.
+
+I've attempted to do things as simple as possible in each of the three languages, don't hesitate to tell me if you've come up with simpler ways.
+I've also committed to the outputs of each of my calculations to be "tidy". That is, if a dataframe comes in, I want a dataframe to come out. I don't want the calculation to return
+a vector, array, series or matrix. I also don't want to keep any row names or indexes, the indexing of the rows should always keep being from 1 to the number of rows.
+
+## Load libraries and data
+
+First we load the Palmer Penguins dataset both in python and R. In SQL, we have a table called `penguins` on our database.
+
+```{r}
+library(dplyr)
+
+library(palmerpenguins)
+
+df <- palmerpenguins::penguins
+```
+
+```{python}
+import pandas as pd
+from palmerpenguins import load_penguins
+
+df_py = load_penguins()
+df_py
+```
+
+## Count based on 1 column
+
+This is by far the simplest of the calculations. We want to count how many penguins are there for each of the `species`.
+Python seems to be the more complicated in this case. This is mainly because the `size` method returns a series, and we have to 
+rename it to have a meaningful name for the count.
+
+```{sql eval=FALSE, include=TRUE}
+SELECT species, count(*) FROM "penguins" group by 1
+```
+
+```{r}
+df %>% count(species)
+```
+
+```{python}
+(
+    df_py
+    .groupby("species")
+    .size()
+    .to_frame()
+    .reset_index()
+    .rename(columns={0: 'n'})
+)
+```
+
+## Count based on 2 columns
+
+This is a very similar case as the previous one. The only difference is that we're counting the number of penguins by `species` and `island`.
+
+```{sql eval=FALSE, include=TRUE}
+SELECT species, island, count(*) FROM "penguins" group by 1, 2
+```
+
+```{r}
+df %>% count(species, island)
+```
+
+```{python}
+(
+    df_py
+    .groupby(["species", "island"])
+    .size()
+    .to_frame()
+    .reset_index()
+    .rename(columns={0: 'n'})
+)
+```
+
+## Manny aggregates per column
+
+In here we want to compute several aggregations on different columns. For every `species` and `island` we want:
+* The average `bill_length_mm`
+* The median `bill_length_mm`
+* The number of penguins whose `flipper_length_mm` is not null.
+
+Python has a nice thing that allows to compute several aggregations functions for a given column. However, the price to pay is that the obtained dataframe is not tidy.
+This is because we have multiindexed columns, and we can use the `flatten_cols` to transform the columns to a list.
+I use it very often to tidy my multiindexed dataframes.
+
+```{sql eval=FALSE, include=TRUE}
+SELECT 
+    species, 
+    island, 
+    avg(bill_length_mm),
+    median(bill_length_mm), 
+    sum(flipper_length_mm is not null) FROM "penguins" 
+group by 1, 2
+```
+
+```{r}
+df %>% 
+  group_by(species, island) %>% 
+  summarise(
+    mean_bill_length_mm = mean(bill_length_mm, na.rm = T),
+    median_bill_length_mm = median(bill_length_mm, na.rm = T),
+    not_null_flipper = sum(!is.na(flipper_length_mm))
+  )
+```
+
+```{python}
+def flatten_cols(df_py):
+    df_py.columns = [' '.join(col).strip() for col in df_py.columns.values]
+    return df_py
+
+(
+    df_py
+    .groupby(["species", "island"], as_index=False)
+    .agg({
+        "bill_length_mm": ["mean", "median"],
+        "flipper_length_mm": ["count"]
+    })
+    .pipe(flatten_cols)
+)
+```
+
+## Keep only groups with an aggregate condition
+
+Here we want to keep groups of `species` and `islands` with more than 70 penguins in them. 
+In this case, dplyr and python have a very similar API, the most complicated in here is the SQL one.
+
+```{sql eval=FALSE, include=TRUE}
+with high_penguins as (
+    select species, island from penguins group by 1, 2 having count(*) > 70
+) select p.* 
+from penguins p
+inner join high_penguins using(species, island)
+```
+
+```{r}
+df %>% 
+  group_by(species, island) %>%
+  filter(n() > 70)
+```
+
+```{python}
+(
+    df_py
+    .groupby(["species", "island"], as_index=False)
+    .filter(lambda x: len(x) > 70)
+)
+```
+
+## Create a column based on an aggregate calculation
+
+Here we want to compute the average `bill_length_mm` by `species` and `island` as an extra column of the penguins dataframe, not just
+as a summarised table. My least favorite is python since I cannot use a list of chained operations, but I have to store partial results and assign them later.
+
+```{sql eval=FALSE, include=TRUE}
+-- Doesn't work in sqlite
+select 
+    *, 
+    avg(bill_length_mm) over (partition by species, island) 
+from penguins
+```
+
+```{r}
+df %>% 
+  group_by(species, island) %>% 
+  mutate(
+    mean_bill_length = mean(bill_length_mm, na.rm = T)
+  )
+```
+
+```{python}
+mean_bill_length = (
+    df_py
+    .loc[:, ["species", "island", "bill_length_mm"]]
+    .groupby(["species", "island"], as_index=False)
+    .transform(lambda x: x.mean())
+)
+
+df_py["mean_bill_length"] = mean_bill_length
+
+df_py
+```
+
+## Count relative
+
+For each `species` I want to know the fraction of penguins of that `species` living in each `island`.
+
+In this case, dplyr is the clear winner since both in python and SQL it is overly complicated to calculate this.
+
+
+```{sql eval=FALSE, include=TRUE}
+with species_island_counts as (
+    select species, island, count(*) as n from penguins
+), species_counts as (
+    select 
+        species, 
+        island, 
+        sum(n) over (partition by species) as species_n,
+        n
+    from species_island_counts
+) select 
+    species, 
+    island, 
+    n / species_n as fraction 
+    from species_counts
+```
+
+```{r}
+df %>% 
+  count(species, island) %>% 
+  group_by(species) %>% 
+  mutate(fraction = n / sum(n))
+```
+
+```{python}
+full_counts = (
+    df_py
+    .groupby(["species", "island"])
+    .size()
+    .to_frame()
+    .reset_index()
+    .rename(columns={0: 'n'})
+)
+
+agg_counts = (
+    full_counts
+    .groupby("species")
+    .transform(lambda x: x.sum())["n"]
+)
+
+full_counts["agg_counts"] = agg_counts
+
+full_counts["fraction"] = full_counts["n"] / full_counts["agg_counts"]
+
+full_counts
+```
+
+## Agg with two columns
+
+I want to compute the average of the ratio of `bill_length_mm` and `bill_depth_mm`. 
+
+This is pretty easy in the three of them although a bit of tidying needs to be done in python to obtain a tidy dataframe.
+
+```{sql eval=FALSE, include=TRUE}
+SELECT species, island, avg(bill_depth_mm / bill_length_mm) FROM "penguins" group by 1, 2
+```
+
+```{r}
+df %>% 
+  group_by(species) %>% 
+  summarise(
+    depth_length_ratio = mean(bill_depth_mm / bill_length_mm, na.rm = T)
+  )
+```
+
+```{python}
+(
+    df_py
+    .groupby("species")
+    .apply(lambda d: (d["bill_depth_mm"] / d["bill_length_mm"]).mean())
+    .to_frame()
+    .reset_index()
+    .rename(columns={0: "depth_length_ratio"})
+)
+```

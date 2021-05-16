@@ -38,6 +38,10 @@ _posts/2021-01-07-non-normality.md: experiments/non_normal/non_normality.Rmd
 	rm -rf non_normality_files
 	rm -rf experiments/non_normal/non_normality.md
 
+_posts/2021-05-16-group-bys.md: experiments/group_bys/group_bys.Rmd
+	Rscript experiments/generate_mds.R experiments/group_bys/group_bys.Rmd
+	cp experiments/group_bys/group_bys.md _posts/2021-05-16-group-bys.md
+	rm -rf cp experiments/group_bys/group_bys.md
 
 help:
 	cat Makefile

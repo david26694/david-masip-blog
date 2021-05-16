@@ -30,3 +30,5 @@ quick_tests/*
 
 # Data
 *.csv
+
+.vscode/
