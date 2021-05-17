@@ -1,8 +1,8 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.0.0">Jekyll</generator><link href="https://david26694.github.io/david-masip-blog/feed.xml" rel="self" type="application/atom+xml" /><link href="https://david26694.github.io/david-masip-blog/" rel="alternate" type="text/html" /><updated>2021-05-17T01:12:34-05:00</updated><id>https://david26694.github.io/david-masip-blog/feed.xml</id><title type="html">David Masip’s notes</title><entry><title type="html">Group by operations comparison in pandas, dplyr and SQL</title><link href="https://david26694.github.io/david-masip-blog/r/python/sql/2021/05/16/group-bys.html" rel="alternate" type="text/html" title="Group by operations comparison in pandas, dplyr and SQL" /><published>2021-05-16T00:00:00-05:00</published><updated>2021-05-16T00:00:00-05:00</updated><id>https://david26694.github.io/david-masip-blog/r/python/sql/2021/05/16/group-bys</id><content type="html" xml:base="https://david26694.github.io/david-masip-blog/r/python/sql/2021/05/16/group-bys.html">&lt;p&gt;This is a comparison of the interfaces of pandas, dplyr and SQL to do
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.0.0">Jekyll</generator><link href="https://david26694.github.io/david-masip-blog/feed.xml" rel="self" type="application/atom+xml" /><link href="https://david26694.github.io/david-masip-blog/" rel="alternate" type="text/html" /><updated>2021-05-17T01:17:03-05:00</updated><id>https://david26694.github.io/david-masip-blog/feed.xml</id><title type="html">David Masip’s notes</title><entry><title type="html">Group by operations comparison in pandas, dplyr and SQL</title><link href="https://david26694.github.io/david-masip-blog/r/python/sql/2021/05/16/group-bys.html" rel="alternate" type="text/html" title="Group by operations comparison in pandas, dplyr and SQL" /><published>2021-05-16T00:00:00-05:00</published><updated>2021-05-16T00:00:00-05:00</updated><id>https://david26694.github.io/david-masip-blog/r/python/sql/2021/05/16/group-bys</id><content type="html" xml:base="https://david26694.github.io/david-masip-blog/r/python/sql/2021/05/16/group-bys.html">&lt;p&gt;This is a comparison of the interfaces of pandas, dplyr and SQL to do
 several calculations based on groups. I’ve come accross many of these
 calculations very often at work.&lt;/p&gt;
 
-&lt;p&gt;The goal is to see which one is simpler to use in each cases. Time
+&lt;p&gt;The goal is to see which one is simpler to use in each case. Time
 benchmarks are done very often of several data analysis libraries, like
 dplyr, data.table, pandas, dask, etc. What is less common is to see how
 the API of these libraries compare and I think this is key when choosing
@@ -144,9 +144,13 @@ that we’re counting the number of penguins by &lt;code class=&quot;highlighter
 &lt;h2 id=&quot;manny-aggregates-per-column&quot;&gt;Manny aggregates per column&lt;/h2&gt;
 
 &lt;p&gt;In here we want to compute several aggregations on different columns.
-For every &lt;code class=&quot;highlighter-rouge&quot;&gt;species&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;island&lt;/code&gt; we want: * The average
-&lt;code class=&quot;highlighter-rouge&quot;&gt;bill_length_mm&lt;/code&gt; * The median &lt;code class=&quot;highlighter-rouge&quot;&gt;bill_length_mm&lt;/code&gt; * The number of
-penguins whose &lt;code class=&quot;highlighter-rouge&quot;&gt;flipper_length_mm&lt;/code&gt; is not null.&lt;/p&gt;
+For every &lt;code class=&quot;highlighter-rouge&quot;&gt;species&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;island&lt;/code&gt; we want:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;The average &lt;code class=&quot;highlighter-rouge&quot;&gt;bill_length_mm&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;The median &lt;code class=&quot;highlighter-rouge&quot;&gt;bill_length_mm&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;The number of penguins whose &lt;code class=&quot;highlighter-rouge&quot;&gt;flipper_length_mm&lt;/code&gt; is not null.&lt;/li&gt;
+&lt;/ul&gt;
 
 &lt;p&gt;Python has a nice thing that allows to compute several aggregations
 functions for a given column. However, the price to pay is that the
@@ -339,8 +343,8 @@ them later.&lt;/p&gt;
 &lt;p&gt;For each &lt;code class=&quot;highlighter-rouge&quot;&gt;species&lt;/code&gt; I want to know the fraction of penguins of that
 &lt;code class=&quot;highlighter-rouge&quot;&gt;species&lt;/code&gt; living in each &lt;code class=&quot;highlighter-rouge&quot;&gt;island&lt;/code&gt;.&lt;/p&gt;
 
-&lt;p&gt;In this case, dplyr is the clear winner since both in python and SQL it
-is overly complicated to calculate this.&lt;/p&gt;
+&lt;p&gt;In this case, dplyr is the clear winner since neither python nor SQL
+provide a very simple way of calcuating this.&lt;/p&gt;
 
 &lt;div class=&quot;language-sql highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;with&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;species_island_counts&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
     &lt;span class=&quot;k&quot;&gt;select&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;species&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;island&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;count&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;n&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;penguins&lt;/span&gt;
@@ -445,7 +449,15 @@ to be done in python to obtain a tidy dataframe.&lt;/p&gt;
 ## 0     Adelie            0.474333
 ## 1  Chinstrap            0.377923
 ## 2     Gentoo            0.315829
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</content><author><name></name></author><summary type="html">This is a comparison of the interfaces of pandas, dplyr and SQL to do several calculations based on groups. I’ve come accross many of these calculations very often at work.</summary></entry><entry><title type="html">Non-normality</title><link href="https://david26694.github.io/david-masip-blog/r/probability-theory/2021/01/07/non-normality.html" rel="alternate" type="text/html" title="Non-normality" /><published>2021-01-07T00:00:00-06:00</published><updated>2021-01-07T00:00:00-06:00</updated><id>https://david26694.github.io/david-masip-blog/r/probability-theory/2021/01/07/non-normality</id><content type="html" xml:base="https://david26694.github.io/david-masip-blog/r/probability-theory/2021/01/07/non-normality.html">&lt;p&gt;I’m still reading the great &lt;em&gt;Statistical Rethinking&lt;/em&gt; book by Richard
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h2&gt;
+
+&lt;p&gt;The main conclusion is that dplyr tends to be the easiest to use, with
+less code needed for most of the calculations.&lt;/p&gt;
+
+&lt;p&gt;The issue with pandas seems to be that the outpus are never tidy enough
+to keep working with them.&lt;/p&gt;</content><author><name></name></author><summary type="html">This is a comparison of the interfaces of pandas, dplyr and SQL to do several calculations based on groups. I’ve come accross many of these calculations very often at work.</summary></entry><entry><title type="html">Non-normality</title><link href="https://david26694.github.io/david-masip-blog/r/probability-theory/2021/01/07/non-normality.html" rel="alternate" type="text/html" title="Non-normality" /><published>2021-01-07T00:00:00-06:00</published><updated>2021-01-07T00:00:00-06:00</updated><id>https://david26694.github.io/david-masip-blog/r/probability-theory/2021/01/07/non-normality</id><content type="html" xml:base="https://david26694.github.io/david-masip-blog/r/probability-theory/2021/01/07/non-normality.html">&lt;p&gt;I’m still reading the great &lt;em&gt;Statistical Rethinking&lt;/em&gt; book by Richard
 McElreath, and I’m learning plenty of things. One thing it quickly
 mentions is that you shouldn’t worry about having non-normal data when
 using a linear regression. Linear regression can be defined as&lt;/p&gt;

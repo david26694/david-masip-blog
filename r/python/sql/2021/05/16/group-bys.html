@@ -124,7 +124,7 @@ window.onload = wrap_img;
        • <span class="read-time" title="Estimated read time">
     
     
-      10 min read
+      11 min read
     
 </span></p>
 
@@ -150,7 +150,7 @@ window.onload = wrap_img;
 several calculations based on groups. I’ve come accross many of these
 calculations very often at work.</p>
 
-<p>The goal is to see which one is simpler to use in each cases. Time
+<p>The goal is to see which one is simpler to use in each case. Time
 benchmarks are done very often of several data analysis libraries, like
 dplyr, data.table, pandas, dask, etc. What is less common is to see how
 the API of these libraries compare and I think this is key when choosing
@@ -292,9 +292,13 @@ that we’re counting the number of penguins by <code class="highlighter-rouge">
 <h2 id="manny-aggregates-per-column">Manny aggregates per column</h2>
 
 <p>In here we want to compute several aggregations on different columns.
-For every <code class="highlighter-rouge">species</code> and <code class="highlighter-rouge">island</code> we want: * The average
-<code class="highlighter-rouge">bill_length_mm</code> * The median <code class="highlighter-rouge">bill_length_mm</code> * The number of
-penguins whose <code class="highlighter-rouge">flipper_length_mm</code> is not null.</p>
+For every <code class="highlighter-rouge">species</code> and <code class="highlighter-rouge">island</code> we want:</p>
+
+<ul>
+  <li>The average <code class="highlighter-rouge">bill_length_mm</code></li>
+  <li>The median <code class="highlighter-rouge">bill_length_mm</code></li>
+  <li>The number of penguins whose <code class="highlighter-rouge">flipper_length_mm</code> is not null.</li>
+</ul>
 
 <p>Python has a nice thing that allows to compute several aggregations
 functions for a given column. However, the price to pay is that the
@@ -487,8 +491,8 @@ them later.</p>
 <p>For each <code class="highlighter-rouge">species</code> I want to know the fraction of penguins of that
 <code class="highlighter-rouge">species</code> living in each <code class="highlighter-rouge">island</code>.</p>
 
-<p>In this case, dplyr is the clear winner since both in python and SQL it
-is overly complicated to calculate this.</p>
+<p>In this case, dplyr is the clear winner since neither python nor SQL
+provide a very simple way of calcuating this.</p>
 
 <div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">with</span> <span class="n">species_island_counts</span> <span class="k">as</span> <span class="p">(</span>
     <span class="k">select</span> <span class="n">species</span><span class="p">,</span> <span class="n">island</span><span class="p">,</span> <span class="k">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span> <span class="k">as</span> <span class="n">n</span> <span class="k">from</span> <span class="n">penguins</span>
@@ -594,6 +598,14 @@ to be done in python to obtain a tidy dataframe.</p>
 ## 1  Chinstrap            0.377923
 ## 2     Gentoo            0.315829
 </code></pre></div></div>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>The main conclusion is that dplyr tends to be the easiest to use, with
+less code needed for most of the calculations.</p>
+
+<p>The issue with pandas seems to be that the outpus are never tidy enough
+to keep working with them.</p>
 
   </div><!-- from https://github.com/utterance/utterances -->
 <script src="https://utteranc.es/client.js"
