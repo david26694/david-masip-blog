@@ -151,8 +151,8 @@ several calculations based on groups. I’ve come accross many of these
 calculations very often at work.</p>
 
 <p>The goal is to see which one is simpler to use in each case. Time
-benchmarks are done very often of several data analysis libraries, like
-dplyr, data.table, pandas, dask, etc. What is less common is to see how
+benchmarks of several data analysis libraries, like dplyr, data.table,
+pandas, and dask are done very often. What is less common is to see how
 the API of these libraries compare and I think this is key when choosing
 one of them.</p>
 
@@ -289,7 +289,7 @@ that we’re counting the number of penguins by <code class="highlighter-rouge">
 ## 4     Gentoo     Biscoe  124
 </code></pre></div></div>
 
-<h2 id="manny-aggregates-per-column">Manny aggregates per column</h2>
+<h2 id="many-aggregates-per-column">Many aggregates per column</h2>
 
 <p>In here we want to compute several aggregations on different columns.
 For every <code class="highlighter-rouge">species</code> and <code class="highlighter-rouge">island</code> we want:</p>
@@ -470,18 +470,18 @@ them later.</p>
 <span class="n">df_py</span>
 </code></pre></div></div>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>##        species     island  bill_length_mm  bill_depth_mm  flipper_length_mm  body_mass_g     sex  year  mean_bill_length
-## 0       Adelie  Torgersen            39.1           18.7              181.0       3750.0    male  2007         38.950980
-## 1       Adelie  Torgersen            39.5           17.4              186.0       3800.0  female  2007         38.950980
-## 2       Adelie  Torgersen            40.3           18.0              195.0       3250.0  female  2007         38.950980
-## 3       Adelie  Torgersen             NaN            NaN                NaN          NaN     NaN  2007         38.950980
-## 4       Adelie  Torgersen            36.7           19.3              193.0       3450.0  female  2007         38.950980
-## ..         ...        ...             ...            ...                ...          ...     ...   ...               ...
-## 339  Chinstrap      Dream            55.8           19.8              207.0       4000.0    male  2009         48.833824
-## 340  Chinstrap      Dream            43.5           18.1              202.0       3400.0  female  2009         48.833824
-## 341  Chinstrap      Dream            49.6           18.2              193.0       3775.0    male  2009         48.833824
-## 342  Chinstrap      Dream            50.8           19.0              210.0       4100.0    male  2009         48.833824
-## 343  Chinstrap      Dream            50.2           18.7              198.0       3775.0  female  2009         48.833824
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>##        species     island  bill_length_mm  bill_depth_mm  ...  body_mass_g     sex  year  mean_bill_length
+## 0       Adelie  Torgersen            39.1           18.7  ...       3750.0    male  2007         38.950980
+## 1       Adelie  Torgersen            39.5           17.4  ...       3800.0  female  2007         38.950980
+## 2       Adelie  Torgersen            40.3           18.0  ...       3250.0  female  2007         38.950980
+## 3       Adelie  Torgersen             NaN            NaN  ...          NaN     NaN  2007         38.950980
+## 4       Adelie  Torgersen            36.7           19.3  ...       3450.0  female  2007         38.950980
+## ..         ...        ...             ...            ...  ...          ...     ...   ...               ...
+## 339  Chinstrap      Dream            55.8           19.8  ...       4000.0    male  2009         48.833824
+## 340  Chinstrap      Dream            43.5           18.1  ...       3400.0  female  2009         48.833824
+## 341  Chinstrap      Dream            49.6           18.2  ...       3775.0    male  2009         48.833824
+## 342  Chinstrap      Dream            50.8           19.0  ...       4100.0    male  2009         48.833824
+## 343  Chinstrap      Dream            50.2           18.7  ...       3775.0  female  2009         48.833824
 ## 
 ## [344 rows x 9 columns]
 </code></pre></div></div>
